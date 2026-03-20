@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="gothic">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>cZEROde</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root,[data-theme="gothic"]{
+  --bg:#0d0d0d;--bg2:#0f0f0f;--bg3:#111;--surf:#141414;
+  --brd:#2a2a2a;--bdim:#1e1e1e;
+  --txt:#cccccc;--tdim:#666;--tfaint:#333;
+  --acc:#cc2200;--accd:#cc4422;--accbg:#1a0000;--accfaint:#2a0000;
+  --grn:#4a9a4a;--gbg:#050f05;--gold:#cc6600;--blue:#4a99aa;
+  --tf:'UnifrakturMaguntia',cursive;--bf:'Rajdhani',sans-serif;
+  --r:0px;--sh:none;--hbg:#080808;--hbrd:#1a0000;--ibg:#111;--obg:#0a0a0a;--scr:#1e1e1e;
+}
+[data-theme="minimal-white"]{
+  --bg:#f5f5f5;--bg2:#efefef;--bg3:#fff;--surf:#e8e8e8;
+  --brd:#d8d8d8;--bdim:#e4e4e4;
+  --txt:#111;--tdim:#777;--tfaint:#aaa;
+  --acc:#111;--accd:#444;--accbg:#ececec;--accfaint:#e8e8e8;
+  --grn:#1a7a3a;--gbg:#f0fff4;--gold:#996600;--blue:#1a6688;
+  --tf:'DM Sans',sans-serif;--bf:'DM Sans',sans-serif;
+  --r:8px;--sh:0 1px 3px rgba(0,0,0,.1);--hbg:#fff;--hbrd:#e0e0e0;--ibg:#fff;--obg:#f9f9f9;--scr:#ddd;
+}
+[data-theme="minimal-black"]{
+  --bg:#0a0a0a;--bg2:#111;--bg3:#161616;--surf:#1c1c1c;
+  --brd:#2c2c2c;--bdim:#1e1e1e;
+  --txt:#e4e4e4;--tdim:#555;--tfaint:#2a2a2a;
+  --acc:#e4e4e4;--accd:#aaa;--accbg:#1c1c1c;--accfaint:#161616;
+  --grn:#3a8a4a;--gbg:#0a120a;--gold:#aa7700;--blue:#3a7a8a;
+  --tf:'DM Sans',sans-serif;--bf:'DM Sans',sans-serif;
+  --r:6px;--sh:0 1px 4px rgba(0,0,0,.4);--hbg:#0d0d0d;--hbrd:#222;--ibg:#161616;--obg:#0d0d0d;--scr:#222;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--txt);font-family:var(--bf);font-size:14px;display:flex;flex-direction:column;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--scr);}
+
+/* HEADER */
+#hdr{display:flex;align-items:center;gap:10px;padding:0 14px;height:46px;background:var(--hbg);border-bottom:1px solid var(--hbrd);flex-shrink:0;z-index:50;}
+.hlogo{font-family:var(--tf);font-size:20px;color:var(--txt);letter-spacing:1px;white-space:nowrap;}
+[data-theme="gothic"] .hlogo .r{color:var(--acc);}
+[data-theme="gothic"] .hlogo .o{color:var(--gold);}
+.hlogo-min{font-weight:600;font-size:17px;letter-spacing:0;}
+.hsep{flex:1;}
+.hnav{display:flex;gap:3px;}
+.hnb{padding:4px 12px;border:1px solid var(--brd);background:transparent;color:var(--tdim);font-family:var(--bf);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.hnb:hover{border-color:var(--acc);color:var(--txt);}
+.hnb.on{border-color:var(--acc);background:var(--accbg);color:var(--txt);}
+[data-theme="minimal-white"] .hnb.on{background:var(--acc);color:#fff;}
+.hicn{width:32px;height:32px;border:1px solid var(--brd);background:transparent;color:var(--tdim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;border-radius:var(--r);font-size:15px;flex-shrink:0;}
+.hicn:hover{border-color:var(--acc);color:var(--txt);}
+.vpill{font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:2px 7px;border:1px solid var(--bdim);color:var(--tfaint);border-radius:999px;white-space:nowrap;}
+
+/* MOBILE BOTTOM NAV */
+#mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:58px;background:var(--hbg);border-top:1px solid var(--hbrd);z-index:60;flex-direction:row;align-items:stretch;}
+.mob-nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:var(--tdim);font-size:9px;font-family:var(--bf);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:color .15s;padding:4px 0 6px;-webkit-tap-highlight-color:transparent;}
+.mob-nb.on{color:var(--txt);}
+.mob-nb-ico{font-size:20px;line-height:1.1;}
+
+/* LAYOUT */
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.pg{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.pg.on{display:flex;}
+.scrl{overflow-y:auto;flex:1;padding:18px 14px;}
+.inner{max-width:660px;margin:0 auto;width:100%;}
+
+/* SECTION HEADERS */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bdim);}
+.sec-title{font-family:var(--tf);font-size:22px;color:var(--txt);}
+[data-theme="minimal-white"] .sec-title,[data-theme="minimal-black"] .sec-title{font-family:var(--bf);font-weight:600;font-size:18px;}
+.sec-sub{font-size:10px;color:var(--tdim);letter-spacing:.1em;text-transform:uppercase;margin-top:3px;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--bdim);padding-bottom:10px;}
+.tb{padding:4px 14px;border:1px solid var(--brd);background:transparent;color:var(--tdim);cursor:pointer;font-family:var(--bf);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:all .15s;border-radius:var(--r);}
+.tb:hover{border-color:var(--acc);color:var(--txt);}
+.tb.on{border-color:var(--acc);background:var(--accbg);color:var(--txt);}
+[data-theme="minimal-white"] .tb.on{background:var(--acc);color:#fff;}
+.panel{display:none;}.panel.on{display:block;}
+
+/* CONTROLS */
+.row{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.tgl{display:flex;background:var(--bg2);border:1px solid var(--brd);padding:2px;gap:2px;border-radius:var(--r);}
+.tglb{padding:4px 12px;border:none;background:transparent;color:var(--tdim);cursor:pointer;font-family:var(--bf);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;border-radius:calc(var(--r) - 1px);}
+.tglb.on{background:var(--acc);color:#fff;}
+select{padding:4px 10px;border:1px solid var(--brd);background:var(--bg2);color:var(--txt);font-family:var(--bf);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;outline:none;border-radius:var(--r);}
+select:focus{border-color:var(--acc);}
+
+/* FIELDS */
+.fl{font-size:10px;color:var(--tfaint);display:block;margin-bottom:5px;letter-spacing:.12em;text-transform:uppercase;}
+.grid{display:grid;gap:10px;}
+textarea{width:100%;padding:10px 12px;border:1px solid var(--brd);background:var(--ibg);color:var(--txt);font-size:15px;line-height:1.6;resize:vertical;font-family:var(--bf);outline:none;transition:border-color .15s;border-radius:var(--r);}
+textarea:focus{border-color:var(--acc);}
+textarea::placeholder{color:var(--tfaint);}
+.oh{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.obox{min-height:80px;padding:10px 12px;border:1px solid var(--brd);background:var(--obg);font-size:17px;line-height:1.8;letter-spacing:.02em;word-break:break-word;font-family:var(--bf);border-radius:var(--r);}
+.obox .ph{color:var(--tfaint);font-size:13px;}
+.t-geo{color:#cc4422;}.t-cyr{color:#e06040;}.t-plain{color:var(--txt);}
+[data-theme="minimal-white"] .t-geo{color:#1a5a9a;}[data-theme="minimal-white"] .t-cyr{color:#5a1a9a;}
+.cbtn{padding:3px 10px;border:1px solid var(--brd);background:transparent;color:var(--tdim);font-family:var(--bf);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.cbtn:hover{border-color:var(--acc);color:var(--txt);}
+.cbtn.ok{border-color:var(--grn);color:var(--grn);}
+.desc{font-size:12px;color:var(--tdim);margin-bottom:10px;line-height:1.7;}
+.dot-r{display:flex;gap:12px;margin-top:7px;}
+.di{display:flex;align-items:center;gap:5px;}
+.dot{width:7px;height:7px;border-radius:50%;}
+.dlbl{font-size:10px;color:var(--tfaint);letter-spacing:.06em;text-transform:uppercase;}
+
+/* STEALTH */
+.ssbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:7px 12px;border:1px solid var(--bdim);background:var(--bg2);border-radius:var(--r);}
+.mlbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.mlbl.enc{color:#cc4422;}.mlbl.dec{color:#4a99aa;}.mlbl.idle{color:var(--tfaint);}
+.mth{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--tdim);}
+.sbox{min-height:90px;padding:10px 12px;border:1px solid var(--brd);background:var(--obg);font-size:13px;line-height:1.7;letter-spacing:.03em;word-break:break-all;font-family:monospace;color:#7a9a7a;border-radius:var(--r);}
+.sbox.dec{color:#6a9aaa;font-family:var(--bf);font-size:16px;letter-spacing:.02em;}
+.sbox .ph{color:var(--tfaint);font-size:12px;font-family:var(--bf);}
+.si{font-size:10px;color:var(--tfaint);letter-spacing:.06em;text-transform:uppercase;margin-top:5px;line-height:1.7;}
+.si span{color:var(--tdim);}
+.pinrow{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--accfaint);background:var(--accbg);margin-bottom:10px;border-radius:var(--r);position:relative;}
+.pinin{flex:1;padding:4px 8px;border:1px solid var(--brd);background:var(--ibg);color:var(--txt);font-family:monospace;font-size:13px;letter-spacing:.1em;outline:none;border-radius:calc(var(--r)/2);transition:border-color .15s;}
+.pinin:focus{border-color:var(--acc);}
+.pinin::placeholder{color:var(--tfaint);font-size:11px;letter-spacing:.04em;}
+.pstr{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tfaint);min-width:55px;text-align:right;}
+.pstr.w{color:#884422;}.pstr.m{color:#aa6622;}.pstr.s{color:#44aa66;}
+.rl{font-size:11px;color:#cc4422;padding:6px 10px;border:1px solid #3a1010;background:#150000;margin-top:6px;border-radius:var(--r);display:none;}
+.ee-warn{display:none;font-size:11px;color:#cc6633;padding:6px 10px;border:1px solid #3a2200;background:#180e00;margin-bottom:8px;border-radius:var(--r);}
+
+/* SAVE TO VAULT BTN */
+.svbtn{padding:5px 14px;border:1px solid var(--grn);background:transparent;color:var(--grn);font-family:var(--bf);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.svbtn:hover{background:var(--grn);color:#fff;}
+
+/* V2 */
+.mgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:7px;}
+.mpill{padding:4px 3px;border:1px solid var(--bdim);background:var(--bg2);text-align:center;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--tfaint);transition:all .2s;border-radius:var(--r);}
+.mpill.active{border-color:var(--acc);color:var(--accd);background:var(--accbg);}
+.mpill.det{border-color:#226688;color:#4a9aaa;background:#001520;}
+.mdots{display:flex;gap:3px;align-items:center;}
+.mdot{width:5px;height:5px;border-radius:50%;background:var(--brd);transition:background .2s;}
+.mdot.on{background:#cc4422;}
+
+/* LEGEND */
+.leg-list{display:grid;gap:4px;margin-bottom:14px;}
+.leg-row{display:flex;align-items:center;gap:10px;padding:7px 12px;border:1px solid var(--bdim);background:var(--bg2);border-radius:var(--r);}
+.leg-src{font-family:monospace;font-size:13px;color:var(--tdim);min-width:46px;}
+.leg-arr{color:var(--tfaint);}
+.leg-out{font-size:19px;min-width:60px;}
+.leg-note{font-size:10px;color:var(--tfaint);margin-left:auto;letter-spacing:.05em;text-transform:uppercase;}
+.chrt-ttl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tdim);margin:0 0 7px;border-top:1px solid var(--bdim);padding-top:10px;}
+.chrt{display:flex;flex-wrap:wrap;gap:3px;}
+.cc{display:flex;flex-direction:column;align-items:center;padding:5px 8px;border:1px solid var(--bdim);background:var(--bg2);min-width:34px;transition:border-color .15s;cursor:default;border-radius:var(--r);}
+.cc:hover{border-color:var(--acc);}
+.gc{font-size:15px;color:#cc4422;}
+.lc{font-size:8px;color:var(--tfaint);margin-top:1px;}
+
+/* FILE DROP ZONE */
+.dropzone{border:2px dashed var(--brd);background:var(--bg2);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;border-radius:var(--r);margin-bottom:10px;}
+.dropzone:hover,.dropzone.over{border-color:var(--acc);background:var(--accbg);}
+.dz-icon{font-size:30px;margin-bottom:8px;opacity:.4;}
+.dz-txt{font-size:12px;color:var(--tdim);letter-spacing:.08em;text-transform:uppercase;}
+.dz-sub{font-size:10px;color:var(--tfaint);margin-top:4px;}
+.file-info{font-size:11px;color:var(--tdim);padding:6px 10px;background:var(--bg2);border:1px solid var(--bdim);border-radius:var(--r);margin-bottom:8px;line-height:1.6;}
+.file-preview{max-width:100%;max-height:160px;border:1px solid var(--brd);border-radius:var(--r);margin-bottom:8px;display:block;}
+.name-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+.ninp{flex:1;min-width:120px;padding:5px 10px;border:1px solid var(--brd);background:var(--ibg);color:var(--txt);font-family:var(--bf);font-size:12px;outline:none;border-radius:var(--r);}
+.ninp:focus{border-color:var(--acc);}
+.abtn{padding:6px 14px;border:1px solid var(--acc);background:transparent;color:var(--accd);font-family:var(--bf);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:var(--r);}
+.abtn:hover{background:var(--acc);color:#fff;}
+.abtn:disabled{opacity:.4;cursor:not-allowed;}
+.abtn.go{border-color:var(--grn);color:var(--grn);}
+.abtn.go:hover{background:var(--grn);color:#fff;}
+
+/* PROGRESS / BATCH BAR */
+.prog{font-size:11px;color:var(--tdim);padding:7px 10px;background:var(--bg2);border:1px solid var(--bdim);border-radius:var(--r);margin-top:8px;display:none;line-height:1.6;}
+.batch-bar-wrap{margin:6px 0;}
+.batch-label{font-size:11px;color:var(--tdim);margin-bottom:5px;letter-spacing:.04em;}
+.batch-track{height:6px;background:var(--bdim);border-radius:3px;overflow:hidden;}
+.batch-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--accd));border-radius:3px;transition:width .15s;}
+.batch-steps{font-size:10px;color:var(--tfaint);margin-top:4px;letter-spacing:.06em;text-transform:uppercase;}
+
+/* VAULT / FILES LIST */
+.list-grid{display:grid;gap:7px;}
+.list-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--bdim);background:var(--bg2);transition:border-color .15s;border-radius:var(--r);cursor:pointer;}
+.list-card:hover{border-color:var(--acc);}
+.lc-icon{font-size:22px;flex-shrink:0;width:32px;text-align:center;}
+.lc-info{flex:1;min-width:0;}
+.lc-name{font-size:13px;color:var(--txt);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lc-meta{font-size:10px;color:var(--tfaint);letter-spacing:.06em;text-transform:uppercase;margin-top:2px;}
+.lc-type{font-size:9px;padding:2px 6px;border:1px solid var(--bdim);color:var(--tdim);letter-spacing:.08em;text-transform:uppercase;border-radius:999px;flex-shrink:0;}
+.lc-type.img{border-color:#334;color:#4a88aa;}
+.lc-type.txt{border-color:#2a3a2a;color:#4a8a4a;}
+.lc-type.fil{border-color:#3a2a3a;color:#8a4a8a;}
+.lc-type.aud{border-color:#3a2a1a;color:#cc8833;}
+.lc-type.vid{border-color:#2a2a3a;color:#7766cc;}
+.lc-type.pl-a{border-color:#3a2a1a;color:#cc8833;}
+.lc-type.pl-v{border-color:#2a2a3a;color:#7766cc;}
+.lc-del{padding:3px 8px;border:1px solid var(--bdim);background:transparent;color:var(--tfaint);font-family:var(--bf);font-size:10px;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.lc-del:hover{border-color:#882200;color:#cc4422;}
+.empty{text-align:center;padding:36px 20px;color:var(--tfaint);}
+.empty-icon{font-size:36px;margin-bottom:8px;opacity:.3;}
+.empty-txt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;}
+.empty-sub{font-size:11px;color:var(--tfaint);margin-top:5px;opacity:.6;}
+.list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.list-count{font-size:10px;color:var(--tfaint);letter-spacing:.1em;text-transform:uppercase;}
+.clear-btn{padding:3px 10px;border:1px solid var(--bdim);background:transparent;color:var(--tfaint);font-family:var(--bf);font-size:10px;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.clear-btn:hover{border-color:#882200;color:#cc4422;}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);}
+.modal-bg.on{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--brd);padding:22px;width:90%;max-width:500px;border-radius:var(--r);box-shadow:var(--sh);max-height:92vh;overflow-y:auto;}
+.modal-title{font-family:var(--tf);font-size:18px;color:var(--txt);margin-bottom:3px;}
+[data-theme="minimal-white"] .modal-title,[data-theme="minimal-black"] .modal-title{font-family:var(--bf);font-weight:600;font-size:16px;}
+.modal-sub{font-size:11px;color:var(--tdim);margin-bottom:14px;letter-spacing:.05em;}
+.modal-result{margin-top:12px;}
+.modal-img{max-width:100%;max-height:260px;border:1px solid var(--brd);border-radius:var(--r);display:block;margin-bottom:8px;}
+.modal-txt{padding:10px;border:1px solid var(--brd);background:var(--obg);font-size:14px;line-height:1.7;min-height:50px;border-radius:var(--r);word-break:break-word;white-space:pre-wrap;}
+.modal-btns{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;}
+.modal-close{padding:5px 14px;border:1px solid var(--brd);background:transparent;color:var(--tdim);font-family:var(--bf);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.modal-close:hover{border-color:var(--acc);color:var(--txt);}
+.modal-dl{padding:5px 14px;border:1px solid var(--grn);background:transparent;color:var(--grn);font-family:var(--bf);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.modal-dl:hover{background:var(--grn);color:#fff;}
+.modal-err{color:#cc4422;font-size:12px;margin-top:7px;}
+
+/* MEDIA PLAYER IN MODAL */
+#dm-video{width:100%;border-radius:var(--r);margin-bottom:8px;background:#000;max-height:260px;display:none;}
+#dm-audio{width:100%;margin-bottom:8px;display:none;}
+
+/* PLAYLIST STYLES */
+.pl-file-list{max-height:200px;overflow-y:auto;border:1px solid var(--brd);border-radius:var(--r);background:var(--obg);margin-bottom:10px;}
+.pl-file-row{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;border-bottom:1px solid var(--bdim);}
+.pl-file-row:last-child{border-bottom:none;}
+.pl-file-row:hover{background:var(--bg3);}
+.pl-file-row input[type=checkbox]{cursor:pointer;accent-color:var(--acc);width:14px;height:14px;flex-shrink:0;}
+.pl-file-row span{font-size:12px;color:var(--txt);}
+.pl-file-row .pl-sz{margin-left:auto;font-size:10px;color:var(--tfaint);flex-shrink:0;}
+.pl-type-badge{font-size:10px;padding:1px 5px;border-radius:999px;border:1px solid var(--bdim);color:var(--tfaint);flex-shrink:0;}
+.pl-now-title{font-size:13px;font-weight:600;color:var(--txt);margin:10px 0 4px;letter-spacing:.03em;display:flex;align-items:center;gap:6px;}
+.pl-now-title .pl-icon{font-size:16px;}
+#pl-video{width:100%;border-radius:var(--r);margin:6px 0;background:#000;display:none;}
+#pl-audio{width:100%;margin:6px 0;display:none;}
+.pl-controls{display:flex;gap:8px;margin:8px 0;}
+.pl-queue{max-height:180px;overflow-y:auto;border:1px solid var(--bdim);border-radius:var(--r);margin-top:8px;}
+.pl-queue-row{display:flex;align-items:center;gap:10px;padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--bdim);transition:background .12s;}
+.pl-queue-row:last-child{border-bottom:none;}
+.pl-queue-row:hover{background:var(--bg3);}
+.pl-queue-row.on{background:var(--accbg);border-left:3px solid var(--acc);padding-left:9px;}
+.plq-num{font-size:11px;color:var(--tfaint);min-width:20px;text-align:right;flex-shrink:0;}
+.plq-name{font-size:12px;color:var(--txt);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.plq-status{font-size:10px;color:var(--acc);flex-shrink:0;}
+.pl-card-actions{display:flex;gap:5px;flex-shrink:0;}
+.pl-sel-info{font-size:10px;color:var(--tdim);margin-bottom:5px;letter-spacing:.06em;}
+.pl-empty-msg{padding:14px;text-align:center;font-size:11px;color:var(--tfaint);}
+
+/* SETTINGS */
+#settings{position:fixed;top:0;right:0;bottom:0;width:300px;background:var(--bg2);border-left:1px solid var(--brd);z-index:150;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;padding:14px;}
+#settings.on{transform:translateX(0);}
+#sbk{position:fixed;inset:0;z-index:149;display:none;background:rgba(0,0,0,.4);}
+#sbk.on{display:block;}
+.s-title{font-family:var(--tf);font-size:18px;color:var(--txt);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--bdim);}
+[data-theme="minimal-white"] .s-title,[data-theme="minimal-black"] .s-title{font-family:var(--bf);font-weight:600;font-size:16px;}
+.s-sec{margin-bottom:18px;}
+.s-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tfaint);margin-bottom:7px;}
+.theme-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.tc{border:1px solid var(--brd);padding:9px 7px;cursor:pointer;text-align:center;transition:all .15s;border-radius:var(--r);}
+.tc:hover{border-color:var(--acc);}
+.tc.on{border-color:var(--acc);background:var(--accbg);}
+[data-theme="minimal-white"] .tc.on{background:var(--acc);}
+.tcp{height:26px;border-radius:3px;margin-bottom:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.tc-g .tcp{background:#0d0d0d;color:#cc2200;font-family:'UnifrakturMaguntia',cursive;font-size:13px;}
+.tc-w .tcp{background:#f5f5f5;border:1px solid #e0e0e0;color:#111;}
+.tc-b .tcp{background:#0a0a0a;color:#e4e4e4;}
+.tcn{font-size:10px;color:var(--tdim);letter-spacing:.07em;text-transform:uppercase;}
+.ver-list{display:grid;gap:4px;}
+.vi{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--bdim);background:var(--bg3);cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.vi:hover{border-color:var(--acc);}
+.vi.on{border-color:var(--acc);background:var(--accbg);}
+.vi-num{font-family:var(--tf);font-size:17px;color:var(--acc);width:22px;text-align:center;flex-shrink:0;}
+[data-theme="minimal-white"] .vi-num,[data-theme="minimal-black"] .vi-num{font-family:var(--bf);font-weight:700;}
+.vi-info{flex:1;}
+.vi-name{font-size:12px;font-weight:600;color:var(--txt);}
+.vi-desc{font-size:10px;color:var(--tfaint);margin-top:1px;}
+.vbdg{font-size:8px;padding:2px 6px;border:1px solid var(--bdim);color:var(--tdim);letter-spacing:.1em;text-transform:uppercase;border-radius:999px;flex-shrink:0;}
+.vbdg.best{border-color:#3a1a00;color:var(--gold);}
+.vbdg.rip{border-color:#002233;color:#226688;}
+.vbdg.prk{border-color:#0f2a0f;color:var(--grn);}
+.s-about{font-size:11px;color:var(--tfaint);line-height:1.7;padding:9px 10px;border:1px solid var(--bdim);background:var(--bg3);border-radius:var(--r);}
+
+/* TUTORIAL */
+#tut{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);}
+#tut.on{display:flex;}
+.tut-box{background:var(--bg2);border:1px solid var(--brd);padding:26px;width:90%;max-width:460px;border-radius:var(--r);}
+.tut-step{display:none;}.tut-step.on{display:block;}
+.tut-sn{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--tfaint);margin-bottom:8px;}
+.tut-title{font-family:var(--tf);font-size:20px;color:var(--txt);margin-bottom:8px;line-height:1.2;}
+[data-theme="minimal-white"] .tut-title,[data-theme="minimal-black"] .tut-title{font-family:var(--bf);font-weight:600;font-size:17px;}
+.tut-title .r{color:var(--acc);}
+.tut-body{font-size:13px;color:var(--tdim);line-height:1.8;margin-bottom:18px;}
+.tut-body strong{color:var(--txt);}
+.tut-icon{font-size:32px;margin-bottom:10px;}
+.tut-nav{display:flex;align-items:center;justify-content:space-between;}
+.tut-dots{display:flex;gap:5px;}
+.tut-dot{width:5px;height:5px;border-radius:50%;background:var(--brd);transition:background .2s;}
+.tut-dot.on{background:var(--acc);}
+.tut-btn{padding:5px 18px;border:1px solid var(--acc);background:transparent;color:var(--accd);font-family:var(--bf);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:var(--r);}
+.tut-btn:hover{background:var(--acc);color:#fff;}
+.tut-skip{font-size:10px;color:var(--tfaint);cursor:pointer;text-decoration:underline;}
+
+/* EASTER EGG */
+#ee{position:fixed;inset:0;z-index:350;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.9);}
+#ee.on{display:flex;}
+.ee-box{background:var(--bg2);border:1px solid var(--brd);padding:26px 22px;width:90%;max-width:400px;text-align:center;border-radius:var(--r);}
+.ee-ico{font-size:44px;margin-bottom:10px;}
+.ee-txt{font-size:15px;color:var(--txt);line-height:1.7;margin-bottom:14px;}
+.ee-close{padding:5px 18px;border:1px solid var(--brd);background:transparent;color:var(--tdim);font-family:var(--bf);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:var(--r);}
+.ee-close:hover{border-color:var(--acc);color:var(--txt);}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;gap:7px;pointer-events:none;}
+.toast{padding:9px 16px;background:var(--surf);border:1px solid var(--brd);color:var(--txt);font-size:12px;letter-spacing:.06em;border-radius:999px;box-shadow:var(--sh);opacity:0;transform:translateY(8px);transition:all .3s;max-width:340px;text-align:center;}
+.toast.on{opacity:1;transform:translateY(0);}
+.toast.warn{border-color:#884422;color:#cc6633;}
+.toast.good{border-color:var(--grn);color:var(--grn);}
+
+/* CODZILLA */
+#pg-codzilla{background:#070f07;}
+#pg-codzilla::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(74,154,74,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(74,154,74,.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+.czinner{max-width:580px;margin:0 auto;padding:18px 14px;width:100%;}
+.cz-title{font-family:'UnifrakturMaguntia',cursive;font-size:32px;color:#c8ffc8;line-height:1;}
+.cz-title .g{color:var(--grn);}
+.cz-tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#1a4a1a;margin-top:4px;margin-bottom:14px;}
+.czwrap textarea{border-color:#1a3a1a;background:var(--gbg);color:#8aba8a;}
+.czwrap textarea:focus{border-color:#3a7a3a;}
+.czwrap textarea::placeholder{color:#1a3a1a;}
+.czebtn{margin-top:10px;padding:8px 22px;border:1px solid #3a7a3a;background:transparent;color:var(--grn);font-family:var(--bf);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.czebtn:hover{background:#0f2a0f;border-color:var(--grn);}
+.czlw{display:none;margin-top:12px;}
+.czllbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#2a6a2a;margin-bottom:6px;}
+.czbw{background:#030a03;border:1px solid #1a3a1a;height:24px;position:relative;overflow:hidden;}
+.czbf{height:100%;background:linear-gradient(90deg,#0f3a0f,#2a6a2a,#4a9a4a);width:0%;position:relative;}
+.czbf::after{content:'';position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(100,200,100,.4));animation:shi 1s linear infinite;}
+@keyframes shi{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+.czbp{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#4a9a4a;font-family:monospace;}
+.czst{font-size:10px;color:#1a4a1a;letter-spacing:.08em;text-transform:uppercase;margin-top:4px;font-style:italic;min-height:15px;}
+.czrw{display:none;margin-top:16px;}
+.czmsg{padding:18px;border:1px solid #1a3a1a;background:var(--gbg);font-size:18px;color:#8aba8a;line-height:1.7;}
+.czrbtn{margin-top:10px;padding:4px 14px;border:1px solid #1a3a1a;background:transparent;color:#2a6a2a;font-family:var(--bf);font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.czrbtn:hover{border-color:var(--grn);color:var(--grn);}
+
+/* STORAGE USAGE BAR */
+.storage-bar-wrap{margin-top:14px;}
+.storage-lbl{font-size:10px;color:var(--tfaint);margin-bottom:4px;letter-spacing:.08em;text-transform:uppercase;}
+.storage-track{height:4px;background:var(--bdim);border-radius:2px;overflow:hidden;}
+.storage-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .3s;}
+.storage-txt{font-size:10px;color:var(--tfaint);margin-top:3px;}
+
+/* SPOTDOWN PAGE */
+#pg-spotdown{flex-direction:column;}
+#pg-spotdown .scrl{padding:0;display:flex;flex-direction:column;}
+.sd-topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--hbg);border-bottom:1px solid var(--hbrd);flex-shrink:0;flex-wrap:wrap;}
+.sd-title{font-family:var(--tf);font-size:16px;color:var(--txt);flex:1;min-width:120px;}
+[data-theme="minimal-white"] .sd-title,[data-theme="minimal-black"] .sd-title{font-family:var(--bf);font-weight:600;font-size:14px;}
+.sd-url{font-size:10px;color:var(--tdim);padding:3px 8px;border:1px solid var(--bdim);background:var(--bg3);border-radius:var(--r);letter-spacing:.04em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sd-open-btn{padding:4px 12px;border:1px solid var(--grn);background:transparent;color:var(--grn);font-family:var(--bf);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:var(--r);transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.sd-open-btn:hover{background:var(--grn);color:#fff;}
+.sd-iframe-wrap{flex:1;position:relative;overflow:hidden;min-height:0;}
+#sd-iframe{width:100%;height:100%;border:none;display:block;background:#fff;}
+.sd-blocked{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:30px 20px;height:100%;background:var(--bg);}
+.sd-blocked-ico{font-size:48px;opacity:.4;}
+.sd-blocked-title{font-size:15px;color:var(--txt);font-weight:600;}
+.sd-blocked-body{font-size:12px;color:var(--tdim);line-height:1.8;max-width:400px;}
+.sd-blocked-body code{font-family:monospace;color:var(--accd);background:var(--accbg);padding:1px 5px;border-radius:3px;}
+.sd-blocked-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.sd-notice{font-size:10px;color:var(--tfaint);padding:5px 12px;background:var(--bg2);border-top:1px solid var(--bdim);letter-spacing:.04em;line-height:1.6;flex-shrink:0;}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:640px){
+  #hdr .hnav{display:none;}
+  #mob-nav{display:flex;}
+  body{padding-bottom:58px;}
+  #toast-wrap{bottom:70px;}
+  .scrl{padding:12px 10px;}
+  .inner{padding:0;}
+  .modal{width:96%;padding:16px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tb{white-space:nowrap;flex-shrink:0;padding:5px 12px;}
+  .abtn,.svbtn,.cbtn{min-height:36px;-webkit-tap-highlight-color:transparent;}
+  .list-card{padding:9px 10px;}
+  .list-card .pl-card-actions{flex-direction:column;gap:3px;}
+  .dropzone{padding:20px 14px;}
+  #settings{width:88%;max-width:320px;}
+  .tut-box{padding:20px 16px;}
+  .modal-btns{flex-direction:column;}
+  .modal-btns .abtn,.modal-btns .modal-close,.modal-btns .modal-dl{width:100%;text-align:center;justify-content:center;}
+  textarea{font-size:14px;}
+  .obox{font-size:15px;}
+  .pl-queue{max-height:140px;}
+  .mgrid{grid-template-columns:repeat(5,1fr);}
+}
+@media(max-width:420px){
+  .vpill{display:none;}
+  .hlogo{font-size:17px;}
+  #hdr{padding:0 10px;gap:7px;}
+  .sec-title{font-size:18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="hlogo" id="hlogo"></div>
+  <span class="vpill" id="vpill">v4 · cZEROde</span>
+  <div class="hsep"></div>
+  <div class="hnav">
+    <button class="hnb on" id="nb-enc" onclick="showPg('enc')">⌨ Encode</button>
+    <button class="hnb" id="nb-vault" onclick="showPg('vault')">🗄 Vault</button>
+    <button class="hnb" id="nb-files" onclick="showPg('files')">📁 Files</button>
+    <button class="hnb" id="nb-spotdown" onclick="showPg('spotdown')">🎵 Spotdown</button>
+  </div>
+  <button class="hicn" onclick="openSettings()">⚙</button>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div id="mob-nav">
+  <button class="mob-nb on" id="mnb-enc" onclick="showPg('enc')"><span class="mob-nb-ico">⌨</span>Encode</button>
+  <button class="mob-nb" id="mnb-vault" onclick="showPg('vault')"><span class="mob-nb-ico">🗄</span>Vault</button>
+  <button class="mob-nb" id="mnb-files" onclick="showPg('files')"><span class="mob-nb-ico">📁</span>Files</button>
+  <button class="mob-nb" id="mnb-spotdown" onclick="showPg('spotdown')"><span class="mob-nb-ico">🎵</span>Spotdown</button>
+  <button class="mob-nb" onclick="openSettings()"><span class="mob-nb-ico">⚙</span>Settings</button>
+</div>
+
+<div id="main">
+
+<!-- ═══ ENCODE PAGE ═══ -->
+<div id="pg-enc" class="pg on">
+  <div class="scrl">
+    <!-- cZEROde -->
+    <div id="ver-cz" class="inner">
+      <div class="sec-hdr">
+        <div><div class="sec-title" id="cz-title"></div><div class="sec-sub">AES-256-GCM · PBKDF2-SHA256 · <span style="color:var(--gold)">★ Best Version</span></div></div>
+      </div>
+      <div class="tabs">
+        <button class="tb on" onclick="sp('cz','classic',this)">✍ Classic</button>
+        <button class="tb" onclick="sp('cz','stealth',this)">🔐 Stealth</button>
+        <button class="tb" onclick="sp('cz','legend',this)">📖 Legend</button>
+      </div>
+      <div id="czp-classic" class="panel on">
+        <div class="row"><div class="tgl"><button class="tglb on" id="czeb" onclick="czmode('encode')">→ Encode</button><button class="tglb" id="czdb" onclick="czmode('decode')">← Decode</button></div><select id="czcaps" onchange="czup()"><option value="cyrillic">Capitals → Cyrillic</option><option value="georgian">Everything → Georgian</option></select></div>
+        <div class="grid"><div><label class="fl" id="czil">English Input</label><textarea id="czin" rows="4" placeholder="type something..." oninput="czup()"></textarea></div><div><div class="oh"><label class="fl" id="czol" style="margin-bottom:0">Mixed Output</label><button class="cbtn" id="czcb" onclick="czcopy()">Copy</button></div><div class="obox" id="czout"><span class="ph">output will appear here...</span></div><div class="dot-r"><div class="di"><div class="dot" style="background:#cc4422"></div><span class="dlbl">Georgian</span></div><div class="di"><div class="dot" style="background:#e06040"></div><span class="dlbl">Cyrillic</span></div></div></div></div>
+      </div>
+      <div id="czp-stealth" class="panel">
+        <p class="desc">Real AES-256-GCM encryption. Output looks like exotic script — unreadable without your PIN.</p>
+        <div class="pinrow"><label class="fl" style="margin-bottom:0;white-space:nowrap">🔑 PIN</label><input type="text" id="czpin" class="pinin" placeholder="your secret key" oninput="czpinch()" autocomplete="off" spellcheck="false"/><div class="pstr" id="czps"></div></div>
+        <div class="ee-warn" id="cz-eew">⚠ Very common password — seriously?</div>
+        <div id="czrl" class="rl"></div>
+        <div class="ssbar"><div class="mlbl idle" id="czml">● Awaiting input</div><div class="mth" id="czmth">—</div></div>
+        <div class="grid">
+          <div><label class="fl">Input — type to encrypt · paste ciphertext to decrypt</label><textarea id="czsin" rows="4" placeholder="message to encode, or paste ciphertext to decode..." oninput="czsup()"></textarea></div>
+          <div>
+            <div class="oh"><label class="fl" id="czsol" style="margin-bottom:0">Stealth Ciphertext</label><div style="display:flex;gap:5px"><button class="cbtn" id="czsc" onclick="czscopy()">Copy</button><button class="svbtn" onclick="saveToVault('cz')">+ Vault</button></div></div>
+            <div class="sbox" id="czsout"><span class="ph">output will appear here...</span></div>
+            <p class="si">AES-256-GCM · PBKDF2-SHA256 · Random salt + IV · <span>Authenticated encryption</span></p>
+          </div>
+        </div>
+      </div>
+      <div id="czp-legend" class="panel"><div class="leg-list" id="czleg"></div><p class="chrt-ttl">Georgian Chart</p><div class="chrt" id="czchrt"></div></div>
+    </div>
+
+    <!-- V1 -->
+    <div id="ver-v1" class="inner" style="display:none">
+      <div class="sec-hdr"><div><div class="sec-title"><span style="color:var(--acc)">ქ</span>Mixed <span style="color:var(--acc)">Ш</span>cript</div><div class="sec-sub">v1 · The Origin · Classic mapping</div></div></div>
+      <div class="tabs"><button class="tb on" onclick="sp('v1','translate',this)">✍ Translate</button><button class="tb" onclick="sp('v1','legend',this)">📖 Legend</button></div>
+      <div id="v1p-translate" class="panel on">
+        <div class="row"><div class="tgl"><button class="tglb on" id="v1eb" onclick="v1mode('encode')">→ Encode</button><button class="tglb" id="v1db" onclick="v1mode('decode')">← Decode</button></div><select id="v1caps" onchange="v1up()"><option value="cyrillic">Capitals → Cyrillic</option><option value="georgian">Everything → Georgian</option></select></div>
+        <div class="grid"><div><label class="fl" id="v1il">English Input</label><textarea id="v1in" rows="4" placeholder="type something..." oninput="v1up()"></textarea></div><div><div class="oh"><label class="fl" id="v1ol" style="margin-bottom:0">Mixed Output</label><button class="cbtn" id="v1cb" onclick="v1copy()">Copy</button></div><div class="obox" id="v1out"><span class="ph">output will appear here...</span></div></div></div>
+      </div>
+      <div id="v1p-legend" class="panel"><div class="leg-list" id="v1leg"></div><p class="chrt-ttl">Georgian Chart</p><div class="chrt" id="v1chrt"></div></div>
+    </div>
+
+    <!-- V2 -->
+    <div id="ver-v2" class="inner" style="display:none">
+      <div class="sec-hdr"><div><div class="sec-title"><span style="color:var(--acc)">ქ</span>Mixed <span style="color:var(--acc)">Ш</span>cript</div><div class="sec-sub" style="color:#226688">v2 · cracked by AI in 30 seconds 💀</div></div></div>
+      <div class="tabs"><button class="tb on" onclick="sp('v2','classic',this)">✍ Classic</button><button class="tb" onclick="sp('v2','stealth',this)">🕵 Stealth</button><button class="tb" onclick="sp('v2','legend',this)">📖 Legend</button></div>
+      <div id="v2p-classic" class="panel on">
+        <div class="row"><div class="tgl"><button class="tglb on" id="v2eb" onclick="v2mode('encode')">→ Encode</button><button class="tglb" id="v2db" onclick="v2mode('decode')">← Decode</button></div><select id="v2caps" onchange="v2up()"><option value="cyrillic">Capitals → Cyrillic</option><option value="georgian">Everything → Georgian</option></select></div>
+        <div class="grid"><div><label class="fl" id="v2il">English Input</label><textarea id="v2in" rows="4" placeholder="type something..." oninput="v2up()"></textarea></div><div><div class="oh"><label class="fl" id="v2ol" style="margin-bottom:0">Mixed Output</label><button class="cbtn" id="v2cb" onclick="v2copy()">Copy</button></div><div class="obox" id="v2out"><span class="ph">output will appear here...</span></div></div></div>
+      </div>
+      <div id="v2p-stealth" class="panel">
+        <p class="desc">5 scramble methods, random selection. <strong style="color:var(--tdim)">This is the one that got cooked. RIP.</strong></p>
+        <div class="ssbar"><div class="mlbl idle" id="v2ml">● Awaiting input</div><div style="display:flex;align-items:center;gap:6px"><span class="mth" id="v2mth">—</span><div class="mdots"><div class="mdot" id="v2d1"></div><div class="mdot" id="v2d2"></div><div class="mdot" id="v2d3"></div><div class="mdot" id="v2d4"></div><div class="mdot" id="v2d5"></div></div></div></div>
+        <div class="grid"><div><label class="fl">Input — type to encrypt · paste to decrypt</label><textarea id="v2sin" rows="4" placeholder="message to encode, or paste output..." oninput="v2sup()"></textarea></div><div><div class="oh"><label class="fl" id="v2sol" style="margin-bottom:0">Stealth Output</label><div style="display:flex;gap:5px"><button class="cbtn" id="v2sc" onclick="v2scopy()">Copy</button><button class="svbtn" onclick="saveToVault('v2')">+ Vault</button></div></div><div class="sbox" id="v2sout"><span class="ph">output will appear here...</span></div><div class="mgrid"><div class="mpill" id="v2p1">I · Reverse</div><div class="mpill" id="v2p2">II · Word<br>Mirror</div><div class="mpill" id="v2p3">III · Chunk<br>Shift</div><div class="mpill" id="v2p4">IV · Pair<br>Flip</div><div class="mpill" id="v2p5">V · Mirror<br>Fold</div></div></div></div>
+      </div>
+      <div id="v2p-legend" class="panel"><div class="leg-list" id="v2leg"></div><p class="chrt-ttl">Georgian Chart</p><div class="chrt" id="v2chrt"></div></div>
+    </div>
+
+    <!-- V3 -->
+    <div id="ver-v3" class="inner" style="display:none">
+      <div class="sec-hdr"><div><div class="sec-title"><span style="color:var(--acc)">ქ</span>Mixed <span style="color:var(--acc)">Ш</span>cript</div><div class="sec-sub">v3 · PIN-locked · Alphabet-shuffled · Uncracked</div></div></div>
+      <div class="tabs"><button class="tb on" onclick="sp('v3','classic',this)">✍ Classic</button><button class="tb" onclick="sp('v3','stealth',this)">🕵 Stealth</button><button class="tb" onclick="sp('v3','legend',this)">📖 Legend</button></div>
+      <div id="v3p-classic" class="panel on">
+        <div class="row"><div class="tgl"><button class="tglb on" id="v3eb" onclick="v3mode('encode')">→ Encode</button><button class="tglb" id="v3db" onclick="v3mode('decode')">← Decode</button></div><select id="v3caps" onchange="v3up()"><option value="cyrillic">Capitals → Cyrillic</option><option value="georgian">Everything → Georgian</option></select></div>
+        <div class="grid"><div><label class="fl" id="v3il">English Input</label><textarea id="v3in" rows="4" placeholder="type something..." oninput="v3up()"></textarea></div><div><div class="oh"><label class="fl" id="v3ol" style="margin-bottom:0">Mixed Output</label><button class="cbtn" id="v3cb" onclick="v3copy()">Copy</button></div><div class="obox" id="v3out"><span class="ph">output will appear here...</span></div></div></div>
+      </div>
+      <div id="v3p-stealth" class="panel">
+        <div class="pinrow"><label class="fl" style="margin-bottom:0;white-space:nowrap">🔑 PIN</label><input type="text" id="v3pin" class="pinin" placeholder="your secret key" oninput="v3pinch()" autocomplete="off" spellcheck="false"/><div class="pstr" id="v3ps"></div></div>
+        <div class="ee-warn" id="v3-eew">⚠ Very common password.</div>
+        <div class="ssbar"><div class="mlbl idle" id="v3ml">● Awaiting input</div><div class="mth" id="v3mth">—</div></div>
+        <div class="grid"><div><label class="fl">Input — type to encrypt · paste to decrypt</label><textarea id="v3sin" rows="4" placeholder="message to encode, or paste output..." oninput="v3sup()"></textarea></div><div><div class="oh"><label class="fl" id="v3sol" style="margin-bottom:0">Stealth Output</label><div style="display:flex;gap:5px"><button class="cbtn" id="v3sc" onclick="v3scopy()">Copy</button><button class="svbtn" onclick="saveToVault('v3')">+ Vault</button></div></div><div class="sbox" id="v3sout"><span class="ph">output will appear here...</span></div><p class="si">Shuffled alphabet · Vigenère shift · <span>Zero recoverable markers</span></p></div></div>
+      </div>
+      <div id="v3p-legend" class="panel"><div class="leg-list" id="v3leg"></div><p class="chrt-ttl">Georgian Chart</p><div class="chrt" id="v3chrt"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VAULT PAGE ═══ -->
+<div id="pg-vault" class="pg">
+  <div class="scrl">
+    <div class="inner">
+      <div class="sec-hdr">
+        <div><div class="sec-title">🗄 Vault</div><div class="sec-sub">Encrypted text entries · stored in your browser</div></div>
+        <button class="clear-btn" onclick="clearVault()">Clear All</button>
+      </div>
+      <div class="list-hdr"><div class="list-count" id="vault-count">0 entries</div></div>
+      <div class="list-grid" id="vault-grid"></div>
+      <div class="storage-bar-wrap"><div class="storage-lbl">Browser Storage Used</div><div class="storage-track"><div class="storage-fill" id="storage-fill" style="width:0%"></div></div><div class="storage-txt" id="storage-txt"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FILES PAGE ═══ -->
+<div id="pg-files" class="pg">
+  <div class="scrl">
+    <div class="inner">
+      <div class="sec-hdr">
+        <div><div class="sec-title">📁 Files</div><div class="sec-sub">Encrypt · Watch · Listen · Organize</div></div>
+        <button class="clear-btn" onclick="clearFiles()">Clear All</button>
+      </div>
+
+      <div class="tabs" style="margin-bottom:12px">
+        <button class="tb on" onclick="spf('encrypt',this)">🔒 Encrypt</button>
+        <button class="tb" onclick="spf('stored',this)">📂 My Files</button>
+        <button class="tb" onclick="spf('playlists',this)">🎵 Playlists</button>
+      </div>
+
+      <!-- ENCRYPT TAB -->
+      <div id="fp-encrypt" class="panel on">
+        <div class="pinrow"><label class="fl" style="margin-bottom:0;white-space:nowrap">🔑 PIN</label><input type="text" id="fpin" class="pinin" placeholder="your secret key" oninput="fpinch()" autocomplete="off" spellcheck="false"/><div class="pstr" id="fps"></div></div>
+        <div class="ee-warn" id="f-eew">⚠ Very common password.</div>
+        <div id="file-drop" class="dropzone" onclick="pickFile()" ondragover="fdragover(event)" ondragleave="fdragleave(event)" ondrop="fdrop(event)">
+          <div class="dz-icon">📂</div>
+          <div class="dz-txt">Tap to select file or drag & drop</div>
+          <div class="dz-sub">Images · Docs · Audio · Video · Any file · Files ≥15MB use batch mode</div>
+        </div>
+        <img id="file-prev" class="file-preview" style="display:none"/>
+        <div class="file-info" id="file-info" style="display:none"></div>
+        <div class="name-row">
+          <input type="text" id="file-name" class="ninp" placeholder="filename (optional)" spellcheck="false"/>
+          <button class="abtn go" id="file-enc-btn" onclick="encryptFile()" disabled>🔒 Encrypt & Store</button>
+        </div>
+        <div class="prog" id="file-prog"></div>
+      </div>
+
+      <!-- STORED FILES TAB -->
+      <div id="fp-stored" class="panel">
+        <div class="list-hdr"><div class="list-count" id="files-count">0 files</div></div>
+        <div class="list-grid" id="files-grid"></div>
+      </div>
+
+      <!-- PLAYLISTS TAB -->
+      <div id="fp-playlists" class="panel">
+        <div class="list-hdr">
+          <div class="list-count" id="pl-count">0 playlists</div>
+          <button class="abtn" style="font-size:10px;padding:4px 12px" onclick="openCreatePlaylist()">+ New Playlist</button>
+        </div>
+        <div class="list-grid" id="pl-grid"></div>
+        <p class="desc" style="margin-top:10px">Group your encrypted audio (up to 50 songs) or video (up to 10 videos) into playlists. Decrypt them all at once with a single PIN.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CODZILLA ═══ -->
+<div id="pg-codzilla" class="pg">
+  <div class="scrl"><div class="czinner">
+    <div class="cz-title"><span class="g">pro</span>jerct <span class="g">c</span>odzilla</div>
+    <p class="cz-tag">next-gen · quantum-resistant · 100% real · definitely not a prank</p>
+    <div id="czilla-inp" class="czwrap"><label class="fl" style="color:#2a6a2a">Enter your message</label><textarea id="czilla-txt" rows="4" placeholder="type your super secret message..."></textarea><button class="czebtn" onclick="startCZ()">⚡ Encode with Codzilla</button></div>
+    <div id="czlw" class="czlw"><div class="czllbl" id="czllbl">⚙ Initializing Codzilla Engine v9.4.2...</div><div class="czbw"><div class="czbf" id="czf"></div><span class="czbp" id="czp2">0%</span></div><div class="czst" id="czst">Booting quantum processors...</div></div>
+    <div id="czrw" class="czrw"><div class="czmsg" id="czmsg"></div><button class="czrbtn" onclick="resetCZ()">↺ Try Again</button></div>
+  </div></div>
+</div>
+
+<!-- ═══ SPOTDOWN PAGE ═══ -->
+<div id="pg-spotdown" class="pg">
+  <div class="scrl">
+    <div class="sd-topbar">
+      <div class="sd-title">🎵 Spotdown</div>
+      <span class="sd-url">spotdown.org</span>
+      <button class="sd-open-btn" onclick="window.open('https://spotdown.org','_blank')">↗ Open in New Tab</button>
+    </div>
+
+    <div class="sd-iframe-wrap">
+      <iframe
+        id="sd-iframe"
+        src="https://spotdown.org"
+        title="Spotdown — Spotify Downloader"
+        sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-downloads"
+        referrerpolicy="no-referrer"
+        onload="sdFrameLoaded()"
+        onerror="sdFrameBlocked()"
+      ></iframe>
+
+      <!-- Shown if iframe is blocked -->
+      <div class="sd-blocked" id="sd-blocked">
+        <div class="sd-blocked-ico">🚫</div>
+        <div class="sd-blocked-title">Spotdown blocked this embed</div>
+        <div class="sd-blocked-body">
+          Spotdown (like most sites) sets <code>X-Frame-Options: DENY</code> which prevents browsers from loading it inside another page — this is a security feature we can't bypass.<br><br>
+          You can still use it normally in a new tab. Downloads go straight to your <strong>Downloads folder</strong> as usual. You can then drag them into the <strong>📁 Files</strong> tab to encrypt them.
+        </div>
+        <div class="sd-blocked-actions">
+          <button class="abtn go" onclick="window.open('https://spotdown.org','_blank')">↗ Open Spotdown</button>
+          <button class="abtn" onclick="showPg('files')">📁 Go to Files</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sd-notice">
+      ℹ Downloads go to your browser's default <strong>Downloads folder</strong>. To encrypt them, drag the downloaded files into 📁 Files → Encrypt tab. · Spotdown may block embedding — use "Open in New Tab" if needed.
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<!-- ═══════ DECRYPT MODAL ═══════ -->
+<div id="dec-modal" class="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="dm-title">🔓 Decrypt</div>
+    <div class="modal-sub" id="dm-sub">Enter your PIN to decrypt</div>
+    <div class="pinrow"><label class="fl" style="margin-bottom:0;white-space:nowrap">🔑 PIN</label><input type="text" id="dm-pin" class="pinin" placeholder="your secret key" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')dmDec()"/><div class="pstr" id="dm-ps"></div></div>
+    <div id="dm-rl" class="rl"></div>
+    <div class="modal-result" id="dm-result" style="display:none">
+      <img id="dm-img" class="modal-img" style="display:none"/>
+      <video id="dm-video" controls></video>
+      <audio id="dm-audio" controls></audio>
+      <div id="dm-txt" class="modal-txt" style="display:none"></div>
+    </div>
+    <div class="modal-err" id="dm-err" style="display:none"></div>
+    <div class="modal-btns">
+      <button class="abtn" onclick="dmDec()" id="dm-btn">Decrypt</button>
+      <button class="modal-dl" id="dm-dl" style="display:none" onclick="dmDownload()">⬇ Download</button>
+      <button class="modal-close" onclick="closeDM()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ CREATE PLAYLIST MODAL ═══════ -->
+<div id="create-pl-modal" class="modal-bg">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">🎵 New Playlist</div>
+    <div class="modal-sub">Group encrypted audio or video files</div>
+    <label class="fl">Playlist Name</label>
+    <input type="text" id="pl-name-inp" class="ninp" style="width:100%;margin-bottom:12px" placeholder="My Playlist" spellcheck="false"/>
+    <label class="fl">Type</label>
+    <div class="tgl" style="margin-bottom:12px">
+      <button class="tglb on" id="pl-type-audio" onclick="setPLType('audio')">🎵 Audio (max 50)</button>
+      <button class="tglb" id="pl-type-video" onclick="setPLType('video')">🎬 Video (max 10)</button>
+    </div>
+    <div class="oh"><label class="fl" style="margin-bottom:0">Select Files</label><span class="pl-sel-info" id="pl-sel-count">0 selected</span></div>
+    <div class="pl-file-list" id="pl-file-list"><div class="pl-empty-msg">No matching files found</div></div>
+    <div class="modal-btns">
+      <button class="abtn go" onclick="createPlaylist()">✓ Create Playlist</button>
+      <button class="modal-close" onclick="closeCreatePlaylist()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PLAYLIST PLAYER MODAL ═══════ -->
+<div id="pl-player" class="modal-bg">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title" id="pl-player-title">▶ Playlist</div>
+
+    <!-- PIN + Decrypt step -->
+    <div id="pl-dec-step">
+      <div class="modal-sub" id="pl-dec-sub">Enter your PIN to decrypt and play all files</div>
+      <div class="pinrow"><label class="fl" style="margin-bottom:0;white-space:nowrap">🔑 PIN</label><input type="text" id="pl-pin" class="pinin" placeholder="your secret key" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')decryptAndPlayPlaylist()"/><div class="pstr" id="pl-ps"></div></div>
+      <div class="batch-bar-wrap" id="pl-dec-prog" style="display:none">
+        <div class="batch-label" id="pl-dec-label">Decrypting...</div>
+        <div class="batch-track"><div class="batch-fill" id="pl-dec-fill" style="width:0%"></div></div>
+        <div class="batch-steps" id="pl-dec-steps"></div>
+      </div>
+      <div class="modal-btns" id="pl-dec-btns">
+        <button class="abtn go" id="pl-dec-btn" onclick="decryptAndPlayPlaylist()">🔓 Decrypt &amp; Play All</button>
+        <button class="modal-close" onclick="closePLPlayer()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Player step -->
+    <div id="pl-player-area" style="display:none">
+      <div class="pl-now-title"><span class="pl-icon" id="pl-now-icon">▶</span><span id="pl-now-title-txt">Loading...</span></div>
+      <video id="pl-video" controls></video>
+      <audio id="pl-audio" controls></audio>
+      <div class="pl-controls">
+        <button class="abtn" onclick="prevPLTrack()" style="padding:5px 12px">⏮ Prev</button>
+        <button class="abtn" onclick="nextPLTrack()" style="padding:5px 12px">Next ⏭</button>
+        <button class="modal-close" onclick="closePLPlayer()" style="margin-left:auto">✕ Close</button>
+      </div>
+      <div class="pl-queue" id="pl-queue"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="sbk" onclick="closeSettings()"></div>
+<div id="settings">
+  <div class="s-title">⚙ Settings</div>
+  <div class="s-sec"><div class="s-lbl">Theme</div>
+    <div class="theme-cards">
+      <div class="tc tc-g on" id="tc-gothic" onclick="setTheme('gothic')"><div class="tcp">Ш</div><div class="tcn">Gothic</div></div>
+      <div class="tc tc-w" id="tc-white" onclick="setTheme('minimal-white')"><div class="tcp">Aa</div><div class="tcn">Min White</div></div>
+      <div class="tc tc-b" id="tc-black" onclick="setTheme('minimal-black')"><div class="tcp">Aa</div><div class="tcn">Min Black</div></div>
+    </div>
+  </div>
+  <div class="s-sec"><div class="s-lbl">Switch Version</div>
+    <div class="ver-list">
+      <div class="vi on" id="sv-cz" onclick="switchVer('cz')"><div class="vi-num">IV</div><div class="vi-info"><div class="vi-name">cZEROde</div><div class="vi-desc">AES-256-GCM · Script camouflage</div></div><span class="vbdg best">⭐ best</span></div>
+      <div class="vi" id="sv-v3" onclick="switchVer('v3')"><div class="vi-num">III</div><div class="vi-info"><div class="vi-name">Mixed Script v3</div><div class="vi-desc">PIN-locked · Vigenère · Uncracked</div></div><span class="vbdg">uncracked</span></div>
+      <div class="vi" id="sv-v2" onclick="switchVer('v2')"><div class="vi-num">II</div><div class="vi-info"><div class="vi-name">Mixed Script v2</div><div class="vi-desc">5-method scramble · Cracked in 30s</div></div><span class="vbdg rip">rip 💀</span></div>
+      <div class="vi" id="sv-v1" onclick="switchVer('v1')"><div class="vi-num">I</div><div class="vi-info"><div class="vi-name">Mixed Script v1</div><div class="vi-desc">The original spark</div></div><span class="vbdg">origin</span></div>
+      <div class="vi" id="sv-codzilla" onclick="switchVer('codzilla')"><div class="vi-num">?</div><div class="vi-info"><div class="vi-name">projerct codzilla</div><div class="vi-desc">Quantum-resistant™. Totally real.</div></div><span class="vbdg prk">prank</span></div>
+    </div>
+  </div>
+  <div class="s-sec"><div class="s-lbl">About</div>
+    <div class="s-about">cZEROde v1.1 — Web Edition<br>All data stored locally (IndexedDB). Nothing leaves your device. Keys are never stored — only you know your PIN.<br><br><span style="color:var(--tfaint)">Security: AES-256-GCM · PBKDF2-SHA256 100k iterations · Batch encryption for large files · Exponential backoff · Clipboard auto-clear 30s</span></div>
+  </div>
+  <div class="s-sec"><div class="s-lbl">Help</div><button class="abtn" style="font-size:10px;padding:4px 12px" onclick="openTut()">↺ Replay Tutorial</button></div>
+</div>
+
+<!-- TUTORIAL -->
+<div id="tut">
+  <div class="tut-box">
+    <div id="ts-0" class="tut-step on"><div class="tut-icon">🔐</div><div class="tut-sn">1 of 6</div><div class="tut-title"><span class="r">c</span>ZER<span style="color:var(--gold)">O</span>de · Web</div><div class="tut-body">Welcome. Encrypt text and files so they look like random exotic script — Georgian and Cyrillic characters unreadable without your PIN.<br><br>Everything is stored <strong>locally in your browser</strong>. Nothing leaves your device.</div><div class="tut-nav"><button class="tut-skip" onclick="closeTut()">Skip</button><div class="tut-dots"><div class="tut-dot on"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div></div><button class="tut-btn" onclick="tutNext()">Next →</button></div></div>
+    <div id="ts-1" class="tut-step"><div class="tut-icon">✍</div><div class="tut-sn">2 of 6</div><div class="tut-title">Classic Mode</div><div class="tut-body">Converts text visually: <strong>lowercase → Georgian</strong>, <strong>capitals → Cyrillic</strong>. Not encrypted — decorative. Great for aesthetics, not secrets.</div><div class="tut-nav"><button class="tut-skip" onclick="closeTut()">Skip</button><div class="tut-dots"><div class="tut-dot"></div><div class="tut-dot on"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div></div><button class="tut-btn" onclick="tutNext()">Next →</button></div></div>
+    <div id="ts-2" class="tut-step"><div class="tut-icon">🔑</div><div class="tut-sn">3 of 6</div><div class="tut-title">Stealth Mode</div><div class="tut-body"><strong>Real encryption</strong> — AES-256-GCM with 100,000 PBKDF2 iterations. Output looks like exotic script but is mathematically unbreakable without your PIN.<br><br>Hit <strong>+ Vault</strong> to save encrypted text to local storage.</div><div class="tut-nav"><button class="tut-skip" onclick="closeTut()">Skip</button><div class="tut-dots"><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot on"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div></div><button class="tut-btn" onclick="tutNext()">Next →</button></div></div>
+    <div id="ts-3" class="tut-step"><div class="tut-icon">📁</div><div class="tut-sn">4 of 6</div><div class="tut-title">Files & Media</div><div class="tut-body">The <strong>Files</strong> section encrypts <em>any file</em>. Audio and video files can be <strong>played directly</strong> after decryption — no download needed.<br><br>Files <strong>15MB or larger</strong> are split into batches for smooth encryption with progress tracking.</div><div class="tut-nav"><button class="tut-skip" onclick="closeTut()">Skip</button><div class="tut-dots"><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot on"></div><div class="tut-dot"></div><div class="tut-dot"></div></div><button class="tut-btn" onclick="tutNext()">Next →</button></div></div>
+    <div id="ts-4" class="tut-step"><div class="tut-icon">🎵</div><div class="tut-sn">5 of 6</div><div class="tut-title">Playlists</div><div class="tut-body">Create <strong>Playlists</strong> from your encrypted audio (max 50 songs) or video (max 10 videos). Enter your PIN once to decrypt and play the entire playlist — no need to decrypt each file individually.</div><div class="tut-nav"><button class="tut-skip" onclick="closeTut()">Skip</button><div class="tut-dots"><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot on"></div><div class="tut-dot"></div></div><button class="tut-btn" onclick="tutNext()">Next →</button></div></div>
+    <div id="ts-5" class="tut-step"><div class="tut-icon">✅</div><div class="tut-sn">6 of 6</div><div class="tut-title">You're Ready</div><div class="tut-body">Use a <strong>strong PIN</strong> — long, random, memorable to you. Switch versions and themes from <strong>⚙ Settings</strong>.<br><br>Everything stays local. Clearing browser data will erase your vault — export important files before doing so.</div><div class="tut-nav"><div></div><div class="tut-dots"><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot"></div><div class="tut-dot on"></div></div><button class="tut-btn" onclick="closeTut()">Let's go →</button></div></div>
+  </div>
+</div>
+
+<!-- EASTER EGG -->
+<div id="ee"><div class="ee-box"><div class="ee-ico">💀</div><div class="ee-txt">I knew you were stupid enough to use a short password, but not so much that you used the most common ones in the planet.</div><button class="ee-close" onclick="closeEE()">ok fine</button></div></div>
+
+<div id="toast-wrap"></div>
+
+<script>
+// ═══════════════════════════ INDEXEDDB
+const DB_NAME='czeroode_db',DB_VER=2;
+let _db=null;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VER);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains('vault'))db.createObjectStore('vault',{keyPath:'id'});if(!db.objectStoreNames.contains('files'))db.createObjectStore('files',{keyPath:'id'});if(!db.objectStoreNames.contains('playlists'))db.createObjectStore('playlists',{keyPath:'id'});};r.onsuccess=e=>{_db=e.target.result;res(_db);};r.onerror=e=>rej(e);});}
+async function dbPut(store,obj){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(obj).onsuccess=e=>res(e.target.result);tx.onerror=e=>rej(e);});}
+async function dbGetAll(store){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(store,'readonly').objectStore(store).getAll();r.onsuccess=e=>res(e.target.result);r.onerror=e=>rej(e);});}
+async function dbDel(store,id){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(id).onsuccess=()=>res();tx.onerror=e=>rej(e);});}
+async function dbClear(store){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).clear().onsuccess=()=>res();tx.onerror=e=>rej(e);});}
+
+// ═══════════════════════════ SHARED DATA
+const GEO={a:"ა",b:"ბ",c:"ც",d:"დ",e:"ე",f:"ფ",g:"გ",h:"ჰ",i:"ი",j:"ჯ",k:"კ",l:"ლ",m:"მ",n:"ნ",o:"ო",p:"პ",q:"ყ",r:"რ",s:"ს",t:"ტ",u:"უ",v:"ვ",w:"წ",x:"ხ",y:"ყ",z:"ზ"};
+const CYR={A:"А",B:"В",C:"С",D:"Д",E:"Е",F:"Ф",G:"Г",H:"Н",I:"И",J:"Ж",K:"К",L:"Л",M:"М",N:"Н",O:"О",P:"Р",Q:"Ф",R:"Р",S:"С",T:"Т",U:"У",V:"В",W:"Ш",X:"Х",Y:"Ч",Z:"З"};
+const GR=Object.fromEntries(Object.entries(GEO).map(([k,v])=>[v,k]));
+const CR=Object.fromEntries(Object.entries(CYR).map(([k,v])=>[v,k.toLowerCase()]));
+const GSET=new Set(Object.values(GEO));
+const WEAK=new Set(['123','1234','12345','password','qwerty','abc','0000','1111','pass','admin']);
+const LEGDAT=[{src:"b",out:[["ბ","geo"]],note:"b → ბ"},{src:"r",out:[["რ","geo"]],note:"r → რ"},{src:"o",out:[["ო","geo"]],note:"o → ო"},{src:"h",out:[["ჰ","geo"]],note:"h → ჰ"},{src:"e",out:[["ე","geo"]],note:"e → ე"},{src:"Good",out:[["Г","cyr"],["ო","geo"],["ო","geo"],["დ","geo"]],note:"Capital→Cyrillic, rest→Georgian"}];
+function buildLeg(lid,gid){const l=document.getElementById(lid);if(l.children.length)return;LEGDAT.forEach(({src,out,note})=>{const r=document.createElement('div');r.className='leg-row';r.innerHTML=`<span class="leg-src">${src}</span><span class="leg-arr">→</span><span class="leg-out">${out.map(([c,t])=>`<span class="t-${t}">${c}</span>`).join('')}</span><span class="leg-note">${note}</span>`;l.appendChild(r);});const g=document.getElementById(gid);if(!g.children.length)Object.entries(GEO).forEach(([lat,geo])=>{const c=document.createElement('div');c.className='cc';c.innerHTML=`<span class="gc">${geo}</span><span class="lc">${lat}</span>`;g.appendChild(c);});}
+function encT(text,caps){return text.split('').map(c=>{if(caps!=='georgian'&&CYR[c])return{text:CYR[c],type:'cyr'};if(GEO[c.toLowerCase()])return{text:GEO[c.toLowerCase()],type:'geo'};return{text:c,type:'plain'};});}
+function decT(text){return text.split('').map(c=>GR[c]||CR[c]||c).join('');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cpTxt(text,btn){if(!text)return;const fb=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:-999px;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);fl(btn);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>{fl(btn);schedCC();}).catch(fb);else fb();}
+function fl(btn){btn.textContent='✓ Copied!';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1500);}
+let _cct=null;function schedCC(){clearTimeout(_cct);_cct=setTimeout(()=>{if(navigator.clipboard)navigator.clipboard.writeText('').catch(()=>{});},30000);}
+function pstr(pin,id){const el=document.getElementById(id);if(!el)return;if(!pin){el.textContent='';el.className='pstr';return;}if(pin.length<4){el.textContent='WEAK';el.className='pstr w';}else if(pin.length<8){el.textContent='MEDIUM';el.className='pstr m';}else{el.textContent='STRONG';el.className='pstr s';}}
+function chkEE(pin,wid){document.getElementById(wid).style.display=WEAK.has(pin.toLowerCase())?'block':'none';if(['123','1234','12345'].includes(pin))showEE();}
+function toast(msg,type=''){const t=document.createElement('div');t.className='toast'+(type?' '+type:'');t.textContent=msg;document.getElementById('toast-wrap').appendChild(t);requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('on')));setTimeout(()=>{t.classList.remove('on');setTimeout(()=>t.remove(),400);},3000);}
+function fmtSize(b){if(b>1024*1024)return`${(b/1024/1024).toFixed(1)}MB`;if(b>1024)return`${(b/1024).toFixed(0)}KB`;return`${b}B`;}
+function fmtDate(ts){return ts?new Date(ts).toLocaleDateString():'';}
+
+// RATE LIMIT
+let _rlFails=0,_rlLock=0;
+function rlCheck(elId){const now=Date.now();if(now<_rlLock){const s=Math.ceil((_rlLock-now)/1000);const el=document.getElementById(elId);if(el){el.textContent=`⏳ Too many failed attempts. Wait ${s}s.`;el.style.display='block';}throw new Error('rl');}if(document.getElementById(elId))document.getElementById(elId).style.display='none';}
+function rlFail(elId){_rlFails++;const d=Math.min(500*Math.pow(2,_rlFails-1),30000);_rlLock=Date.now()+d;const el=document.getElementById(elId);if(el){el.textContent=`❌ Wrong PIN. Wait ${Math.ceil(d/1000)}s.`;el.style.display='block';}}
+function rlOk(){_rlFails=0;_rlLock=0;}
+
+// ═══════════════════════════ AES-256-GCM
+const SA=[...'აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮ'];
+const B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+const B2S=Object.fromEntries([...B64].map((c,i)=>[c,SA[i]]));
+const S2B=Object.fromEntries(SA.map((c,i)=>[c,B64[i]]));
+const SSET=new Set(SA);
+function buf2s(buf){const b=new Uint8Array(buf);let bin='';for(let i=0;i<b.length;i++)bin+=String.fromCharCode(b[i]);return[...btoa(bin).replace(/=+$/,'')].map(c=>B2S[c]||c).join('');}
+function s2buf(txt){const r=[...txt].map(c=>S2B[c]??c).join('');const p=(4-r.length%4)%4;const bin=atob(r+'='.repeat(p));const buf=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);return buf;}
+function isAES(t){const c=[...t.trim()];if(c.length<12)return false;return c.filter(x=>SSET.has(x)).length/c.length>0.85;}
+async function dk(pin,salt){const e=new TextEncoder();const r=await crypto.subtle.importKey('raw',e.encode(pin),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},r,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
+async function aesEnc(pt,pin){const e=new TextEncoder();const salt=crypto.getRandomValues(new Uint8Array(16));const iv=crypto.getRandomValues(new Uint8Array(12));const key=await dk(pin,salt);const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,e.encode(pt));const blob=new Uint8Array(28+ct.byteLength);blob.set(salt,0);blob.set(iv,16);blob.set(new Uint8Array(ct),28);return buf2s(blob);}
+async function aesDec(sc,pin){const blob=s2buf(sc);if(blob.length<45)throw new Error('too short');const key=await dk(pin,blob.slice(0,16));const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:blob.slice(16,28)},key,blob.slice(28));return new TextDecoder().decode(pt);}
+
+// ARRAY BUFFER HELPERS
+function ab2b64(buf){const bytes=new Uint8Array(buf);let bin='';const C=8192;for(let i=0;i<bytes.length;i+=C)bin+=String.fromCharCode(...bytes.subarray(i,i+C));return btoa(bin);}
+function b64ToBytes(b64){const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes;}
+
+// ═══════════════════════════ V2 STEALTH
+const NC='†‡§¶※◊●○◦•⁕⁂✦✧✩✪⌘⌬⍟⏣⌖⎌⌀';
+const MM={1:'╾',2:'╿',3:'╼',4:'╽',5:'╻'};const M2M={'╾':1,'╿':2,'╼':3,'╽':4,'╻':5};
+const MSET2=new Set(Object.values(MM));const NSET=new Set([...NC]);
+const MN={1:'I·Reverse',2:'II·Word Mirror',3:'III·Chunk Shift',4:'IV·Pair Flip',5:'V·Mirror Fold'};
+function rn(){return NC[Math.floor(Math.random()*NC.length)];}
+function injN(t){const c=[...t],o=[];const l=2+Math.floor(Math.random()*3);for(let i=0;i<l;i++)o.push(rn());for(const x of c){o.push(x);if(Math.random()<.3)o.push(rn());}const r=2+Math.floor(Math.random()*3);for(let i=0;i<r;i++)o.push(rn());return o.join('');}
+function strN(t){return[...t].filter(c=>!NSET.has(c)).join('');}
+function sm1(s){return[...s].reverse().join('');}function sm2(s){return s.split(' ').map(w=>[...w].reverse().join('')).join(' ');}
+function sm3(s){const c=[...s],ch=[];for(let i=0;i<c.length;i+=3)ch.push(c.slice(i,i+3));return ch.reverse().map(x=>x.join('')).join('');}
+function sm4(s){const c=[...s],o=[];for(let i=0;i<c.length;i+=2){if(i+1<c.length)o.push(c[i+1],c[i]);else o.push(c[i]);}return o.join('');}
+function sm5(s){return sm4([...s].reverse().join(''));}function us5(s){return[...sm4(s)].reverse().join('');}
+const SCR={1:sm1,2:sm2,3:sm3,4:sm4,5:sm5};const USC={1:sm1,2:sm2,3:sm3,4:sm4,5:us5};
+function v2senc(plain){const tok=encT(plain,'cyrillic');const enc=tok.map(t=>t.text).join('');const m=Math.floor(Math.random()*5)+1;return{ct:MM[m]+injN(SCR[m](enc)),method:m};}
+function v2sdec(ci){const c=[...ci];if(!c.length)return null;const f=c[0];if(!MSET2.has(f))return null;const m=M2M[f];return{text:decT(USC[m](strN(c.slice(1).join('')))),method:m};}
+function isV2C(t){const f=[...t.trimStart()][0];return f&&MSET2.has(f);}
+
+// ═══════════════════════════ V3 STEALTH
+function srng(pin){let h=2166136261;for(let i=0;i<pin.length;i++){h^=pin.charCodeAt(i);h=(h*16777619)>>>0;}return()=>{h^=h<<13;h^=h>>17;h^=h<<5;h>>>=0;return h/0xFFFFFFFF;};}
+function shufA(pin){const a='abcdefghijklmnopqrstuvwxyz'.split('');const rng=srng(pin);for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function vig(text,pin,e){const key=pin.toLowerCase().replace(/[^a-z]/g,'')||'x';return text.split('').map((c,i)=>{const code=c.charCodeAt(0);if(code>=97&&code<=122){const sh=key.charCodeAt(i%key.length)-97,b=code-97;return String.fromCharCode((e?(b+sh)%26:(b-sh+26)%26)+97);}return c;}).join('');}
+function v3se(text,pin){const sh=shufA(pin),src='abcdefghijklmnopqrstuvwxyz';let s1=text.split('').map(c=>{const idx=src.indexOf(c.toLowerCase());if(idx===-1)return c;const o=sh[idx];return c===c.toUpperCase()?o.toUpperCase():o;}).join('');return vig(s1.toLowerCase(),pin,true).split('').map(c=>GEO[c]||(c===' '?' ':c)).join('');}
+function v3sd(text,pin){const sh=shufA(pin),src='abcdefghijklmnopqrstuvwxyz',rv={};sh.forEach((c,i)=>{rv[c]=src[i];});const s3=text.split('').map(c=>GR[c]||c).join('');return vig(s3,pin,false).split('').map(c=>rv[c.toLowerCase()]||c).join('');}
+function isGeo(t){const c=[...t.trim()];if(c.length<5)return false;return c.filter(x=>GSET.has(x)).length/c.length>0.6;}
+
+// ═══════════════════════════ NAV
+let _curVer='cz';
+function showPg(name){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.hnb').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('on'));
+  if(name==='codzilla'){document.getElementById('pg-codzilla').classList.add('on');document.getElementById('nb-enc').classList.add('on');document.getElementById('mnb-enc').classList.add('on');}
+  else if(name==='vault'){document.getElementById('pg-vault').classList.add('on');document.getElementById('nb-vault').classList.add('on');document.getElementById('mnb-vault').classList.add('on');refreshVault();}
+  else if(name==='files'){document.getElementById('pg-files').classList.add('on');document.getElementById('nb-files').classList.add('on');document.getElementById('mnb-files').classList.add('on');refreshFiles();}
+  else if(name==='spotdown'){document.getElementById('pg-spotdown').classList.add('on');document.getElementById('nb-spotdown').classList.add('on');document.getElementById('mnb-spotdown').classList.add('on');sdInit();}
+  else{document.getElementById('pg-enc').classList.add('on');document.getElementById('nb-enc').classList.add('on');document.getElementById('mnb-enc').classList.add('on');}
+}
+function switchVer(ver){
+  _curVer=ver;
+  document.querySelectorAll('#pg-enc .inner').forEach(d=>d.style.display='none');
+  document.querySelectorAll('.vi').forEach(i=>i.classList.remove('on'));
+  const sv=document.getElementById('sv-'+ver);if(sv)sv.classList.add('on');
+  if(ver==='codzilla'){showPg('codzilla');closeSettings();return;}
+  showPg('enc');
+  const el=document.getElementById('ver-'+ver);if(el)el.style.display='';
+  const titles={cz:'<span style="color:var(--acc)">c</span>ZER<span style="color:var(--gold)">O</span>de',v1:'<span style="color:var(--acc)">ქ</span>Mixed <span style="color:var(--acc)">Ш</span>cript',v2:'<span style="color:var(--acc)">ქ</span>Mixed <span style="color:var(--acc)">Ш</span>cript',v3:'<span style="color:var(--acc)">ქ</span>Mixed <span style="color:var(--acc)">Ш</span>cript'};
+  const pills={cz:'v4 · cZEROde',v1:'v1 · Origin',v2:'v2 · Cracked 💀',v3:'v3 · Uncracked'};
+  document.getElementById('hlogo').innerHTML=(titles[ver]||titles.cz);
+  document.getElementById('vpill').textContent=(pills[ver]||pills.cz);
+  const ct=document.getElementById('cz-title');if(ct)ct.innerHTML='<span style="color:var(--acc)">c</span>ZER<span style="color:var(--gold)">O</span>de';
+  closeSettings();
+}
+function sp(pfx,name,btn){
+  const sid='ver-'+pfx;
+  document.querySelectorAll(`#${sid} .panel`).forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll(`#${sid} .tb`).forEach(b=>b.classList.remove('on'));
+  document.getElementById(`${pfx}p-${name}`).classList.add('on');
+  btn.classList.add('on');
+  if(name==='legend')buildLeg(`${pfx}leg`,`${pfx}chrt`);
+}
+function spf(name,btn){
+  document.querySelectorAll('#pg-files .panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('#pg-files .tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('fp-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name==='stored')refreshFiles();
+  if(name==='playlists')refreshPlaylists();
+}
+
+// ═══════════════════════════ V1
+let _v1m='encode';
+function v1mode(m){_v1m=m;document.getElementById('v1eb').classList.toggle('on',m==='encode');document.getElementById('v1db').classList.toggle('on',m==='decode');document.getElementById('v1caps').style.display=m==='encode'?'':'none';document.getElementById('v1il').textContent=m==='encode'?'English Input':'Mixed Script Input';document.getElementById('v1ol').textContent=m==='encode'?'Mixed Output':'Decoded English';v1up();}
+function v1up(){const i=document.getElementById('v1in').value,b=document.getElementById('v1out');if(!i){b.innerHTML='<span class="ph">output will appear here...</span>';return;}if(_v1m==='encode')b.innerHTML=encT(i,document.getElementById('v1caps').value).map(t=>`<span class="t-${t.type}">${esc(t.text)}</span>`).join('');else b.textContent=decT(i);}
+function v1copy(){const t=document.getElementById('v1out').textContent;if(!t||t.includes('output will appear'))return;cpTxt(t,document.getElementById('v1cb'));}
+
+// ═══════════════════════════ V2
+let _v2m='encode';
+function v2mode(m){_v2m=m;document.getElementById('v2eb').classList.toggle('on',m==='encode');document.getElementById('v2db').classList.toggle('on',m==='decode');document.getElementById('v2caps').style.display=m==='encode'?'':'none';document.getElementById('v2il').textContent=m==='encode'?'English Input':'Mixed Script Input';document.getElementById('v2ol').textContent=m==='encode'?'Mixed Output':'Decoded English';v2up();}
+function v2up(){const i=document.getElementById('v2in').value,b=document.getElementById('v2out');if(!i){b.innerHTML='<span class="ph">output will appear here...</span>';return;}if(_v2m==='encode')b.innerHTML=encT(i,document.getElementById('v2caps').value).map(t=>`<span class="t-${t.type}">${esc(t.text)}</span>`).join('');else b.textContent=decT(i);}
+function v2copy(){const t=document.getElementById('v2out').textContent;if(!t||t.includes('output will appear'))return;cpTxt(t,document.getElementById('v2cb'));}
+function v2sup(){const i=document.getElementById('v2sin').value,ob=document.getElementById('v2sout'),ml=document.getElementById('v2ml'),mt=document.getElementById('v2mth'),ol=document.getElementById('v2sol');for(let x=1;x<=5;x++){document.getElementById(`v2p${x}`).className='mpill';document.getElementById(`v2d${x}`).className='mdot';}if(!i.trim()){ob.className='sbox';ob.innerHTML='<span class="ph">output will appear here...</span>';ml.textContent='● Awaiting input';ml.className='mlbl idle';mt.textContent='—';ol.textContent='Stealth Output';return;}if(isV2C(i)){const r=v2sdec(i);if(r){ml.textContent='◀ Decrypting';ml.className='mlbl dec';ol.textContent='Decoded';ob.className='sbox dec';ob.textContent=r.text;mt.textContent=MN[r.method];document.getElementById(`v2p${r.method}`).className='mpill det';document.getElementById(`v2d${r.method}`).className='mdot on';}else ob.innerHTML='<span class="ph">could not decode</span>';}else{const r=v2senc(i);ml.textContent='▶ Encrypting';ml.className='mlbl enc';ol.textContent='Stealth Output';ob.className='sbox';ob.textContent=r.ct;mt.textContent=MN[r.method];document.getElementById(`v2p${r.method}`).className='mpill active';document.getElementById(`v2d${r.method}`).className='mdot on';}}
+function v2scopy(){const t=document.getElementById('v2sout').textContent;if(!t||t.includes('output will appear')||t.includes('could not'))return;cpTxt(t,document.getElementById('v2sc'));}
+
+// ═══════════════════════════ V3
+let _v3m='encode';
+function v3mode(m){_v3m=m;document.getElementById('v3eb').classList.toggle('on',m==='encode');document.getElementById('v3db').classList.toggle('on',m==='decode');document.getElementById('v3caps').style.display=m==='encode'?'':'none';document.getElementById('v3il').textContent=m==='encode'?'English Input':'Mixed Script Input';document.getElementById('v3ol').textContent=m==='encode'?'Mixed Output':'Decoded English';v3up();}
+function v3up(){const i=document.getElementById('v3in').value,b=document.getElementById('v3out');if(!i){b.innerHTML='<span class="ph">output will appear here...</span>';return;}if(_v3m==='encode')b.innerHTML=encT(i,document.getElementById('v3caps').value).map(t=>`<span class="t-${t.type}">${esc(t.text)}</span>`).join('');else b.textContent=decT(i);}
+function v3copy(){const t=document.getElementById('v3out').textContent;if(!t||t.includes('output will appear'))return;cpTxt(t,document.getElementById('v3cb'));}
+function v3pinch(){const pin=document.getElementById('v3pin').value;pstr(pin,'v3ps');chkEE(pin,'v3-eew');v3sup();}
+function v3sup(){const i=document.getElementById('v3sin').value,pin=document.getElementById('v3pin').value,ob=document.getElementById('v3sout'),ml=document.getElementById('v3ml'),mt=document.getElementById('v3mth'),ol=document.getElementById('v3sol');if(!i.trim()){ob.className='sbox';ob.innerHTML='<span class="ph">output will appear here...</span>';ml.textContent='● Awaiting input';ml.className='mlbl idle';mt.textContent='—';ol.textContent='Stealth Output';return;}const d=isGeo(i);ml.textContent=d?'◀ Decoding':'▶ Encoding';ml.className='mlbl '+(d?'dec':'enc');ol.textContent=d?'Decoded Text':'Stealth Output';if(!pin){ob.innerHTML='<span class="ph" style="color:#553300">⚠ Set a PIN first</span>';mt.textContent='PIN required';return;}try{const r=d?v3sd(i,pin):v3se(i,pin);ob.className='sbox'+(d?' dec':'');ob.textContent=r;mt.textContent='Shuffled α · Vigenère';}catch{ob.innerHTML='<span class="ph" style="color:#882200">❌ Error</span>';}}
+function v3scopy(){const t=document.getElementById('v3sout').textContent;if(!t||t.includes('output will appear')||t.startsWith('⚠')||t.startsWith('❌'))return;cpTxt(t,document.getElementById('v3sc'));}
+
+// ═══════════════════════════ cZEROde
+let _czm='encode',_czD=null;
+function czmode(m){_czm=m;document.getElementById('czeb').classList.toggle('on',m==='encode');document.getElementById('czdb').classList.toggle('on',m==='decode');document.getElementById('czcaps').style.display=m==='encode'?'':'none';document.getElementById('czil').textContent=m==='encode'?'English Input':'Mixed Script Input';document.getElementById('czol').textContent=m==='encode'?'Mixed Output':'Decoded English';czup();}
+function czup(){const i=document.getElementById('czin').value,b=document.getElementById('czout');if(!i){b.innerHTML='<span class="ph">output will appear here...</span>';return;}if(_czm==='encode')b.innerHTML=encT(i,document.getElementById('czcaps').value).map(t=>`<span class="t-${t.type}">${esc(t.text)}</span>`).join('');else b.textContent=decT(i);}
+function czcopy(){const t=document.getElementById('czout').textContent;if(!t||t.includes('output will appear'))return;cpTxt(t,document.getElementById('czcb'));}
+function czpinch(){const pin=document.getElementById('czpin').value;pstr(pin,'czps');chkEE(pin,'cz-eew');czsup();}
+function czsup(){const i=document.getElementById('czsin').value,pin=document.getElementById('czpin').value,ob=document.getElementById('czsout'),ml=document.getElementById('czml'),mt=document.getElementById('czmth'),ol=document.getElementById('czsol');if(!i.trim()){clearTimeout(_czD);ob.className='sbox';ob.innerHTML='<span class="ph">output will appear here...</span>';ml.textContent='● Awaiting input';ml.className='mlbl idle';mt.textContent='—';ol.textContent='Stealth Ciphertext';return;}const d=isAES(i);ml.textContent=d?'◀ Decrypting':'▶ Encrypting';ml.className='mlbl '+(d?'dec':'enc');ol.textContent=d?'Decoded Plaintext':'Stealth Ciphertext';ob.className='sbox'+(d?' dec':'');if(!pin){clearTimeout(_czD);ob.innerHTML='<span class="ph" style="color:#553300">⚠ Set a PIN first</span>';mt.textContent='PIN required';return;}mt.textContent='computing…';ob.innerHTML='<span class="ph" style="color:var(--tfaint)">⏳ deriving key…</span>';clearTimeout(_czD);_czD=setTimeout(()=>_czRun(i,pin,d),300);}
+async function _czRun(i,pin,d){const ob=document.getElementById('czsout'),mt=document.getElementById('czmth');try{rlCheck('czrl');const r=d?await aesDec(i,pin):await aesEnc(i,pin);ob.className='sbox'+(d?' dec':'');ob.textContent=r;mt.textContent='AES-256-GCM · PBKDF2';if(d)rlOk();}catch(e){if(e.message==='rl')return;if(d){rlFail('czrl');ob.innerHTML='<span class="ph" style="color:#882200">❌ Wrong PIN or corrupted</span>';}else ob.innerHTML='<span class="ph" style="color:#882200">❌ Encryption error</span>';mt.textContent='Error';}}
+function czscopy(){const t=document.getElementById('czsout').textContent;if(!t||t.includes('output will appear')||t.startsWith('⚠')||t.startsWith('❌')||t.startsWith('⏳'))return;cpTxt(t,document.getElementById('czsc'));}
+
+// ═══════════════════════════ SAVE TO VAULT
+async function saveToVault(ver){
+  let cipher='',pin='',label='';
+  if(ver==='cz'){cipher=document.getElementById('czsout').textContent;pin=document.getElementById('czpin').value;}
+  else if(ver==='v2'){cipher=document.getElementById('v2sout').textContent;label='v2 stealth';}
+  else if(ver==='v3'){cipher=document.getElementById('v3sout').textContent;pin=document.getElementById('v3pin').value;}
+  if(!cipher||cipher.includes('output will appear')||cipher.startsWith('⚠')||cipher.startsWith('❌')||cipher.startsWith('⏳')){toast('Nothing to save yet','warn');return;}
+  const name=prompt('Name this entry (optional):',`${ver}-${Date.now()}`)||`${ver}-${Date.now()}`;
+  try{
+    await dbPut('vault',{id:Date.now().toString(),name,cipher,ver,pin_hint:pin?`${pin.length} chars`:'',date:Date.now(),size:cipher.length});
+    toast('Saved to vault!','good');
+  }catch(e){toast('Could not save','warn');}
+}
+
+// ═══════════════════════════ VAULT PAGE
+async function refreshVault(){
+  const grid=document.getElementById('vault-grid');
+  const entries=await dbGetAll('vault').catch(()=>[]);
+  entries.sort((a,b)=>b.date-a.date);
+  document.getElementById('vault-count').textContent=`${entries.length} entr${entries.length===1?'y':'ies'}`;
+  if(!entries.length){grid.innerHTML='<div class="empty"><div class="empty-icon">🔒</div><div class="empty-txt">No vault entries yet</div><div class="empty-sub">Use + Vault on any stealth output to save here</div></div>';updateStorage();return;}
+  grid.innerHTML='';
+  entries.forEach(e=>{
+    const card=document.createElement('div');card.className='list-card';
+    const verColors={cz:'var(--gold)',v3:'var(--acc)',v2:'#226688'};
+    card.innerHTML=`<div class="lc-icon">🔐</div><div class="lc-info"><div class="lc-name">${e.name}</div><div class="lc-meta">${fmtDate(e.date)} · ${fmtSize(e.size||0)} · ${e.ver||'?'}</div></div><span class="lc-type txt" style="border-color:${verColors[e.ver]||'var(--bdim)'};color:${verColors[e.ver]||'var(--tdim)'}">${e.ver||'?'}</span><div><button class="lc-del" onclick="delVault('${e.id}',event)">✕</button></div>`;
+    card.onclick=ev=>{if(ev.target.classList.contains('lc-del'))return;openDM(e,'vault');};
+    grid.appendChild(card);
+  });
+  updateStorage();
+}
+async function delVault(id,e){e.stopPropagation();if(!confirm('Delete this entry?'))return;await dbDel('vault',id);toast('Deleted');refreshVault();}
+async function clearVault(){if(!confirm('Clear ALL vault entries? This cannot be undone.'))return;await dbClear('vault');toast('Vault cleared');refreshVault();}
+
+// ═══════════════════════════ STORAGE USAGE
+async function updateStorage(){
+  try{
+    if(navigator.storage&&navigator.storage.estimate){
+      const {usage,quota}=await navigator.storage.estimate();
+      const pct=quota?Math.min((usage/quota)*100,100):0;
+      document.getElementById('storage-fill').style.width=pct+'%';
+      document.getElementById('storage-txt').textContent=`${fmtSize(usage||0)} used of ~${fmtSize(quota||0)} available`;
+    }
+  }catch{}
+}
+
+// ═══════════════════════════ FILES PAGE
+const LARGE_FILE_THRESHOLD = 15 * 1024 * 1024; // 15MB
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB per batch
+let _fileBuffer=null,_fileMime=null,_fileOrigName=null,_fileExt=null,_fileSize=0;
+
+function fpinch(){const pin=document.getElementById('fpin').value;pstr(pin,'fps');chkEE(pin,'f-eew');}
+function pickFile(){const inp=document.createElement('input');inp.type='file';inp.onchange=e=>{const f=e.target.files[0];if(!f)return;loadFile(f);};inp.click();}
+function fdragover(e){e.preventDefault();document.getElementById('file-drop').classList.add('over');}
+function fdragleave(){document.getElementById('file-drop').classList.remove('over');}
+function fdrop(e){e.preventDefault();document.getElementById('file-drop').classList.remove('over');const f=e.dataTransfer.files[0];if(f)loadFile(f);}
+
+function loadFile(f){
+  _fileMime=f.type||'application/octet-stream';
+  _fileExt=f.name.split('.').pop().toLowerCase();
+  _fileOrigName=f.name.replace(/\.[^.]+$/,'');
+  _fileSize=f.size;
+  document.getElementById('file-name').value=_fileOrigName;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    _fileBuffer=ev.target.result;
+    const isImg=f.type.startsWith('image/');
+    const prev=document.getElementById('file-prev');
+    if(isImg&&f.size<5*1024*1024){
+      const r2=new FileReader();r2.onload=e2=>{prev.src=e2.target.result;prev.style.display='block';};r2.readAsDataURL(f);
+    } else {prev.style.display='none';}
+    const isLarge=f.size>=LARGE_FILE_THRESHOLD;
+    const totalBatches=isLarge?Math.ceil(f.size/CHUNK_SIZE):1;
+    const icons={'image/':'🖼','audio/':'🎵','video/':'🎬','application/pdf':'📄','text/':'📝'};
+    let icon='📦';for(const[k,v]of Object.entries(icons))if(f.type.startsWith(k))icon=v;
+    let info=`${icon} ${f.name} · ${fmtSize(f.size)} · ${f.type||'unknown'}`;
+    if(isLarge)info+=`\n⚡ Large file — will encrypt in ${totalBatches} batches of ~${fmtSize(CHUNK_SIZE)} each`;
+    document.getElementById('file-info').textContent=info;
+    document.getElementById('file-info').style.display='block';
+    document.getElementById('file-enc-btn').disabled=false;
+  };
+  reader.readAsArrayBuffer(f);
+}
+
+async function encryptFile(){
+  const pin=document.getElementById('fpin').value;
+  const name=(document.getElementById('file-name').value.trim()||_fileOrigName||'file');
+  if(!_fileBuffer){toast('Select a file first','warn');return;}
+  if(!pin){toast('Enter a PIN first','warn');return;}
+  const prog=document.getElementById('file-prog');
+  prog.style.display='block';
+  document.getElementById('file-enc-btn').disabled=true;
+  const isLarge=_fileSize>=LARGE_FILE_THRESHOLD;
+  const isImg=_fileMime.startsWith('image/');
+  const isAudio=_fileMime.startsWith('audio/');
+  const isVideo=_fileMime.startsWith('video/');
+  const typeClass=isImg?'img':(isAudio?'aud':(isVideo?'vid':'file'));
+  const id=Date.now().toString();
+  try{
+    if(isLarge){
+      // Chunked batch encryption for large files
+      const totalChunks=Math.ceil(_fileBuffer.byteLength/CHUNK_SIZE);
+      const encryptedChunks=[];
+      for(let i=0;i<totalChunks;i++){
+        const pct=Math.round((i/totalChunks)*100);
+        prog.innerHTML=`<div class="batch-bar-wrap"><div class="batch-label">⚡ Encrypting batch ${i+1} of ${totalChunks}...</div><div class="batch-track"><div class="batch-fill" style="width:${pct}%"></div></div><div class="batch-steps">${fmtSize(i*CHUNK_SIZE)} / ${fmtSize(_fileBuffer.byteLength)}</div></div>`;
+        // Yield to UI between batches
+        await new Promise(r=>setTimeout(r,30));
+        const slice=_fileBuffer.slice(i*CHUNK_SIZE,(i+1)*CHUNK_SIZE);
+        const b64=ab2b64(slice);
+        const payload=JSON.stringify({v:1,type:'chunk',index:i,totalChunks,data:b64,mime:_fileMime,name:_fileOrigName,ext:_fileExt});
+        const cipher=await aesEnc(payload,pin);
+        encryptedChunks.push(cipher);
+      }
+      await dbPut('files',{id,name:`${name}.${_fileExt}`,chunks:encryptedChunks,isChunked:true,mime:_fileMime,ext:_fileExt,type:typeClass,date:Date.now(),size:_fileSize});
+      prog.innerHTML=`✅ Encrypted in ${totalChunks} batches: ${name}.${_fileExt}`;
+    } else {
+      prog.textContent='⏳ Encrypting...';
+      const b64=ab2b64(_fileBuffer);
+      const payload=JSON.stringify({v:1,type:'file',mime:_fileMime,name:_fileOrigName,ext:_fileExt,data:b64});
+      const cipher=await aesEnc(payload,pin);
+      await dbPut('files',{id,name:`${name}.${_fileExt}`,cipher,isChunked:false,mime:_fileMime,ext:_fileExt,type:typeClass,date:Date.now(),size:_fileSize});
+      prog.textContent=`✅ Encrypted: ${name}.${_fileExt}`;
+    }
+    toast('File encrypted and stored!','good');
+    _fileBuffer=null;_fileSize=0;
+    document.getElementById('file-prev').style.display='none';
+    document.getElementById('file-info').style.display='none';
+    document.getElementById('file-enc-btn').disabled=true;
+    document.getElementById('file-name').value='';
+  }catch(e){prog.textContent='❌ Encryption failed. '+e.message;toast('Failed','warn');}
+  document.getElementById('file-enc-btn').disabled=false;
+}
+
+async function refreshFiles(){
+  const grid=document.getElementById('files-grid');
+  const entries=await dbGetAll('files').catch(()=>[]);
+  entries.sort((a,b)=>b.date-a.date);
+  document.getElementById('files-count').textContent=`${entries.length} file${entries.length===1?'':'s'}`;
+  if(!entries.length){grid.innerHTML='<div class="empty"><div class="empty-icon">📁</div><div class="empty-txt">No encrypted files yet</div><div class="empty-sub">Encrypt any file in the Encrypt tab</div></div>';updateStorage();return;}
+  grid.innerHTML='';
+  entries.forEach(e=>{
+    const card=document.createElement('div');card.className='list-card';
+    const iconMap={img:'🖼',aud:'🎵',vid:'🎬',file:'📦'};
+    const icon=iconMap[e.type]||'📦';
+    const typeClass=e.type||'fil';
+    const batchBadge=e.isChunked?`<span style="font-size:9px;color:var(--tdim);margin-left:3px">⚡${e.chunks?.length||'?'}x</span>`:'';
+    card.innerHTML=`<div class="lc-icon">${icon}</div><div class="lc-info"><div class="lc-name">${e.name}${batchBadge}</div><div class="lc-meta">${fmtDate(e.date)} · ${fmtSize(e.size||0)}</div></div><span class="lc-type ${typeClass}">${e.ext||e.type}</span><div><button class="lc-del" onclick="delFile('${e.id}',event)">✕</button></div>`;
+    card.onclick=ev=>{if(ev.target.classList.contains('lc-del'))return;openDM(e,'file');};
+    grid.appendChild(card);
+  });
+  updateStorage();
+}
+async function delFile(id,e){e.stopPropagation();if(!confirm('Delete this file?'))return;await dbDel('files',id);toast('Deleted');refreshFiles();}
+async function clearFiles(){if(!confirm('Clear ALL encrypted files? This cannot be undone.'))return;await dbClear('files');toast('Files cleared');refreshFiles();}
+
+// ═══════════════════════════ DECRYPT MODAL
+let _dmEntry=null,_dmStore=null,_dmDecBytes=null,_dmDecMime=null,_dmDecName=null,_dmBlobUrl=null;
+
+function openDM(entry,store){
+  _dmEntry=entry;_dmStore=store;_dmDecBytes=null;_dmDecMime=null;_dmDecName=null;
+  if(_dmBlobUrl){URL.revokeObjectURL(_dmBlobUrl);_dmBlobUrl=null;}
+  document.getElementById('dm-title').textContent='🔓 '+(entry.name||'Decrypt');
+  const chunkInfo=entry.isChunked?` · ${entry.chunks?.length||'?'} batches`:'';
+  document.getElementById('dm-sub').textContent=store==='file'?`${entry.mime||''} · ${fmtSize(entry.size||0)}${chunkInfo}`:'Encrypted text entry';
+  document.getElementById('dm-result').style.display='none';
+  document.getElementById('dm-img').style.display='none';
+  document.getElementById('dm-video').style.display='none';
+  document.getElementById('dm-audio').style.display='none';
+  document.getElementById('dm-txt').style.display='none';
+  document.getElementById('dm-dl').style.display='none';
+  document.getElementById('dm-err').style.display='none';
+  document.getElementById('dm-pin').value='';
+  document.getElementById('dm-ps').textContent='';
+  document.getElementById('dm-rl').style.display='none';
+  document.getElementById('dm-btn').textContent='Decrypt';
+  document.getElementById('dm-btn').disabled=false;
+  document.getElementById('dec-modal').classList.add('on');
+  setTimeout(()=>document.getElementById('dm-pin').focus(),100);
+}
+
+function closeDM(){
+  document.getElementById('dec-modal').classList.remove('on');
+  if(_dmBlobUrl){URL.revokeObjectURL(_dmBlobUrl);_dmBlobUrl=null;}
+  const vid=document.getElementById('dm-video');if(vid){vid.pause();vid.src='';}
+  const aud=document.getElementById('dm-audio');if(aud){aud.pause();aud.src='';}
+}
+
+document.getElementById('dm-pin').oninput=function(){pstr(this.value,'dm-ps');};
+
+async function dmDec(){
+  const pin=document.getElementById('dm-pin').value;
+  const err=document.getElementById('dm-err');err.style.display='none';
+  if(!pin){err.textContent='Enter your PIN.';err.style.display='block';return;}
+  const btn=document.getElementById('dm-btn');btn.disabled=true;
+  // Hide previous results
+  document.getElementById('dm-result').style.display='none';
+  document.getElementById('dm-img').style.display='none';
+  document.getElementById('dm-video').style.display='none';
+  document.getElementById('dm-audio').style.display='none';
+  document.getElementById('dm-txt').style.display='none';
+  document.getElementById('dm-dl').style.display='none';
+  if(_dmBlobUrl){URL.revokeObjectURL(_dmBlobUrl);_dmBlobUrl=null;}
+  try{
+    rlCheck('dm-rl');
+    let bytes=null,mime=null,fname=null;
+    if(_dmStore==='file'&&_dmEntry.isChunked){
+      // Batch decryption for large files
+      const chunks=_dmEntry.chunks;
+      const parts=[];
+      for(let i=0;i<chunks.length;i++){
+        btn.textContent=`Decrypting ${i+1}/${chunks.length}...`;
+        await new Promise(r=>setTimeout(r,5));
+        const pt=await aesDec(chunks[i],pin);
+        parts.push(JSON.parse(pt));
+      }
+      rlOk();
+      parts.sort((a,b)=>a.index-b.index);
+      mime=parts[0].mime;fname=`${parts[0].name}.${parts[0].ext}`;
+      let totalLen=0;parts.forEach(p=>totalLen+=atob(p.data).length);
+      bytes=new Uint8Array(totalLen);let offset=0;
+      for(const p of parts){const bin=atob(p.data);for(let j=0;j<bin.length;j++)bytes[offset++]=bin.charCodeAt(j);}
+    } else if(_dmStore==='file'){
+      const pt=await aesDec(_dmEntry.cipher,pin);
+      let payload;try{payload=JSON.parse(pt);}catch{payload=null;}
+      rlOk();
+      if(payload&&payload.type==='file'&&payload.data){
+        mime=payload.mime||'application/octet-stream';
+        fname=`${payload.name||'file'}.${payload.ext||'bin'}`;
+        bytes=b64ToBytes(payload.data);
+      } else {
+        document.getElementById('dm-result').style.display='block';
+        const tx=document.getElementById('dm-txt');tx.textContent=payload?JSON.stringify(payload,null,2):pt;tx.style.display='block';
+        btn.textContent='Decrypt';btn.disabled=false;return;
+      }
+    } else {
+      // Vault text
+      const pt=await aesDec(_dmEntry.cipher,pin);
+      let payload;try{payload=JSON.parse(pt);}catch{payload=null;}
+      rlOk();
+      document.getElementById('dm-result').style.display='block';
+      const tx=document.getElementById('dm-txt');tx.textContent=payload?JSON.stringify(payload,null,2):pt;tx.style.display='block';
+      btn.textContent='Decrypt';btn.disabled=false;return;
+    }
+    // We have bytes
+    _dmDecBytes=bytes;_dmDecMime=mime;_dmDecName=fname;
+    document.getElementById('dm-result').style.display='block';
+    if(mime.startsWith('image/')){
+      let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));
+      const img=document.getElementById('dm-img');img.src=`data:${mime};base64,${btoa(bin)}`;img.style.display='block';
+      document.getElementById('dm-dl').style.display='';
+    } else if(mime.startsWith('video/')||mime.startsWith('audio/')){
+      const blob=new Blob([bytes],{type:mime});
+      _dmBlobUrl=URL.createObjectURL(blob);
+      if(mime.startsWith('video/')){const vid=document.getElementById('dm-video');vid.src=_dmBlobUrl;vid.style.display='block';}
+      else{const aud=document.getElementById('dm-audio');aud.src=_dmBlobUrl;aud.style.display='block';}
+      document.getElementById('dm-dl').style.display='';
+    } else {
+      const tx=document.getElementById('dm-txt');tx.textContent=`[${mime}] — ready to download`;tx.style.display='block';
+      document.getElementById('dm-dl').style.display='';
+    }
+  }catch(e){
+    if(e.message==='rl')return;
+    rlFail('dm-rl');err.textContent='Wrong PIN or corrupted entry.';err.style.display='block';
+  }
+  btn.textContent='Decrypt';btn.disabled=false;
+}
+
+function dmDownload(){
+  if(!_dmDecBytes||!_dmDecMime)return;
+  const blob=new Blob([_dmDecBytes],{type:_dmDecMime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=_dmDecName||'decrypted';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('Downloaded!','good');
+}
+
+// ═══════════════════════════ PLAYLISTS
+let _curPL=null,_plTracks=[],_plIdx=0,_plBlobUrls=[];
+
+async function refreshPlaylists(){
+  const grid=document.getElementById('pl-grid');
+  const entries=await dbGetAll('playlists').catch(()=>[]);
+  entries.sort((a,b)=>b.date-a.date);
+  document.getElementById('pl-count').textContent=`${entries.length} playlist${entries.length===1?'':'s'}`;
+  if(!entries.length){grid.innerHTML='<div class="empty"><div class="empty-icon">🎵</div><div class="empty-txt">No playlists yet</div><div class="empty-sub">Click + New Playlist to get started</div></div>';return;}
+  grid.innerHTML='';
+  entries.forEach(pl=>{
+    const card=document.createElement('div');card.className='list-card';
+    const icon=pl.type==='audio'?'🎵':'🎬';
+    const limit=pl.type==='audio'?50:10;
+    const typeClass=pl.type==='audio'?'pl-a':'pl-v';
+    card.innerHTML=`<div class="lc-icon">${icon}</div><div class="lc-info"><div class="lc-name">${pl.name}</div><div class="lc-meta">${fmtDate(pl.date)} · ${pl.fileIds.length}/${limit} files</div></div><span class="lc-type ${typeClass}">${pl.type}</span><div class="pl-card-actions"><button class="abtn" style="font-size:10px;padding:4px 10px" onclick="openPLPlayer('${pl.id}',event)">▶ Play</button><button class="lc-del" onclick="delPlaylist('${pl.id}',event)">✕</button></div>`;
+    grid.appendChild(card);
+  });
+}
+
+let _plType='audio';
+function setPLType(t){
+  _plType=t;
+  document.getElementById('pl-type-audio').classList.toggle('on',t==='audio');
+  document.getElementById('pl-type-video').classList.toggle('on',t==='video');
+  populatePLFileList();
+}
+
+async function openCreatePlaylist(){
+  _plType='audio';
+  document.getElementById('pl-type-audio').classList.add('on');
+  document.getElementById('pl-type-video').classList.remove('on');
+  document.getElementById('pl-name-inp').value='';
+  await populatePLFileList();
+  document.getElementById('create-pl-modal').classList.add('on');
+}
+function closeCreatePlaylist(){document.getElementById('create-pl-modal').classList.remove('on');}
+
+async function populatePLFileList(){
+  const list=document.getElementById('pl-file-list');
+  const files=await dbGetAll('files').catch(()=>[]);
+  const limit=_plType==='audio'?50:10;
+  const filtered=files.filter(f=>_plType==='audio'?(f.mime&&f.mime.startsWith('audio/')):( f.mime&&f.mime.startsWith('video/')));
+  document.getElementById('pl-sel-count').textContent=`0 of ${limit} selected`;
+  if(!filtered.length){list.innerHTML=`<div class="pl-empty-msg">No ${_plType} files found. Encrypt some ${_plType} files first.</div>`;return;}
+  list.innerHTML='';
+  filtered.forEach(f=>{
+    const row=document.createElement('label');row.className='pl-file-row';
+    const ext=(f.ext||'').toUpperCase();
+    row.innerHTML=`<input type="checkbox" class="pl-file-cb" value="${f.id}" onchange="updatePLSelCount(${limit})"><span>${f.name}</span><span class="pl-type-badge">${ext}</span><span class="pl-sz">${fmtSize(f.size||0)}</span>`;
+    list.appendChild(row);
+  });
+}
+
+function updatePLSelCount(limit){
+  const sel=document.querySelectorAll('.pl-file-cb:checked').length;
+  document.getElementById('pl-sel-count').textContent=`${sel} of ${limit} selected`;
+  document.querySelectorAll('.pl-file-cb:not(:checked)').forEach(cb=>{cb.disabled=sel>=limit;});
+}
+
+async function createPlaylist(){
+  const name=document.getElementById('pl-name-inp').value.trim();
+  if(!name){toast('Enter a playlist name','warn');return;}
+  const selected=[...document.querySelectorAll('.pl-file-cb:checked')].map(cb=>cb.value);
+  if(!selected.length){toast('Select at least one file','warn');return;}
+  const id=Date.now().toString();
+  await dbPut('playlists',{id,name,type:_plType,fileIds:selected,date:Date.now()});
+  toast('Playlist created!','good');
+  closeCreatePlaylist();
+  refreshPlaylists();
+}
+
+async function delPlaylist(id,e){
+  e.stopPropagation();
+  if(!confirm('Delete this playlist?'))return;
+  await dbDel('playlists',id);toast('Deleted');refreshPlaylists();
+}
+
+async function openPLPlayer(id,e){
+  if(e)e.stopPropagation();
+  const lists=await dbGetAll('playlists');
+  _curPL=lists.find(p=>p.id===id);
+  if(!_curPL)return;
+  const icon=_curPL.type==='audio'?'🎵':'🎬';
+  document.getElementById('pl-player-title').textContent=`${icon} ${_curPL.name}`;
+  document.getElementById('pl-dec-sub').textContent=`Enter your PIN to decrypt and play ${_curPL.fileIds.length} file${_curPL.fileIds.length===1?'':'s'}`;
+  document.getElementById('pl-dec-step').style.display='block';
+  document.getElementById('pl-player-area').style.display='none';
+  document.getElementById('pl-dec-prog').style.display='none';
+  document.getElementById('pl-dec-btns').style.display='flex';
+  document.getElementById('pl-dec-btn').disabled=false;
+  document.getElementById('pl-dec-btn').textContent='🔓 Decrypt & Play All';
+  document.getElementById('pl-pin').value='';
+  document.getElementById('pl-ps').textContent='';
+  document.getElementById('pl-player').classList.add('on');
+}
+
+function closePLPlayer(){
+  document.getElementById('pl-player').classList.remove('on');
+  _plBlobUrls.forEach(u=>URL.revokeObjectURL(u));_plBlobUrls=[];_plTracks=[];
+  const vid=document.getElementById('pl-video');if(vid){vid.pause();vid.src='';vid.style.display='none';}
+  const aud=document.getElementById('pl-audio');if(aud){aud.pause();aud.src='';aud.style.display='none';}
+}
+
+document.getElementById('pl-pin').oninput=function(){pstr(this.value,'pl-ps');};
+
+async function decryptAndPlayPlaylist(){
+  const pin=document.getElementById('pl-pin').value;
+  if(!pin){toast('Enter your PIN','warn');return;}
+  if(!_curPL)return;
+  const btn=document.getElementById('pl-dec-btn');
+  btn.disabled=true;btn.textContent='Decrypting...';
+  document.getElementById('pl-dec-prog').style.display='block';
+  document.getElementById('pl-dec-btns').style.display='none';
+  const label=document.getElementById('pl-dec-label');
+  const fill=document.getElementById('pl-dec-fill');
+  const steps=document.getElementById('pl-dec-steps');
+  const allFiles=await dbGetAll('files');
+  const plFiles=_curPL.fileIds.map(id=>allFiles.find(f=>f.id===id)).filter(Boolean);
+  _plTracks=[];_plBlobUrls.forEach(u=>URL.revokeObjectURL(u));_plBlobUrls=[];
+  let failCount=0;
+  for(let i=0;i<plFiles.length;i++){
+    const f=plFiles[i];
+    label.textContent=`Decrypting ${i+1} of ${plFiles.length}: ${f.name}`;
+    fill.style.width=`${Math.round(((i+1)/plFiles.length)*100)}%`;
+    steps.textContent=`${i+1} / ${plFiles.length} files`;
+    await new Promise(r=>setTimeout(r,10));
+    try{
+      let bytes,mime,tname;
+      if(f.isChunked){
+        const parts=[];
+        for(const chunk of f.chunks){const pt=await aesDec(chunk,pin);parts.push(JSON.parse(pt));}
+        parts.sort((a,b)=>a.index-b.index);
+        mime=parts[0].mime;tname=parts[0].name+'.'+parts[0].ext;
+        let len=0;parts.forEach(p=>len+=atob(p.data).length);
+        bytes=new Uint8Array(len);let off=0;
+        for(const p of parts){const bin=atob(p.data);for(let j=0;j<bin.length;j++)bytes[off++]=bin.charCodeAt(j);}
+      } else {
+        const pt=await aesDec(f.cipher,pin);const payload=JSON.parse(pt);
+        mime=payload.mime;tname=(payload.name||'track')+'.'+payload.ext;
+        bytes=b64ToBytes(payload.data);
+      }
+      const blob=new Blob([bytes],{type:mime});
+      const url=URL.createObjectURL(blob);
+      _plBlobUrls.push(url);
+      _plTracks.push({url,mime,name:tname,id:f.id});
+    }catch(err){
+      _plBlobUrls.push(null);
+      _plTracks.push({url:null,mime:'',name:f.name,id:f.id,error:true});
+      failCount++;
+    }
+  }
+  if(!_plTracks.some(t=>!t.error)){
+    label.textContent='❌ Failed to decrypt any files. Check your PIN.';
+    btn.textContent='🔓 Decrypt & Play All';btn.disabled=false;
+    document.getElementById('pl-dec-btns').style.display='flex';
+    return;
+  }
+  label.textContent=`✅ ${plFiles.length-failCount} files ready${failCount?` (${failCount} failed)`:''}`;
+  await new Promise(r=>setTimeout(r,600));
+  document.getElementById('pl-dec-step').style.display='none';
+  document.getElementById('pl-player-area').style.display='block';
+  _plIdx=0;buildPLQueue();
+  // Find first playable track
+  const firstOk=_plTracks.findIndex(t=>!t.error);
+  if(firstOk>=0)playPLTrack(firstOk);
+}
+
+function buildPLQueue(){
+  const queue=document.getElementById('pl-queue');
+  queue.innerHTML='';
+  _plTracks.forEach((t,i)=>{
+    const row=document.createElement('div');
+    row.className='pl-queue-row'+(i===_plIdx?' on':'');
+    row.id=`plq-${i}`;
+    row.innerHTML=t.error
+      ?`<span class="plq-num">${i+1}</span><span class="plq-name" style="color:#884422">❌ ${t.name}</span>`
+      :`<span class="plq-num">${i+1}</span><span class="plq-name">${t.name}</span>`;
+    if(!t.error)row.onclick=()=>playPLTrack(i);
+    queue.appendChild(row);
+  });
+}
+
+function playPLTrack(idx){
+  _plIdx=idx;
+  const track=_plTracks[idx];
+  if(!track||track.error){
+    // Find next valid track
+    const next=_plTracks.findIndex((t,i)=>i>idx&&!t.error);
+    if(next>=0)playPLTrack(next);return;
+  }
+  const vid=document.getElementById('pl-video');
+  const aud=document.getElementById('pl-audio');
+  const icon=_curPL.type==='audio'?'🎵':'🎬';
+  document.getElementById('pl-now-icon').textContent=icon;
+  document.getElementById('pl-now-title-txt').textContent=track.name;
+  if(track.mime.startsWith('video/')){
+    aud.pause();aud.style.display='none';aud.src='';
+    vid.src=track.url;vid.style.display='block';
+    vid.onended=nextPLTrack;vid.play().catch(()=>{});
+  } else {
+    vid.pause();vid.style.display='none';vid.src='';
+    aud.src=track.url;aud.style.display='block';
+    aud.onended=nextPLTrack;aud.play().catch(()=>{});
+  }
+  // Update queue highlighting
+  document.querySelectorAll('.pl-queue-row').forEach((r,i)=>r.classList.toggle('on',i===idx));
+  // Scroll to current track
+  const activeRow=document.getElementById(`plq-${idx}`);
+  if(activeRow)activeRow.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+
+function nextPLTrack(){
+  const next=_plTracks.findIndex((t,i)=>i>_plIdx&&!t.error);
+  if(next>=0)playPLTrack(next);
+}
+function prevPLTrack(){
+  for(let i=_plIdx-1;i>=0;i--){if(!_plTracks[i].error){playPLTrack(i);return;}}
+}
+
+// ═══════════════════════════ SETTINGS
+function openSettings(){document.getElementById('settings').classList.add('on');document.getElementById('sbk').classList.add('on');}
+function closeSettings(){document.getElementById('settings').classList.remove('on');document.getElementById('sbk').classList.remove('on');}
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('czd_theme',t);document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));const m={'gothic':'tc-gothic','minimal-white':'tc-white','minimal-black':'tc-black'};const el=document.getElementById(m[t]);if(el)el.classList.add('on');}
+
+// ═══════════════════════════ TUTORIAL
+let _ts=0;
+function openTut(){_ts=0;showTS(0);document.getElementById('tut').classList.add('on');}
+function closeTut(){document.getElementById('tut').classList.remove('on');localStorage.setItem('czd_launched','1');}
+function tutNext(){if(_ts<5){_ts++;showTS(_ts);}else closeTut();}
+function showTS(n){document.querySelectorAll('.tut-step').forEach(s=>s.classList.remove('on'));document.getElementById('ts-'+n).classList.add('on');}
+
+// ═══════════════════════════ EASTER EGG
+let _eeShown=false;
+function showEE(){if(_eeShown)return;_eeShown=true;document.getElementById('ee').classList.add('on');}
+function closeEE(){document.getElementById('ee').classList.remove('on');setTimeout(()=>_eeShown=false,5000);}
+
+// ═══════════════════════════ CODZILLA
+const CZST=["Booting quantum processors...","Aligning neural matrices...","Calibrating Codzilla cores v9.4.2...","Injecting chaos entropy seed...","Parsing your entire vibe...","Consulting the ancient scripts...","Cross-referencing 47 encrypted databases...","Warming up the encode reactors...","Stabilizing the warp field...","Compressing temporal buffers...","This is definitely working, trust...","Summoning the algorithm from the void...","Applying 9-layer quantum obfuscation...","Almost there... (not really)...","Final verification phase initiating..."];
+let _czR=null,_czSt=null;
+function startCZ(){if(!document.getElementById('czilla-txt').value.trim())return;document.getElementById('czilla-inp').style.display='none';document.getElementById('czlw').style.display='block';document.getElementById('czrw').style.display='none';document.getElementById('czf').style.width='0%';document.getElementById('czp2').textContent='0%';_czSt=performance.now();_czR=requestAnimationFrame(tickCZ);}
+function tickCZ(now){const D=30000,el=now-_czSt,t=Math.min(el/D,1),pct=t>=1?99.99999:t*99.99999;document.getElementById('czf').style.width=pct+'%';const pe=document.getElementById('czp2');if(pct>=99.99999)pe.textContent='99.99999%';else if(pct<1)pe.textContent=pct.toFixed(4)+'%';else if(pct<10)pe.textContent=pct.toFixed(3)+'%';else if(pct<50)pe.textContent=pct.toFixed(2)+'%';else pe.textContent=pct.toFixed(1)+'%';document.getElementById('czst').textContent=CZST[Math.min(Math.floor(t*CZST.length),CZST.length-1)];if(t<1)_czR=requestAnimationFrame(tickCZ);else setTimeout(()=>{document.getElementById('czlw').style.display='none';document.getElementById('czrw').style.display='block';document.getElementById('czmsg').textContent='bro the fuck did you just type there, twin not even me can encode that shit 😭🥀✌️';},500);}
+function resetCZ(){cancelAnimationFrame(_czR);_czSt=null;document.getElementById('czilla-txt').value='';document.getElementById('czilla-inp').style.display='block';document.getElementById('czlw').style.display='none';document.getElementById('czrw').style.display='none';document.getElementById('czf').style.width='0%';}
+
+// ═══════════════════════════ SPOTDOWN
+let _sdInited=false,_sdBlocked=false;
+function sdInit(){
+  if(_sdInited)return;
+  _sdInited=true;
+  // Give the iframe 5 seconds to load before assuming it's blocked
+  _sdBlockTimer=setTimeout(sdFrameBlocked,5000);
+}
+let _sdBlockTimer=null;
+function sdFrameLoaded(){
+  // iframe fired onload — it might have loaded, or it might have loaded an error page
+  // We can't read inside it cross-origin, so just clear the block timer and
+  // try to detect the X-Frame-Options block by checking if the iframe is blank
+  clearTimeout(_sdBlockTimer);
+  try{
+    // If we can access contentDocument it's same-origin (won't happen here), 
+    // if it throws or is null the frame was blocked
+    const f=document.getElementById('sd-iframe');
+    const cd=f.contentDocument||f.contentWindow.document;
+    // If we got here the frame actually loaded same-origin — unlikely but fine
+    if(!cd||!cd.body||cd.body.innerHTML===''){sdFrameBlocked();}
+  }catch(e){
+    // Cross-origin means the page loaded in the frame (good!) OR was blocked with 
+    // a navigation to about:blank — we can't tell the difference.
+    // Show a "check" message instead of assuming blocked.
+    sdFrameMaybeOk();
+  }
+}
+function sdFrameMaybeOk(){
+  // Cross-origin load fired — iframe may be showing spotdown.
+  // If the site blocked it, the browser will show its own error inside the frame.
+  // Nothing more we can do — just keep the frame visible.
+  clearTimeout(_sdBlockTimer);
+  document.getElementById('sd-blocked').style.display='none';
+  document.getElementById('sd-iframe').style.display='block';
+}
+function sdFrameBlocked(){
+  clearTimeout(_sdBlockTimer);
+  // Show the blocked UI
+  document.getElementById('sd-iframe').style.display='none';
+  const bl=document.getElementById('sd-blocked');
+  bl.style.display='flex';
+}
+(async function(){
+  const t=localStorage.getItem('czd_theme')||'gothic';
+  setTheme(t);
+  switchVer('cz');
+  buildLeg('czleg','czchrt');
+  if(!localStorage.getItem('czd_launched'))setTimeout(openTut,700);
+  await updateStorage();
+})();
+</script>
+</body>
+</html>
