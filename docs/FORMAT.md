@@ -230,14 +230,17 @@ Every name that comes from a file (containers, bundles, backups, legacy records,
 `app/util/format.js` `safeFilename` and is only ever shown as text:
 
 1. Lone surrogates become U+FFFD.
-2. These are removed: C0/C1 controls, DEL, U+061C, U+200B–U+200F, U+2028–U+202E, U+2060–U+2064, U+2066–U+206F,
-   U+FEFF and U+FFF9–U+FFFB (zero-width, bidi and other invisible characters).
+2. These are removed: C0/C1 controls, DEL, U+00AD, U+034F, U+061C, U+115F, U+1160, U+17B4, U+17B5,
+   U+180B–U+180F, U+200B–U+200F, U+2028–U+202E, U+2060–U+2064, U+2066–U+206F, U+3164, U+FEFF, U+FFA0 and
+   U+FFF9–U+FFFB (zero-width, bidi, filler and other invisible characters).
 3. The name is NFC-normalized.
 4. `/ \ : * ? " < > |` become `_`.
-5. Leading and trailing dots and spaces are trimmed.
-6. The name is capped at 200 UTF-16 units, keeping the extension.
-7. Windows device names (`CON`, `PRN`, `AUX`, `NUL`, `COM0-9`, `LPT0-9`) get a `_` prefix.
-8. An empty name becomes `file`.
+5. Every run of whitespace (any Unicode space, including no-break spaces and U+2800) becomes one space, so blank
+   padding can't push the real extension out of view (`invoice.pdf      …` for `invoice.pdf<blanks>.exe`).
+6. Leading and trailing dots and spaces are trimmed.
+7. The name is capped at 200 UTF-16 units, keeping the extension.
+8. Windows device names (`CON`, `PRN`, `AUX`, `NUL`, `COM0-9`, `LPT0-9`) get a `_` prefix.
+9. An empty name becomes `file`.
 
 ### 3.6 Payload
 

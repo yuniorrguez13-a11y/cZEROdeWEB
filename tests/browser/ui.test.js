@@ -394,8 +394,11 @@ export default async function (t) {
     inside.remove();
     outside.remove();
     announce('Hello there');
-    await wait(50);
     const live = document.getElementById('announcer');
+    t.equal(live.textContent, '', 'the text lands in the next frame');
+    // A frame callback registered after announce()'s own runs after it (a fixed wait can end before a busy
+    // machine paints the next frame).
+    await frame();
     t.equal(live.getAttribute('aria-live'), 'polite');
     t.equal(live.textContent, 'Hello there');
   });

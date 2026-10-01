@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Main window: native open/save dialogs, the <AppData>/vault2 store (and the old <AppData>/vault folder, read by convention only), files/folders the user picks or opens with the app, and the releases page.",
+  "description": "Main window: native open/save dialogs, the <AppData>/vault2 store (and the old <AppData>/vault folder, read only: exists, stat, read-dir and read-file are its only commands), files/folders the user picks or opens with the app, and the releases page.",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -9,12 +9,12 @@
     "dialog:allow-open",
     "dialog:allow-save",
 
-    "fs:allow-exists",
-    "fs:allow-stat",
+    { "identifier": "fs:allow-exists", "allow": [{ "path": "$APPDATA/vault" }, { "path": "$APPDATA/vault/**" }] },
+    { "identifier": "fs:allow-stat", "allow": [{ "path": "$APPDATA/vault" }, { "path": "$APPDATA/vault/**" }] },
     "fs:allow-fstat",
-    "fs:allow-read-dir",
+    { "identifier": "fs:allow-read-dir", "allow": [{ "path": "$APPDATA/vault" }, { "path": "$APPDATA/vault/**" }] },
     "fs:allow-mkdir",
-    "fs:allow-read-file",
+    { "identifier": "fs:allow-read-file", "allow": [{ "path": "$APPDATA/vault" }, { "path": "$APPDATA/vault/**" }] },
     "fs:allow-write-file",
     "fs:allow-open",
     "fs:allow-read",
@@ -27,9 +27,7 @@
       "identifier": "fs:scope",
       "allow": [
         { "path": "$APPDATA/vault2" },
-        { "path": "$APPDATA/vault2/**" },
-        { "path": "$APPDATA/vault" },
-        { "path": "$APPDATA/vault/**" }
+        { "path": "$APPDATA/vault2/**" }
       ]
     },
 

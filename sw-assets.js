@@ -135,7 +135,7 @@ self.INTEGRITY = {
   "app/ui/viewer.js": "7l66L6JwXjXKUDZIe/x/hSw5tfrR09neZmXm8FRwqEo=",
   "app/util/bytes.js": "qZ7PzmoCgF8nEgfDT6dp5AjaczQmYqXuVUBesYBQs6o=",
   "app/util/dom.js": "hMQJ36DdSvx9Uv5PZgmuILX3gWk1HPW4eQZxwYYuzpk=",
-  "app/util/format.js": "tXDza0q2Dmxc5U+CCQGQHZIZjai440R0HvMKEJWE+ko=",
+  "app/util/format.js": "WFaOFsWu0IN3MMmsSM1S7yVTNFGsQTKhNq0daZblujc=",
   "app/util/stream.js": "QpstVnqaPjE/HFRI3M6I4kOc0FTsjEBchxffad4brvE=",
   "app/vault/autolock.js": "p2ptKNLo+nWzTQLYa0CGCRw5KsRj7j5jnVgdxXwd220=",
   "app/vault/backup.js": "ybO+iT4g6sP9w5POw+YWdUmyn8zttkINcpI095vi/Zw=",
@@ -185,4 +185,4 @@ self.INTEGRITY = {
   "index.html": "BTIIdA2rmNynJJoKV4stLB4AzxmqWVNeoiGfdyA01dA=",
   "manifest.webmanifest": "kKGFnUnIckY3dA3yo5mQyLrKpNK0T1GSS7OjOJEvIR4="
 };
-self.ASSET_VERSION = 'dc8dd4c53374';
+self.ASSET_VERSION = '188e413e2979';

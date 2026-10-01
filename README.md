@@ -177,7 +177,8 @@ are built straight from this repository by GitHub Actions. Only download them fr
   the app *"is damaged and can't be opened"*, run this in Terminal once and open it again:
   `xattr -dr com.apple.quarantine /Applications/cZEROde.app`. macOS 12 or newer is required.
 - **Linux** (`.deb` or AppImage):
-  - Install the `.deb` with `sudo apt install ./cZEROde_*.deb`.
+  - Install the `.deb` with `sudo apt install ./czeroode_*.deb` (the package is called `czeroode`; remove it
+    with `sudo apt remove czeroode`).
   - For the AppImage, make it executable (`chmod +x`) and run it.
   - To play audio and video, have `gstreamer1.0-plugins-good` and `gstreamer1.0-libav` installed.
   - On Linux the desktop app plays audio and video previews from memory, up to 512 MB per file. For bigger files,

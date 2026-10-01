@@ -94,7 +94,8 @@ cZEROde is a static app: the code you run is the code in this repository, delive
     you choose to reload, and never while the vault is unlocked or a job is running.
 - **Desktop.**
   - Installers are built by GitHub Actions from this repository (`.github/workflows/desktop.yml`) and published
-    as workflow artifacts and GitHub Releases.
+    as workflow artifacts and GitHub Releases. Every action the workflows use is pinned to a commit, checkouts
+    keep no credentials, and only release (tag) builds get a token that can write to the repository.
   - They are **not code-signed**, so Windows SmartScreen and macOS Gatekeeper warn about them. Download them
     only from `https://github.com/yuniorrguez13-a11y/cZEROdeWEB/releases` or from this repository's Actions runs.
   - There is no auto-updater. "Get the latest version" only opens the releases page.
@@ -115,7 +116,7 @@ cZEROde is a static app: the code you run is the code in this repository, delive
 | Where the vault lives | IndexedDB + the origin private file system of that browser profile | `<app data>/com.czeroode.app/vault2/` (containers + an `index.json` mirror of the encrypted index) plus the webview's IndexedDB |
 | Can the browser delete it? | Yes, under storage pressure unless "Keep my data" (persistent storage) is granted; Safari can erase a vault in a Safari **tab** after 7 days without use (install the app first on iPhone/iPad) | No; uninstalling may |
 | Big video playback | streamed through the service worker, decrypted chunk by chunk | streamed from disk by the `czstream` protocol (Windows, macOS); **Linux** decrypts previews in memory up to 512 MB |
-| File access | only files you pick | files you pick plus its own `vault2` folder and the old cZEROde 1 `vault` folder (read only by convention) |
+| File access | only files you pick | files you pick plus its own `vault2` folder and the old cZEROde 1 `vault` folder (read only) |
 | Updates | service worker, applied on your tap | download a new installer from Releases |
 | Code signing | HTTPS from GitHub Pages | none (SmartScreen / Gatekeeper warnings) |
 
@@ -177,9 +178,12 @@ A `.czb` holds:
 - every encrypted index record, each with its SHA-256;
 - every container verbatim, each with its header MAC.
 
-The whole table is authenticated with HMAC-SHA256 under a key derived from the vault key. Restoring verifies
-everything before anything becomes visible. Merging from another vault re-encrypts every item into fresh
-containers.
+The whole table is authenticated with HMAC-SHA256 under a key derived from the vault key. Before anything
+becomes visible, restoring verifies that table, every index record and every item's header (the header MAC binds
+the item's key, its metadata and its exact length). The contents of an item are authenticated chunk by chunk when
+it is opened, like every vault item: a backup damaged inside an item's contents restores, and that item then says
+"This file is damaged" when you open it. Merging from another vault re-encrypts every item into fresh containers,
+so there every chunk is checked during the merge.
 
 ### What is visible without the passphrase
 
@@ -225,6 +229,14 @@ it.
   install the app, and keep `.czb` backups.
 - **Lower-memory vaults.** A vault created with the low-memory parameters stays that way. There is no automatic
   upgrade and no vault key rotation in 2.0.
+- **Removed or rolled-back items.** Every item and index record is authenticated on its own, so a changed,
+  swapped or cut-short item is detected. There is no checksum over the vault as a whole: someone who can write to
+  the device's storage can delete items, or put back an item (record and file) they copied earlier, such as a
+  deleted item or an older version of a note, and cZEROde can't tell.
+- **Incoming files can come from any website.** cZEROde web accepts files shared to it from the system share
+  sheet (installed app). Any web page can post files to that same address, so files under **Incoming** are not
+  necessarily from you. They are only listed (a single locked file waits in the Open card for its passphrase):
+  nothing is decrypted, added to the vault or restored until you act.
 - **Shared-origin risk (web)**, see [above](#the-web-version-shares-its-address).
 - **Unsigned installers**, see [Code delivery](#code-delivery-and-trust).
 - **Legacy formats are weak**, see [Legacy data](#legacy-data-czerode-1).

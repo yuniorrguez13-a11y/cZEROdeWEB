@@ -241,9 +241,12 @@ test('safeFilename: a device name that also hits the 200-unit cap keeps its exte
     assert.ok(out.endsWith('.txt'), `${n}: kept the extension, got …${out.slice(-6)}`);
     assert.equal(safeFilename(out), out, 'idempotent');
   }
-  // Cutting the stem can expose a device name ("con   …   .txt" → "con.txt"): still prefixed.
+  // Cutting the stem can expose a device name ("con……….txt" → "con.txt"): still prefixed.
+  const dotted = `con${'.'.repeat(300)}.txt`;
+  assert.equal(safeFilename(dotted), '_con.txt');
+  // Blank runs collapse to one space before the cap (security audit): the device name is still prefixed.
   const spaced = `con${' '.repeat(300)}.txt`;
-  assert.equal(safeFilename(spaced), '_con.txt');
+  assert.equal(safeFilename(spaced), '_con .txt');
 });
 
 test('safeFilename: invisible format characters are stripped too', () => {

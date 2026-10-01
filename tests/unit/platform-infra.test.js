@@ -40,6 +40,19 @@ test('tauri.conf.json: identity, build, window, plugins-facing settings (§2.5)'
   assert.equal(w.dragDropEnabled, false);
 });
 
+test('Linux packaging: package/file names follow the czeroode binary, the menu entry still says cZEROde', () => {
+  // Tauri names the .deb package after kebab-case(productName): 'cZEROde' would ship as "c-zer-ode".
+  const linux = json('src-tauri/tauri.linux.conf.json');
+  const crate = /^\[package\][^[]*?^name\s*=\s*"([^"]+)"/m.exec(read('src-tauri/Cargo.toml'))?.[1];
+  assert.equal(crate, 'czeroode');
+  assert.deepEqual(Object.keys(linux).filter((k) => k !== '$schema'), ['productName'], 'the Linux override changes nothing else');
+  assert.equal(linux.productName, crate);
+  assert.equal(conf.productName, 'cZEROde', 'Windows/macOS keep the product name');
+  const tpl = read(`src-tauri/${conf.bundle.linux.deb.desktopTemplate}`);
+  assert.match(tpl, /^Name=cZEROde$/m, 'menu entry name is not the Linux product name');
+  assert.doesNotMatch(tpl, /\{\{name\}\}/);
+});
+
 test('tauri.conf.json: bundle (file associations, NSIS per user, deb recommends, macOS 12, icons)', () => {
   const b = conf.bundle;
   assert.deepEqual(b.fileAssociations.map((a) => ({ ext: a.ext, name: a.name, mimeType: a.mimeType, role: a.role })), [
@@ -71,7 +84,8 @@ test('capabilities: main window only; fs commands, the vault scopes and deny-def
   }
   assert.ok(!ids.some((p) => /^fs:(allow|scope)-(app|home|desktop|document|download|picture|video|audio|temp|exe|resource)/.test(p)), 'no broad fs presets');
   const scope = caps.permissions.find((p) => p.identifier === 'fs:scope');
-  assert.deepEqual(scope.allow, [{ path: '$APPDATA/vault2' }, { path: '$APPDATA/vault2/**' }, { path: '$APPDATA/vault' }, { path: '$APPDATA/vault/**' }]);
+  // The old cZEROde 1 folder is not in the global scope: only the read commands reach it (security-audit.test.js).
+  assert.deepEqual(scope.allow, [{ path: '$APPDATA/vault2' }, { path: '$APPDATA/vault2/**' }]);
   assert.equal(scope.deny, undefined);
   const opener = caps.permissions.filter((p) => typeof p === 'object' && p.identifier.startsWith('opener:'));
   assert.deepEqual(opener, [{ identifier: 'opener:allow-open-url', allow: [{ url: RELEASES_URL }] }]);
@@ -179,7 +193,7 @@ test('CI workflows: unit + precache check + browser/e2e on ubuntu, cargo test/cl
     assert.ok(ci.includes(s), `ci.yml: ${s}`);
   }
   const desk = read('.github/workflows/desktop.yml');
-  for (const s of ['tauri-apps/tauri-action@v1', '--bundles nsis', 'windows-latest', 'ubuntu-22.04', 'macos-latest', 'aarch64-apple-darwin', "tags: ['v*']",
+  for (const s of ['tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # v1', '--bundles nsis', 'windows-latest', 'ubuntu-22.04', 'macos-latest', 'aarch64-apple-darwin', "tags: ['v*']",
     'workflow_dispatch', 'src-tauri/**', 'scripts/**', 'package*.json']) {
     assert.ok(desk.includes(s), `desktop.yml: ${s}`);
   }

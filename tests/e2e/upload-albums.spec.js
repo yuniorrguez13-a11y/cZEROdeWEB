@@ -931,18 +931,53 @@ test('double clicks: cancelling a row is not undone by the second click; removin
   const errors = await watch(page);
   await openVault(page);
   await page.evaluate(async () => {
-    window.__p = window.__U.importFiles({ vault: window.__vault, files: [window.__big(12, 'slow.bin'), await window.__fx('notes.txt')] });
+    // slow.bin hands out its first MiB, then waits for window.__go(): it is still being added when the double
+    // click below lands, however fast this machine encrypts it (a plain 12 MiB file can be done before the click).
+    const gate = new Promise((r) => {
+      window.__go = r;
+    });
+    const chunk = new Uint8Array(2 ** 20).map((_, i) => (i * 7 + 3) & 255);
+    class HeldFile extends File {
+      stream() {
+        let sent = 0;
+        let gone = false;
+        const total = this.size;
+        return new ReadableStream({
+          async pull(ctl) {
+            if (sent > 0) await gate;
+            if (gone) return;
+            if (sent >= total) return ctl.close();
+            const n = Math.min(chunk.length, total - sent);
+            ctl.enqueue(chunk.slice(0, n));
+            sent += n;
+          },
+          cancel() {
+            gone = true;
+          },
+        });
+      }
+    }
+    const slow = new HeldFile(Array(12).fill(chunk), 'slow.bin', { type: 'application/octet-stream' });
+    window.__p = window.__U.importFiles({ vault: window.__vault, files: [slow, await window.__fx('notes.txt')] });
     await window.__whenRunning('slow.bin', () => true);
   });
   const row = page.locator('.up-row', { hasText: 'slow.bin' });
   await row.getByRole('button', { name: 'Cancel slow.bin' }).dblclick();
   const res = await page.evaluate(async () => {
+    window.__go();
     const r = await window.__p;
     return { cancelled: r.cancelled, added: r.added.map((i) => i.name) };
   });
   expect(res).toEqual({ cancelled: 1, added: ['notes.txt'] });
+  await expect(row).toHaveAttribute('data-state', 'cancelled');
+  // The second click of a double click that lands after the row turned into "Retry" doesn't retry it either.
+  const box = await row.getByRole('button', { name: 'Retry slow.bin' }).boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
   await page.waitForTimeout(300);
   await expect(row).toHaveAttribute('data-state', 'cancelled');
+  expect(await items(page)).toEqual(['notes.txt']);
 
   const albumId = await page.evaluate(async () => {
     const res2 = await window.__U.importFiles({ vault: window.__vault, files: [await window.__fx('image.png', 'a.png'), await window.__fx('image.png', 'b.png'), await window.__fx('image.png', 'c.png')] });

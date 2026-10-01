@@ -193,8 +193,13 @@ export function safeMediaType(t) {
 
 // C0 + DEL + C1 controls, zero-width/bidi marks and embeddings, isolates, ALM, line/paragraph separators, BOM,
 // and the other invisible format characters (word joiner/invisible operators, deprecated format controls,
-// interlinear annotation marks) that can hide part of a name.
-const STRIP = /[\u0000-\u001f\u007f-\u009f\u061c\u200b-\u200f\u2028-\u202e\u2060-\u2064\u2066-\u206f\ufeff\ufff9-\ufffb]/g;
+// interlinear annotation marks) that can hide part of a name; also the invisible "filler" characters (soft
+// hyphen, combining grapheme joiner, Hangul fillers, Khmer inherent vowels, Mongolian selectors/separator).
+const STRIP = /[\u0000-\u001f\u007f-\u009f\u00ad\u034f\u061c\u115f\u1160\u17b4\u17b5\u180b-\u180f\u200b-\u200f\u2028-\u202e\u2060-\u2064\u2066-\u206f\u3164\ufeff\uffa0\ufff9-\ufffb]/g;
+// Runs of blanks (any Unicode space, incl. the no-break and braille blanks that CSS never collapses) become one
+// space: a name padded with them would push its real extension out of every ellipsized display
+// ("invoice.pdf      \u2026" for "invoice.pdf<blanks>.exe").
+const BLANKS = /[\s\u2800]+/gu;
 const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g;
 const RESERVED_CHARS = /[/\\:*?"<>|]/g;
 const EDGE = /^[\s.]+|[\s.]+$/gu;
@@ -220,8 +225,9 @@ function cut(s, max) {
 /**
  * Sanitizes an untrusted name (DESIGN §2.2, §10): NFC; strips C0/C1 controls, zero-width and bidi
  * controls (U+200B–U+200F, U+202A–U+202E, U+2066–U+2069, U+061C), other invisible format characters
- * (U+2060–U+2064, U+206A–U+206F, U+FFF9–U+FFFB), line separators and U+FEFF;
- * lone surrogates → U+FFFD; / \ : * ? " < > | → '_'; trims dots and whitespace at both ends;
+ * (U+2060–U+2064, U+206A–U+206F, U+FFF9–U+FFFB), invisible fillers (U+00AD, U+034F, U+115F, U+1160,
+ * U+17B4, U+17B5, U+180B–U+180F, U+3164, U+FFA0), line separators and U+FEFF; runs of whitespace (any Unicode
+ * space, U+2800 too) → one space; lone surrogates → U+FFFD; / \ : * ? " < > | → '_'; trims dots and whitespace at both ends;
  * '_' prefix for Windows device names (CON, PRN, AUX, NUL, COM1-9, LPT1-9, also with an extension);
  * at most 200 UTF-16 units keeping the extension; empty → "file". Idempotent.
  * @param {unknown} s
@@ -230,7 +236,7 @@ function cut(s, max) {
 export function safeFilename(s) {
   let n = typeof s === 'string' ? s : s == null ? '' : String(s);
   // Strip before NFC: removing a zero-width char can make a sequence composable (idempotence).
-  n = fit(n.replace(LONE_SURROGATE, '\ufffd').replace(STRIP, '').normalize('NFC').replace(RESERVED_CHARS, '_').replace(EDGE, ''));
+  n = fit(n.replace(LONE_SURROGATE, '\ufffd').replace(STRIP, '').normalize('NFC').replace(RESERVED_CHARS, '_').replace(BLANKS, ' ').replace(EDGE, ''));
   // After the cap (cutting a stem can expose "con"); the prefixed name is capped again, keeping the extension.
   if (WIN_DEVICE.test(n.split('.', 1)[0].trimEnd())) n = fit(`_${n}`);
   return n || 'file';

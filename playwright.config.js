@@ -12,7 +12,10 @@ export default defineConfig({
   expect: { timeout: 15 * 1000 },
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
+  // CI runs a failed test once more so the report tells a flake from a real failure, but a flaky test still fails
+  // the run: a retry never hides a flake.
   retries: process.env.CI ? 1 : 0,
+  failOnFlakyTests: Boolean(process.env.CI),
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {

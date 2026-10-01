@@ -220,9 +220,14 @@ npm run icons                          # = tauri icon src-tauri/icons/source.png
   identifier, so the new app finds the old desktop vault in the same app-data folder (`$APPDATA/vault/*.czd`).
   Don't change it.
 - Desktop specifics live in `src-tauri/`:
-  - `capabilities/default.json`: dialogs; fs limited to `$APPDATA/vault2/**` and `$APPDATA/vault/**`; the opener
-    limited to the releases URL.
+  - `capabilities/default.json`: dialogs; fs limited to `$APPDATA/vault2/**`, plus read-only access (`exists`,
+    `stat`, `read-dir`, `read-file` command scopes) to the old `$APPDATA/vault/**`; the opener limited to the
+    releases URL.
   - `.czd`/`.czb` file associations.
+  - `tauri.linux.conf.json` sets the product name to `czeroode` on Linux only: Tauri names the Debian package after
+    the product name in kebab case (`cZEROde` would become `c-zer-ode`), so the package, the `.deb`/AppImage file
+    names and the `.desktop` file match the `czeroode` binary. The menu entry still says cZEROde
+    (`linux/czeroode.desktop` hardcodes `Name=`), and Windows/macOS keep the product name `cZEROde`.
   - Single instance, with files forwarded from argv and macOS `Opened`.
   - The `czstream` protocol (`src/stream.rs`). It is refused on Linux, where previews use the in-memory path; see
     [FORMAT.md §9.3](FORMAT.md#93-desktop-czstream-protocol). Debug builds take `CZSTREAM_LINUX=1` and
@@ -243,6 +248,12 @@ npm run icons                          # = tauri icon src-tauri/icons/source.png
 **`.github/workflows/desktop.yml`** builds the installers with `tauri-action`. It runs on pushes to `main`
 (except Markdown-only changes), on tags `v*`, on pull requests that touch `src-tauri/`, `scripts/` or
 `package*.json`, and by hand (Actions → Desktop build → Run workflow).
+
+Workflow hygiene (checked by `tests/unit/security-audit.test.js`): every `uses:` is pinned to a full commit SHA
+with the tag in a comment (to update one, look up the new tag's commit with `git ls-remote --tags <repo>`), every
+checkout sets `persist-credentials: false`, and the build step gets the repository-write `GITHUB_TOKEN` only on
+`v*` tags. The build runs the build scripts of every npm and Cargo dependency; a branch or pull-request build must
+never hold a token that could push to `main`, which GitHub Pages serves to every user.
 
 | platform | bundles | required? |
 |---|---|---|
