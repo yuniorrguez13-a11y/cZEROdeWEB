@@ -1,1 +1,147 @@
-/* upload.css — upload queue. Owner: V1b (phase 3). Every selector starts with .up- */
+/* upload.css — import queue dock and its dialogs (app/ui/upload.js). Owner: V1b. Every selector starts with .up-
+   Uses the app.css tokens and component classes (.btn, .btn-icon, .progress, .kind-icon, .check, .modal). */
+
+/* ───────── Dock: fixed panel bottom-right (phones: full width above the bottom nav), lifted over the player dock */
+.up-dock {
+  --up-base: 16px;
+  position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: calc(var(--up-base) + var(--up-lift, 0px)); z-index: 120;
+  display: flex; flex-direction: column; width: min(420px, calc(100vw - 32px)); max-height: calc(100dvh - 96px - var(--up-lift, 0px));
+  border: 1px solid var(--brd); border-radius: var(--r); background: var(--hbg); color: var(--txt); box-shadow: var(--sh-pop);
+  overflow: hidden; animation: czd-rise .18s ease-out;
+}
+.up-dock[data-state="running"] { border-color: var(--hbrd); }
+[data-theme^="minimal"] .up-dock[data-state="running"] { border-color: var(--brd); }
+
+/* Overall progress: a hairline along the top edge */
+.up-bar { flex: none; height: 2px; background: var(--bdim); }
+.up-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--acc), var(--accd)); transition: width .25s linear; }
+[data-theme^="minimal"] .up-bar-fill { background: var(--acc); }
+
+.up-head { flex: none; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 8px 10px 14px; }
+.up-body:not([hidden]) { border-top: 1px solid var(--bdim); }
+.up-head-icon {
+  display: grid; place-items: center; flex: none; width: 36px; height: 36px;
+  border: 1px solid var(--acc); border-radius: var(--r-sm); background: var(--accbg); color: var(--accd);
+}
+[data-theme^="minimal"] .up-head-icon { color: var(--txt); }
+.up-head-icon .icon { width: 18px; height: 18px; }
+.up-dock[data-state="done"] .up-head-icon { border-color: var(--ok); background: transparent; color: var(--ok); }
+.up-dock[data-state="failed"] .up-head-icon,
+.up-dock[data-state="interrupted"] .up-head-icon,
+.up-dock[data-state="warn"] .up-head-icon { border-color: var(--warn); background: var(--warnbg); color: var(--warn); }
+.up-dock[data-state="running"] .up-head-icon .icon { animation: up-rise 1.4s ease-in-out infinite; }
+.up-head-text { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.up-title { color: var(--txt); font-size: 12px; font-weight: 700; letter-spacing: .16em; line-height: 1.2; text-transform: uppercase; }
+[data-theme^="minimal"] .up-title { letter-spacing: .1em; }
+.up-status { overflow: hidden; color: var(--tdim); font-size: 13px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.up-pct { flex: none; color: var(--txt); font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.up-toggle, .up-close { width: 38px; height: 38px; border-color: transparent; }
+.up-toggle .icon { transform: rotate(-90deg); transition: transform .15s; }
+.up-collapsed .up-toggle .icon { transform: rotate(90deg); }
+
+.up-body { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+
+/* After-batch hint ("your originals are still in Photos/Downloads") */
+.up-hint { display: flex; flex: none; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--bdim); border-left: 3px solid var(--info); background: var(--bg2); }
+.up-hint-icon { flex: none; color: var(--info); }
+.up-hint-icon .icon { width: 18px; height: 18px; margin-top: 2px; }
+.up-hint-main { min-width: 0; }
+.up-hint-text { color: var(--txt); font-size: 14px; line-height: 1.45; }
+.up-hint-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+/* File rows */
+.up-list { flex: 1 1 auto; max-height: min(44vh, 380px); margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
+.up-row {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr) 38px; align-items: center; gap: 12px; padding: 9px 8px 9px 14px;
+  content-visibility: auto; contain-intrinsic-size: auto 58px;
+}
+.up-list > li + li { border-top: 1px solid var(--bdim); }
+.up-row[data-state="running"] { background: var(--bg2); }
+.up-row-icon {
+  display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--bdim); border-radius: var(--r-sm); background: var(--bg2);
+}
+.up-row-icon .icon { width: 18px; height: 18px; }
+.up-row-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.up-row-top { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.up-row-name { flex: 1; min-width: 0; overflow: hidden; font-size: 14px; font-weight: var(--fw-strong); line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.up-row-hidden { color: var(--tfaint); font-style: italic; font-weight: var(--fw); }
+.up-row-size { flex: none; color: var(--tfaint); font-size: 12px; font-variant-numeric: tabular-nums; }
+.up-row-bar { height: 3px; }
+.up-row-status { color: var(--tdim); font-size: 13px; line-height: 1.35; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.up-row[data-state="waiting"] .up-row-name { color: var(--tdim); }
+.up-row[data-state="waiting"] .up-row-icon { opacity: .6; }
+.up-row[data-state="waiting"] .up-row-btn { color: var(--tfaint); }
+.up-row[data-state="done"] .up-row-status { color: var(--ok); }
+.up-row[data-state="failed"] .up-row-status { color: var(--err); }
+.up-row[data-state="failed"] .up-row-icon { border-color: var(--err); }
+.up-row[data-state="interrupted"] .up-row-status { color: var(--warn); }
+.up-row[data-state="cancelled"] .up-row-name,
+.up-row[data-state="cancelled"] .up-row-status { color: var(--tfaint); }
+.up-row[data-state="cancelled"] .up-row-name { text-decoration: line-through; text-decoration-color: var(--tfaint); }
+.up-row.up-row-warn .up-row-status { color: var(--warn); }
+.up-row-btn { width: 38px; height: 38px; border-color: transparent; }
+.up-row-btn:disabled.up-row-ok { opacity: 1; color: var(--ok); cursor: default; }
+.up-row.up-row-warn .up-row-btn:disabled.up-row-ok { color: var(--warn); }
+.up-row[data-state="running"] .up-row-btn:hover:not(:disabled) { border-color: var(--err); background: var(--errbg); color: var(--err); }
+
+/* Rows outside the rendered window (big queues): "1,234 earlier files · 1,230 added" / "5,000 more files waiting" */
+.up-more {
+  padding: 10px 14px; background: var(--bg2); color: var(--tdim); font-size: 11px; font-weight: 700; letter-spacing: .14em;
+  line-height: 1.4; text-align: center; text-transform: uppercase; font-variant-numeric: tabular-nums;
+}
+[data-theme^="minimal"] .up-more { letter-spacing: .08em; }
+
+/* Folder group header: "📁 Holiday · 12 files" + Create album option */
+.up-group { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px 6px; background: var(--bg2); }
+.up-group-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.up-group-icon { display: inline-flex; flex: none; color: var(--gold); }
+.up-group-icon .icon { width: 18px; height: 18px; }
+.up-group-name { min-width: 0; overflow: hidden; font-weight: var(--fw-strong); text-overflow: ellipsis; white-space: nowrap; }
+.up-group-count { flex: none; color: var(--tdim); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.up-group-opt { display: flex; align-items: center; gap: 10px; min-height: 40px; color: var(--tdim); font-size: 14px; cursor: pointer; }
+.up-group-opt input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--acc); }
+.up-group-opt:hover { color: var(--txt); }
+
+/* Footer: summary + Cancel all / Retry failed / Done */
+.up-foot { display: flex; flex: none; align-items: center; gap: 8px; min-height: 52px; padding: 8px 8px 8px 14px; border-top: 1px solid var(--bdim); background: var(--hbg); }
+.up-foot-text { min-width: 0; color: var(--tdim); font-size: 13px; line-height: 1.35; }
+.up-foot-actions { display: flex; flex: none; gap: 6px; margin-left: auto; }
+
+@keyframes up-rise { 0%, 100% { transform: translateY(1px); } 50% { transform: translateY(-2px); } }
+
+/* ───────── Dialogs: "Locked cZEROde file — Open it?" and "Not enough space" */
+.up-special-lead { color: var(--txt); font-size: 17px; font-weight: var(--fw-strong); line-height: 1.4; }
+.up-special-list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.up-special-name {
+  display: flex; align-items: center; gap: 10px; min-width: 0; padding: 9px 12px;
+  border: 1px solid var(--bdim); border-left: 2px solid var(--acc); border-radius: var(--r); background: var(--bg); color: var(--txt);
+  font-family: var(--mono); font-size: 14px;
+}
+.up-special-name .icon { flex: none; width: 16px; height: 16px; color: var(--accd); }
+[data-theme^="minimal"] .up-special-name .icon { color: var(--txt); }
+.up-special-name span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.modal.up-space { max-width: 560px; }
+.up-space-lead { color: var(--warn); font-size: 16px; font-weight: var(--fw-strong); line-height: 1.4; }
+.up-space-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.up-space-fit { flex: 1 1 200px; margin: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
+.up-space-fit.up-space-ok { color: var(--ok); }
+.up-space-list { max-height: min(40vh, 320px); margin: 0; padding: 0; overflow-y: auto; border: 1px solid var(--bdim); border-radius: var(--r); background: var(--bg); list-style: none; }
+.up-space-list > li + li { border-top: 1px solid var(--bdim); }
+.check.up-space-row { align-items: center; gap: 10px; min-height: 46px; padding: 6px 12px; }
+.check.up-space-row input { margin: 0; }
+.up-space-name { flex: 1; min-width: 0; overflow: hidden; color: var(--txt); text-overflow: ellipsis; white-space: nowrap; }
+.up-space-folder { display: inline-flex; flex: none; align-items: center; gap: 4px; max-width: 30%; overflow: hidden; color: var(--tfaint); font-size: 12px; white-space: nowrap; }
+.up-space-folder .icon { width: 14px; height: 14px; }
+.up-space-size { flex: none; color: var(--tdim); font-size: 13px; font-variant-numeric: tabular-nums; }
+.up-space-rest .up-space-name { color: var(--tdim); }
+
+/* ───────── Phones: full width above the bottom nav */
+@media (max-width: 719px) {
+  .up-dock {
+    --up-base: calc(64px + env(safe-area-inset-bottom) + 8px);
+    left: 8px; right: 8px; width: auto; max-height: calc(100dvh - 150px - var(--up-lift, 0px));
+  }
+  .up-list { max-height: 36vh; }
+  .up-head { min-height: 56px; }
+}
