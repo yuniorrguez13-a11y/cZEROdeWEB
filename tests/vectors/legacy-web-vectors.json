@@ -1,0 +1,3063 @@
+{
+ "README": "Shape documented in legacy-web.md, section \"README: legacy-web-vectors.json\". Every value was produced by EXECUTING the original cZEROde Web v1.1 <script> (harness-web/). No binary fields exist in the stored records (all ciphertext is text); raw file bytes are given as standard padded base64 in *_b64 fields.",
+ "meta": {
+  "source_file": "/home/user/cZEROdeWEB/index.html",
+  "source_sha256": "c15d46fb8ace576e56d8fe0923407f8bfdf547a655c174eb812d30b11bf0f5a9",
+  "script_lines": [
+   761,
+   1489
+  ],
+  "generated_at": "2026-09-30T23:49:19.565Z",
+  "node": "v22.22.2",
+  "generator": "harness-web/run-all.mjs -> gen.mjs (real|reduced)",
+  "binary_encoding": "standard base64 (RFC 4648 §4, with = padding) for *_b64 fields; hex for *_hex fields",
+  "randomness_note": "v2 (Math.random noise/method) and v4/file (random salt+IV) ciphertexts are non-deterministic; they are DECODE vectors. v1 and v3 encoders are deterministic and can be checked both ways."
+ },
+ "constants": {
+  "SA": [
+   {
+    "index": 0,
+    "base64_char": "A",
+    "char": "ა",
+    "codepoint": "U+10D0"
+   },
+   {
+    "index": 1,
+    "base64_char": "B",
+    "char": "ბ",
+    "codepoint": "U+10D1"
+   },
+   {
+    "index": 2,
+    "base64_char": "C",
+    "char": "გ",
+    "codepoint": "U+10D2"
+   },
+   {
+    "index": 3,
+    "base64_char": "D",
+    "char": "დ",
+    "codepoint": "U+10D3"
+   },
+   {
+    "index": 4,
+    "base64_char": "E",
+    "char": "ე",
+    "codepoint": "U+10D4"
+   },
+   {
+    "index": 5,
+    "base64_char": "F",
+    "char": "ვ",
+    "codepoint": "U+10D5"
+   },
+   {
+    "index": 6,
+    "base64_char": "G",
+    "char": "ზ",
+    "codepoint": "U+10D6"
+   },
+   {
+    "index": 7,
+    "base64_char": "H",
+    "char": "თ",
+    "codepoint": "U+10D7"
+   },
+   {
+    "index": 8,
+    "base64_char": "I",
+    "char": "ი",
+    "codepoint": "U+10D8"
+   },
+   {
+    "index": 9,
+    "base64_char": "J",
+    "char": "კ",
+    "codepoint": "U+10D9"
+   },
+   {
+    "index": 10,
+    "base64_char": "K",
+    "char": "ლ",
+    "codepoint": "U+10DA"
+   },
+   {
+    "index": 11,
+    "base64_char": "L",
+    "char": "მ",
+    "codepoint": "U+10DB"
+   },
+   {
+    "index": 12,
+    "base64_char": "M",
+    "char": "ნ",
+    "codepoint": "U+10DC"
+   },
+   {
+    "index": 13,
+    "base64_char": "N",
+    "char": "ო",
+    "codepoint": "U+10DD"
+   },
+   {
+    "index": 14,
+    "base64_char": "O",
+    "char": "პ",
+    "codepoint": "U+10DE"
+   },
+   {
+    "index": 15,
+    "base64_char": "P",
+    "char": "ჟ",
+    "codepoint": "U+10DF"
+   },
+   {
+    "index": 16,
+    "base64_char": "Q",
+    "char": "რ",
+    "codepoint": "U+10E0"
+   },
+   {
+    "index": 17,
+    "base64_char": "R",
+    "char": "ს",
+    "codepoint": "U+10E1"
+   },
+   {
+    "index": 18,
+    "base64_char": "S",
+    "char": "ტ",
+    "codepoint": "U+10E2"
+   },
+   {
+    "index": 19,
+    "base64_char": "T",
+    "char": "უ",
+    "codepoint": "U+10E3"
+   },
+   {
+    "index": 20,
+    "base64_char": "U",
+    "char": "ფ",
+    "codepoint": "U+10E4"
+   },
+   {
+    "index": 21,
+    "base64_char": "V",
+    "char": "ქ",
+    "codepoint": "U+10E5"
+   },
+   {
+    "index": 22,
+    "base64_char": "W",
+    "char": "ღ",
+    "codepoint": "U+10E6"
+   },
+   {
+    "index": 23,
+    "base64_char": "X",
+    "char": "ყ",
+    "codepoint": "U+10E7"
+   },
+   {
+    "index": 24,
+    "base64_char": "Y",
+    "char": "შ",
+    "codepoint": "U+10E8"
+   },
+   {
+    "index": 25,
+    "base64_char": "Z",
+    "char": "ჩ",
+    "codepoint": "U+10E9"
+   },
+   {
+    "index": 26,
+    "base64_char": "a",
+    "char": "ც",
+    "codepoint": "U+10EA"
+   },
+   {
+    "index": 27,
+    "base64_char": "b",
+    "char": "ძ",
+    "codepoint": "U+10EB"
+   },
+   {
+    "index": 28,
+    "base64_char": "c",
+    "char": "წ",
+    "codepoint": "U+10EC"
+   },
+   {
+    "index": 29,
+    "base64_char": "d",
+    "char": "ჭ",
+    "codepoint": "U+10ED"
+   },
+   {
+    "index": 30,
+    "base64_char": "e",
+    "char": "ხ",
+    "codepoint": "U+10EE"
+   },
+   {
+    "index": 31,
+    "base64_char": "f",
+    "char": "ჯ",
+    "codepoint": "U+10EF"
+   },
+   {
+    "index": 32,
+    "base64_char": "g",
+    "char": "ჰ",
+    "codepoint": "U+10F0"
+   },
+   {
+    "index": 33,
+    "base64_char": "h",
+    "char": "А",
+    "codepoint": "U+0410"
+   },
+   {
+    "index": 34,
+    "base64_char": "i",
+    "char": "Б",
+    "codepoint": "U+0411"
+   },
+   {
+    "index": 35,
+    "base64_char": "j",
+    "char": "В",
+    "codepoint": "U+0412"
+   },
+   {
+    "index": 36,
+    "base64_char": "k",
+    "char": "Г",
+    "codepoint": "U+0413"
+   },
+   {
+    "index": 37,
+    "base64_char": "l",
+    "char": "Д",
+    "codepoint": "U+0414"
+   },
+   {
+    "index": 38,
+    "base64_char": "m",
+    "char": "Е",
+    "codepoint": "U+0415"
+   },
+   {
+    "index": 39,
+    "base64_char": "n",
+    "char": "Ж",
+    "codepoint": "U+0416"
+   },
+   {
+    "index": 40,
+    "base64_char": "o",
+    "char": "З",
+    "codepoint": "U+0417"
+   },
+   {
+    "index": 41,
+    "base64_char": "p",
+    "char": "И",
+    "codepoint": "U+0418"
+   },
+   {
+    "index": 42,
+    "base64_char": "q",
+    "char": "Й",
+    "codepoint": "U+0419"
+   },
+   {
+    "index": 43,
+    "base64_char": "r",
+    "char": "К",
+    "codepoint": "U+041A"
+   },
+   {
+    "index": 44,
+    "base64_char": "s",
+    "char": "Л",
+    "codepoint": "U+041B"
+   },
+   {
+    "index": 45,
+    "base64_char": "t",
+    "char": "М",
+    "codepoint": "U+041C"
+   },
+   {
+    "index": 46,
+    "base64_char": "u",
+    "char": "Н",
+    "codepoint": "U+041D"
+   },
+   {
+    "index": 47,
+    "base64_char": "v",
+    "char": "О",
+    "codepoint": "U+041E"
+   },
+   {
+    "index": 48,
+    "base64_char": "w",
+    "char": "П",
+    "codepoint": "U+041F"
+   },
+   {
+    "index": 49,
+    "base64_char": "x",
+    "char": "Р",
+    "codepoint": "U+0420"
+   },
+   {
+    "index": 50,
+    "base64_char": "y",
+    "char": "С",
+    "codepoint": "U+0421"
+   },
+   {
+    "index": 51,
+    "base64_char": "z",
+    "char": "Т",
+    "codepoint": "U+0422"
+   },
+   {
+    "index": 52,
+    "base64_char": "0",
+    "char": "У",
+    "codepoint": "U+0423"
+   },
+   {
+    "index": 53,
+    "base64_char": "1",
+    "char": "Ф",
+    "codepoint": "U+0424"
+   },
+   {
+    "index": 54,
+    "base64_char": "2",
+    "char": "Х",
+    "codepoint": "U+0425"
+   },
+   {
+    "index": 55,
+    "base64_char": "3",
+    "char": "Ц",
+    "codepoint": "U+0426"
+   },
+   {
+    "index": 56,
+    "base64_char": "4",
+    "char": "Ч",
+    "codepoint": "U+0427"
+   },
+   {
+    "index": 57,
+    "base64_char": "5",
+    "char": "Ш",
+    "codepoint": "U+0428"
+   },
+   {
+    "index": 58,
+    "base64_char": "6",
+    "char": "Щ",
+    "codepoint": "U+0429"
+   },
+   {
+    "index": 59,
+    "base64_char": "7",
+    "char": "Ъ",
+    "codepoint": "U+042A"
+   },
+   {
+    "index": 60,
+    "base64_char": "8",
+    "char": "Ы",
+    "codepoint": "U+042B"
+   },
+   {
+    "index": 61,
+    "base64_char": "9",
+    "char": "Ь",
+    "codepoint": "U+042C"
+   },
+   {
+    "index": 62,
+    "base64_char": "+",
+    "char": "Э",
+    "codepoint": "U+042D"
+   },
+   {
+    "index": 63,
+    "base64_char": "/",
+    "char": "Ю",
+    "codepoint": "U+042E"
+   }
+  ],
+  "SA_length": 64,
+  "SA_unique": 64,
+  "GEO": {
+   "a": "ა",
+   "b": "ბ",
+   "c": "ც",
+   "d": "დ",
+   "e": "ე",
+   "f": "ფ",
+   "g": "გ",
+   "h": "ჰ",
+   "i": "ი",
+   "j": "ჯ",
+   "k": "კ",
+   "l": "ლ",
+   "m": "მ",
+   "n": "ნ",
+   "o": "ო",
+   "p": "პ",
+   "q": "ყ",
+   "r": "რ",
+   "s": "ს",
+   "t": "ტ",
+   "u": "უ",
+   "v": "ვ",
+   "w": "წ",
+   "x": "ხ",
+   "y": "ყ",
+   "z": "ზ"
+  },
+  "CYR": {
+   "A": "А",
+   "B": "В",
+   "C": "С",
+   "D": "Д",
+   "E": "Е",
+   "F": "Ф",
+   "G": "Г",
+   "H": "Н",
+   "I": "И",
+   "J": "Ж",
+   "K": "К",
+   "L": "Л",
+   "M": "М",
+   "N": "Н",
+   "O": "О",
+   "P": "Р",
+   "Q": "Ф",
+   "R": "Р",
+   "S": "С",
+   "T": "Т",
+   "U": "У",
+   "V": "В",
+   "W": "Ш",
+   "X": "Х",
+   "Y": "Ч",
+   "Z": "З"
+  },
+  "GR": {
+   "ა": "a",
+   "ბ": "b",
+   "ც": "c",
+   "დ": "d",
+   "ე": "e",
+   "ფ": "f",
+   "გ": "g",
+   "ჰ": "h",
+   "ი": "i",
+   "ჯ": "j",
+   "კ": "k",
+   "ლ": "l",
+   "მ": "m",
+   "ნ": "n",
+   "ო": "o",
+   "პ": "p",
+   "ყ": "y",
+   "რ": "r",
+   "ს": "s",
+   "ტ": "t",
+   "უ": "u",
+   "ვ": "v",
+   "წ": "w",
+   "ხ": "x",
+   "ზ": "z"
+  },
+  "CR": {
+   "А": "a",
+   "В": "v",
+   "С": "s",
+   "Д": "d",
+   "Е": "e",
+   "Ф": "q",
+   "Г": "g",
+   "Н": "n",
+   "И": "i",
+   "Ж": "j",
+   "К": "k",
+   "Л": "l",
+   "М": "m",
+   "О": "o",
+   "Р": "r",
+   "Т": "t",
+   "У": "u",
+   "Ш": "w",
+   "Х": "x",
+   "Ч": "y",
+   "З": "z"
+  },
+  "GSET_size": 25,
+  "WEAK": [
+   "123",
+   "1234",
+   "12345",
+   "password",
+   "qwerty",
+   "abc",
+   "0000",
+   "1111",
+   "pass",
+   "admin"
+  ],
+  "NC": [
+   {
+    "char": "†",
+    "codepoint": "U+2020"
+   },
+   {
+    "char": "‡",
+    "codepoint": "U+2021"
+   },
+   {
+    "char": "§",
+    "codepoint": "U+00A7"
+   },
+   {
+    "char": "¶",
+    "codepoint": "U+00B6"
+   },
+   {
+    "char": "※",
+    "codepoint": "U+203B"
+   },
+   {
+    "char": "◊",
+    "codepoint": "U+25CA"
+   },
+   {
+    "char": "●",
+    "codepoint": "U+25CF"
+   },
+   {
+    "char": "○",
+    "codepoint": "U+25CB"
+   },
+   {
+    "char": "◦",
+    "codepoint": "U+25E6"
+   },
+   {
+    "char": "•",
+    "codepoint": "U+2022"
+   },
+   {
+    "char": "⁕",
+    "codepoint": "U+2055"
+   },
+   {
+    "char": "⁂",
+    "codepoint": "U+2042"
+   },
+   {
+    "char": "✦",
+    "codepoint": "U+2726"
+   },
+   {
+    "char": "✧",
+    "codepoint": "U+2727"
+   },
+   {
+    "char": "✩",
+    "codepoint": "U+2729"
+   },
+   {
+    "char": "✪",
+    "codepoint": "U+272A"
+   },
+   {
+    "char": "⌘",
+    "codepoint": "U+2318"
+   },
+   {
+    "char": "⌬",
+    "codepoint": "U+232C"
+   },
+   {
+    "char": "⍟",
+    "codepoint": "U+235F"
+   },
+   {
+    "char": "⏣",
+    "codepoint": "U+23E3"
+   },
+   {
+    "char": "⌖",
+    "codepoint": "U+2316"
+   },
+   {
+    "char": "⎌",
+    "codepoint": "U+238C"
+   },
+   {
+    "char": "⌀",
+    "codepoint": "U+2300"
+   }
+  ],
+  "MM": {
+   "1": "╾",
+   "2": "╿",
+   "3": "╼",
+   "4": "╽",
+   "5": "╻"
+  },
+  "MN": {
+   "1": "I·Reverse",
+   "2": "II·Word Mirror",
+   "3": "III·Chunk Shift",
+   "4": "IV·Pair Flip",
+   "5": "V·Mirror Fold"
+  },
+  "LARGE_FILE_THRESHOLD": 15728640,
+  "CHUNK_SIZE": 5242880,
+  "DB_NAME": "czeroode_db",
+  "DB_VER": 2
+ },
+ "v1": {
+  "encode_decode": [
+   {
+    "input": "hello world",
+    "caps": "cyrillic",
+    "encoded": "ჰელლო წორლდ",
+    "token_types": "geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,geo",
+    "decoded_by_original": "hello world",
+    "roundtrip_exact": true
+   },
+   {
+    "input": "hello world",
+    "caps": "georgian",
+    "encoded": "ჰელლო წორლდ",
+    "token_types": "geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,geo",
+    "decoded_by_original": "hello world",
+    "roundtrip_exact": true
+   },
+   {
+    "input": "Hello World",
+    "caps": "cyrillic",
+    "encoded": "Нელლო Шორლდ",
+    "token_types": "cyr,geo,geo,geo,geo,plain,cyr,geo,geo,geo,geo",
+    "decoded_by_original": "nello world",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Hello World",
+    "caps": "georgian",
+    "encoded": "ჰელლო წორლდ",
+    "token_types": "geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,geo",
+    "decoded_by_original": "hello world",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+    "caps": "cyrillic",
+    "encoded": "ТНЕ ФУИСК ВРОШН ФОХ ЖУМРС ОВЕР ТНЕ ЛАЗЧ ДОГ",
+    "token_types": "cyr,cyr,cyr,plain,cyr,cyr,cyr,cyr,cyr,plain,cyr,cyr,cyr,cyr,cyr,plain,cyr,cyr,cyr,plain,cyr,cyr,cyr,cyr,cyr,plain,cyr,cyr,cyr,cyr,plain,cyr,cyr,cyr,plain,cyr,cyr,cyr,cyr,plain,cyr,cyr,cyr",
+    "decoded_by_original": "tne quisk vrown qox jumrs over tne lazy dog",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+    "caps": "georgian",
+    "encoded": "ტჰე ყუიცკ ბროწნ ფოხ ჯუმპს ოვერ ტჰე ლაზყ დოგ",
+    "token_types": "geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo,geo,geo",
+    "decoded_by_original": "the yuick brown fox jumps over the lazy dog",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "the quick brown fox jumps over the lazy dog",
+    "caps": "cyrillic",
+    "encoded": "ტჰე ყუიცკ ბროწნ ფოხ ჯუმპს ოვერ ტჰე ლაზყ დოგ",
+    "token_types": "geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo,geo,geo",
+    "decoded_by_original": "the yuick brown fox jumps over the lazy dog",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "the quick brown fox jumps over the lazy dog",
+    "caps": "georgian",
+    "encoded": "ტჰე ყუიცკ ბროწნ ფოხ ჯუმპს ოვერ ტჰე ლაზყ დოგ",
+    "token_types": "geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,plain,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo,geo,geo",
+    "decoded_by_original": "the yuick brown fox jumps over the lazy dog",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Quiz: Yes? No! 123 #42 @home",
+    "caps": "cyrillic",
+    "encoded": "Фუიზ: Чეს? Нო! 123 #42 @ჰომე",
+    "token_types": "cyr,geo,geo,geo,plain,plain,cyr,geo,geo,plain,plain,cyr,geo,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain,geo,geo,geo,geo",
+    "decoded_by_original": "quiz: yes? no! 123 #42 @home",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Quiz: Yes? No! 123 #42 @home",
+    "caps": "georgian",
+    "encoded": "ყუიზ: ყეს? ნო! 123 #42 @ჰომე",
+    "token_types": "geo,geo,geo,geo,plain,plain,geo,geo,geo,plain,plain,geo,geo,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain,geo,geo,geo,geo",
+    "decoded_by_original": "yuiz: yes? no! 123 #42 @home",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Brb, Vince & Harry: PQRS FVHN",
+    "caps": "cyrillic",
+    "encoded": "Вრბ, Вინცე & Нარრყ: РФРС ФВНН",
+    "token_types": "cyr,geo,geo,plain,plain,cyr,geo,geo,geo,geo,plain,plain,plain,cyr,geo,geo,geo,geo,plain,plain,cyr,cyr,cyr,cyr,plain,cyr,cyr,cyr,cyr",
+    "decoded_by_original": "vrb, vince & narry: rqrs qvnn",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Brb, Vince & Harry: PQRS FVHN",
+    "caps": "georgian",
+    "encoded": "ბრბ, ვინცე & ჰარრყ: პყრს ფვჰნ",
+    "token_types": "geo,geo,geo,plain,plain,geo,geo,geo,geo,geo,plain,plain,plain,geo,geo,geo,geo,geo,plain,plain,geo,geo,geo,geo,plain,geo,geo,geo,geo",
+    "decoded_by_original": "brb, vince & harry: pyrs fvhn",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Café naïve – ÄÖÜ ß 😀",
+    "caps": "cyrillic",
+    "encoded": "Сაფé ნაïვე – ÄÖÜ ß 😀",
+    "token_types": "cyr,geo,geo,plain,plain,geo,geo,plain,geo,geo,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain",
+    "decoded_by_original": "safé naïve – ÄÖÜ ß 😀",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Café naïve – ÄÖÜ ß 😀",
+    "caps": "georgian",
+    "encoded": "ცაფé ნაïვე – ÄÖÜ ß 😀",
+    "token_types": "geo,geo,geo,plain,plain,geo,geo,plain,geo,geo,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain,plain",
+    "decoded_by_original": "café naïve – ÄÖÜ ß 😀",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "line1\nLine2\ttab",
+    "caps": "cyrillic",
+    "encoded": "ლინე1\nЛინე2\tტაბ",
+    "token_types": "geo,geo,geo,geo,plain,plain,cyr,geo,geo,geo,plain,plain,geo,geo,geo",
+    "decoded_by_original": "line1\nline2\ttab",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "line1\nLine2\ttab",
+    "caps": "georgian",
+    "encoded": "ლინე1\nლინე2\tტაბ",
+    "token_types": "geo,geo,geo,geo,plain,plain,geo,geo,geo,geo,plain,plain,geo,geo,geo",
+    "decoded_by_original": "line1\nline2\ttab",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "qy QY",
+    "caps": "cyrillic",
+    "encoded": "ყყ ФЧ",
+    "token_types": "geo,geo,plain,cyr,cyr",
+    "decoded_by_original": "yy qy",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "qy QY",
+    "caps": "georgian",
+    "encoded": "ყყ ყყ",
+    "token_types": "geo,geo,plain,geo,geo",
+    "decoded_by_original": "yy yy",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Kelvin sign K",
+    "caps": "cyrillic",
+    "encoded": "Кელვინ სიგნ კ",
+    "token_types": "cyr,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo",
+    "decoded_by_original": "kelvin sign k",
+    "roundtrip_exact": false
+   },
+   {
+    "input": "Kelvin sign K",
+    "caps": "georgian",
+    "encoded": "კელვინ სიგნ კ",
+    "token_types": "geo,geo,geo,geo,geo,geo,plain,geo,geo,geo,geo,plain,geo",
+    "decoded_by_original": "kelvin sign k",
+    "roundtrip_exact": false
+   }
+  ],
+  "decode_only": [
+   {
+    "input": "ჰელლო წორლდ",
+    "decoded_by_original": "hello world"
+   },
+   {
+    "input": "Привет Мир",
+    "decoded_by_original": "Привет mир"
+   },
+   {
+    "input": "ПРИВЕТ",
+    "decoded_by_original": "Пrivet"
+   },
+   {
+    "input": "ყუიზ",
+    "decoded_by_original": "yuiz"
+   },
+   {
+    "input": "ФОХ",
+    "decoded_by_original": "qox"
+   },
+   {
+    "input": "plain latin stays",
+    "decoded_by_original": "plain latin stays"
+   },
+   {
+    "input": "ქართული ენა",
+    "decoded_by_original": "ქarთuli ena"
+   },
+   {
+    "input": "mixed ჰი Вob",
+    "decoded_by_original": "mixed hi vob"
+   }
+  ]
+ },
+ "v2": {
+  "vectors": [
+   {
+    "plaintext": "Hello World",
+    "method": 1,
+    "method_name": "I·Reverse",
+    "ciphertext": "╾※•✦დლ✧რო⌀Ш ო⁂ლ•ლე✪Н⏣⍟•⎌",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "nello world",
+    "original_decoder_method": 1,
+    "intended_output": "nello world",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 11
+   },
+   {
+    "plaintext": "Hello World",
+    "method": 2,
+    "method_name": "II·Word Mirror",
+    "ciphertext": "╿⎌✪ოლ⌀ლე•Н§ დლრ§ო†Ш✩⌀",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "nello world",
+    "original_decoder_method": 2,
+    "intended_output": "nello world",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 11
+   },
+   {
+    "plaintext": "Hello World",
+    "method": 3,
+    "method_name": "III·Chunk Shift",
+    "ciphertext": "╼§✧⌘ლ✦დ●Ш⏣ორლო Нელ✩⌀",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "elo norlldw",
+    "original_decoder_method": 3,
+    "intended_output": "nello world",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 11
+   },
+   {
+    "plaintext": "Hello World",
+    "method": 4,
+    "method_name": "IV·Pair Flip",
+    "ciphertext": "╽◦○⌀ე⁂Н◦ლლ ⁕ო※ო⌬Шლრდ§•✩",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "nello world",
+    "original_decoder_method": 4,
+    "intended_output": "nello world",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 11
+   },
+   {
+    "plaintext": "Hello World",
+    "method": 5,
+    "method_name": "V·Mirror Fold",
+    "ciphertext": "╻○⁂ლდ‡ო⌀რ ✩Ш§ლო⁂ელ✧Н◊✩",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "nello world",
+    "original_decoder_method": 5,
+    "intended_output": "nello world",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 11
+   },
+   {
+    "plaintext": "attack at dawn",
+    "method": 1,
+    "method_name": "I·Reverse",
+    "ciphertext": "╾※◊◦※ნწად ტა კცატტ⌀ა⌘◊✪✦⏣",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "attack at dawn",
+    "original_decoder_method": 1,
+    "intended_output": "attack at dawn",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 14
+   },
+   {
+    "plaintext": "attack at dawn",
+    "method": 2,
+    "method_name": "II·Word Mirror",
+    "ciphertext": "╿⏣⁕⍟‡კცა○ტ‡ტა ტა ●ნ⏣წად✦◦",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "attack at dawn",
+    "original_decoder_method": 2,
+    "intended_output": "attack at dawn",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 14
+   },
+   {
+    "plaintext": "attack at dawn",
+    "method": 3,
+    "method_name": "III·Chunk Shift",
+    "ciphertext": "╼✦✦◦წნ ○და ა§ტაცკატ◦ტ○●⁕✧",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "ttckaatada wn ",
+    "original_decoder_method": 3,
+    "intended_output": "attack at dawn",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 14
+   },
+   {
+    "plaintext": "attack at dawn",
+    "method": 4,
+    "method_name": "IV·Pair Flip",
+    "ciphertext": "╽⌀¶※⁕ტ⍟ა‡ა※ტკცა ⌖ ‡ტად⌘ნწ⁕⁕◦⍟⌖",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "attack at dawn",
+    "original_decoder_method": 4,
+    "intended_output": "attack at dawn",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 14
+   },
+   {
+    "plaintext": "attack at dawn",
+    "method": 5,
+    "method_name": "V·Mirror Fold",
+    "ciphertext": "╻✧○წნდა⌘ტ  აცკტ※ა⌬ატ●⌘",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "attack at dawn",
+    "original_decoder_method": 5,
+    "intended_output": "attack at dawn",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 14
+   },
+   {
+    "plaintext": "Meet me at the old bridge at 9",
+    "method": 1,
+    "method_name": "I·Reverse",
+    "ciphertext": "╾○⎌⎌✩9 ტა ეგ⌖დ◦ი✪რბ დლო ეჰტ ტა ე●მ◊ ტეეМ⌀‡",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "meet me at the old bridge at 9",
+    "original_decoder_method": 1,
+    "intended_output": "meet me at the old bridge at 9",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 30
+   },
+   {
+    "plaintext": "Meet me at the old bridge at 9",
+    "method": 2,
+    "method_name": "II·Word Mirror",
+    "ciphertext": "╿⌖⌘•⁕ტ✧ეეМ ●ე⌘მ ◦ტა ე⌀ჰ●ტ⌖ ⌀დლ●ო ⁂ე⏣გ⌬დ⎌ირ●ბ ტა⎌ 9⌀⁕",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "meet me at the old bridge at 9",
+    "original_decoder_method": 2,
+    "intended_output": "meet me at the old bridge at 9",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 30
+   },
+   {
+    "plaintext": "Meet me at the old bridge at 9",
+    "method": 3,
+    "method_name": "III·Chunk Shift",
+    "ciphertext": "╼⌀⌘⎌⌘ტ◦ 9ე⌖ აიდ✪გ ბროლდჰე †ტ ტე ატ✦ ※მ⏣Мეე⏣‡",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "meet me at the old bridge at 9",
+    "original_decoder_method": 3,
+    "intended_output": "meet me at the old bridge at 9",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 30
+   },
+   {
+    "plaintext": "Meet me at the old bridge at 9",
+    "method": 4,
+    "method_name": "IV·Pair Flip",
+    "ciphertext": "╽✪✦ეМ⁂ტე⁂მ  ◦ეტატ •ეჰ✦ო¶ დლ§ბ ირგდ ე⌖ტა○9 ⁕§⌖⌀⌘",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "meet me at the old bridge at 9",
+    "original_decoder_method": 4,
+    "intended_output": "meet me at the old bridge at 9",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 30
+   },
+   {
+    "plaintext": "Meet me at the old bridge at 9",
+    "method": 5,
+    "method_name": "V·Mirror Fold",
+    "ciphertext": "╻⏣⁕✦ ⁕9ატე დგ✦რი◦ †ბ⁂ლდ◦ ოჰე ტატე✪  მ✦ე✦ტМე✩✩§○",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "meet me at the old bridge at 9",
+    "original_decoder_method": 5,
+    "intended_output": "meet me at the old bridge at 9",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 30
+   },
+   {
+    "plaintext": "abc def",
+    "method": 1,
+    "method_name": "I·Reverse",
+    "ciphertext": "╾⏣⎌⍟⏣ფ⌬ედ⌖ ც●ბა✦○",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "abc def",
+    "original_decoder_method": 1,
+    "intended_output": "abc def",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 7
+   },
+   {
+    "plaintext": "abc def",
+    "method": 2,
+    "method_name": "II·Word Mirror",
+    "ciphertext": "╿※⌀ცბ⌀ა⎌ ფედ●●",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "abc def",
+    "original_decoder_method": 2,
+    "intended_output": "abc def",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 7
+   },
+   {
+    "plaintext": "abc def",
+    "method": 3,
+    "method_name": "III·Chunk Shift",
+    "ciphertext": "╼✦§⎌⎌ფ ◊დე※ა⌬ბც⍟●✧",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "ceabf d",
+    "original_decoder_method": 3,
+    "intended_output": "abc def",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 7
+   },
+   {
+    "plaintext": "abc def",
+    "method": 4,
+    "method_name": "IV·Pair Flip",
+    "ciphertext": "╽✩††◦ბ§ა §ცედ○ფ⌘⌬•‡⌘",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "abc def",
+    "original_decoder_method": 4,
+    "intended_output": "abc def",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 7
+   },
+   {
+    "plaintext": "abc def",
+    "method": 5,
+    "method_name": "V·Mirror Fold",
+    "ciphertext": "╻⌘○✪※ეფ✪ ✦დბ¶ც○ა※⌖•",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "abc def",
+    "original_decoder_method": 5,
+    "intended_output": "abc def",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 7
+   },
+   {
+    "plaintext": "q and y: Quick Yellow",
+    "method": 1,
+    "method_name": "I·Reverse",
+    "ciphertext": "╾⏣⎌წოლლ✦ეЧ• კც§იუ✦Ф§ :ყ დნა ყ⌖⁕⌘○",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "y and y: quick yellow",
+    "original_decoder_method": 1,
+    "intended_output": "y and y: quick yellow",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 21
+   },
+   {
+    "plaintext": "q and y: Quick Yellow",
+    "method": 2,
+    "method_name": "II·Word Mirror",
+    "ciphertext": "╿⁂⍟⏣§ყ დნა :ყ ⏣კცი✪უФ⌖ ⌖წო✦ლლ⍟ეЧ§⍟",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "y and y: quick yellow",
+    "original_decoder_method": 2,
+    "intended_output": "y and y: quick yellow",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 21
+   },
+   {
+    "plaintext": "q and y: Quick Yellow",
+    "method": 3,
+    "method_name": "III·Chunk Shift",
+    "ciphertext": "╼⁕⏣⌀◊ლო◦წЧე✦ლცკ ⌀Ф⁂უ⎌იყ⎌: ნ⁕დ● ყ •ა‡⌬⏣",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "y and y: quick yellow",
+    "original_decoder_method": 3,
+    "intended_output": "y and y: quick yellow",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 21
+   },
+   {
+    "plaintext": "q and y: Quick Yellow",
+    "method": 4,
+    "method_name": "IV·Pair Flip",
+    "ciphertext": "╽⌘● ყ✧ნ⍟ა ⁕დ:✦ყФ იუკცЧ ლ○ეო¶ლ⌘წ✧※⍟†⍟",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "y and y: quick yellow",
+    "original_decoder_method": 4,
+    "intended_output": "y and y: quick yellow",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 21
+   },
+   {
+    "plaintext": "q and y: Quick Yellow",
+    "method": 5,
+    "method_name": "V·Mirror Fold",
+    "ciphertext": "╻†⍟ოწ⎌ლლ●Ч✦ე✪კ※ იცФუ‡:  ყნ•დ ა◦ყ⌖✦⁕",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "y and y: quick yellow",
+    "original_decoder_method": 5,
+    "intended_output": "y and y: quick yellow",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 21
+   },
+   {
+    "plaintext": "hi 😀 there",
+    "method": 1,
+    "method_name": "I·Reverse",
+    "ciphertext": "╾‡⌘⌀✧ერეჰტ 😀 ✪ი⁕ჰ⁕§✩✦",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "hi 😀 there",
+    "original_decoder_method": 1,
+    "intended_output": "hi 😀 there",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 10
+   },
+   {
+    "plaintext": "hi 😀 there",
+    "method": 2,
+    "method_name": "II·Word Mirror",
+    "ciphertext": "╿✧✪※ი✪ჰ ⏣😀 ე⁕რეჰტ※⌀",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "hi 😀 there",
+    "original_decoder_method": 2,
+    "intended_output": "hi 😀 there",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 10
+   },
+   {
+    "plaintext": "hi 😀 there",
+    "method": 3,
+    "method_name": "III·Chunk Shift",
+    "ciphertext": "╼◦§‡ეჰერ✪😀⌘ ¶ტ※ჰ✪ი †✩✩",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": " thir😀 ehe",
+    "original_decoder_method": 3,
+    "intended_output": "hi 😀 there",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 10
+   },
+   {
+    "plaintext": "hi 😀 there",
+    "method": 4,
+    "method_name": "IV·Pair Flip",
+    "ciphertext": "╽†⁂⁕იჰ¶😀‡ ⌖ტ ეჰე✧რ¶●⌀⎌",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "hi 😀 there",
+    "original_decoder_method": 4,
+    "intended_output": "hi 😀 there",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 10
+   },
+   {
+    "plaintext": "hi 😀 there",
+    "method": 5,
+    "method_name": "V·Mirror Fold",
+    "ciphertext": "╻⏣†რ‡ეჰე ტ ⎌😀ჰი✧⌘⁂",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "hi 😀 there",
+    "original_decoder_method": 5,
+    "intended_output": "hi 😀 there",
+    "original_decoder_correct": true,
+    "scrambled_len_codepoints": 10
+   },
+   {
+    "plaintext": "price: 5§ • 3 ✦ok",
+    "method": 1,
+    "method_name": "I·Reverse",
+    "ciphertext": "╾⁂⁂კ⏣ო✦ ⁕3 • •§5 :ე‡ცირპ§⌀†",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "price: 5  3 ok",
+    "original_decoder_method": 1,
+    "intended_output": "price: 5§ • 3 ✦ok",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 17
+   },
+   {
+    "plaintext": "price: 5§ • 3 ✦ok",
+    "method": 2,
+    "method_name": "II·Word Mirror",
+    "ciphertext": "╿⎌•:⁕ე•ცირპ ⌘§5※ • 3 კო✦†⁂◦",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "price: 5  3 ok",
+    "original_decoder_method": 2,
+    "intended_output": "price: 5§ • 3 ✦ok",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 17
+   },
+   {
+    "plaintext": "price: 5§ • 3 ✦ok",
+    "method": 3,
+    "method_name": "III·Chunk Shift",
+    "ciphertext": "╼¶¶ოკ3 ¶✦ ⏣•⎌  ⌘5§ცე:პრ⁕ი¶•✩",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "rie:p 5c   ok3",
+    "original_decoder_method": 3,
+    "intended_output": "price: 5§ • 3 ✦ok",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 17
+   },
+   {
+    "plaintext": "price: 5§ • 3 ✦ok",
+    "method": 4,
+    "method_name": "IV·Pair Flip",
+    "ciphertext": "╽⁂◊⌘⎌რპ✪ცი:ე5  ✪§ • 3✧ო✦კ¶§●‡",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "price: 5  3 ko",
+    "original_decoder_method": 4,
+    "intended_output": "price: 5§ • 3 ✦ok",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 17
+   },
+   {
+    "plaintext": "price: 5§ • 3 ✦ok",
+    "method": 5,
+    "method_name": "V·Mirror Fold",
+    "ciphertext": "╻⏣●ო•კ ✦ 3 •5§⎌:⌘ ცერ•იპ‡•¶⌀",
+    "ui_detects_as_ciphertext": true,
+    "original_decoder_output": "iper c5:3   ok",
+    "original_decoder_method": 5,
+    "intended_output": "price: 5§ • 3 ✦ok",
+    "original_decoder_correct": false,
+    "scrambled_len_codepoints": 17
+   }
+  ],
+  "edge_cases": [
+   {
+    "description": "ciphertext with 2 leading spaces: isV2C() trims, v2sdec() does not",
+    "input": "  ╾※•✦დლ✧რო⌀Ш ო⁂ლ•ლე✪Н⏣⍟•⎌",
+    "ui_output": "could not decode",
+    "isV2C": true,
+    "v2sdec": null
+   }
+  ]
+ },
+ "v3": {
+  "vectors": [
+   {
+    "pin": "1234",
+    "plaintext": "hello world",
+    "ciphertext": "კმუუჰ გჰდუტ",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "კმუუჰ გჰდუტ",
+    "ui_decode_output": "hello world",
+    "original_decoder_output": "hello world",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "1234",
+    "plaintext": "Hello, World! 123",
+    "ciphertext": "კმუუჰ, გჰდუტ! 123",
+    "ui_detects_as_ciphertext": false,
+    "ui_encode_output": "კმუუჰ, გჰდუტ! 123",
+    "ui_decode_output": "კმუუჰ, გჰდუტ! 123",
+    "original_decoder_output": "hello, world! 123",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "0000",
+    "plaintext": "the quick brown fox jumps over the lazy dog",
+    "ciphertext": "ჯბვ ხწნგკ ლჰყცმ იყო ეწდსუ ყრვჰ ჯბვ პყზა ფყტ",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "ჯბვ ხწნგკ ლჰყცმ იყო ეწდსუ ყრვჰ ჯბვ პყზა ფყტ",
+    "ui_decode_output": "the quick brawn fax jumps aver the lazy dag",
+    "original_decoder_output": "the quick brawn fax jumps aver the lazy dag",
+    "lossless_vs_lowercased_input": false
+   },
+   {
+    "pin": "987654321",
+    "plaintext": "Meet me at 10pm 🌙",
+    "ciphertext": "მკკი მკ ბი 10სმ 🌙",
+    "ui_detects_as_ciphertext": false,
+    "ui_encode_output": "მკკი მკ ბი 10სმ 🌙",
+    "ui_decode_output": "მკკი მკ ბი 10სმ 🌙",
+    "original_decoder_output": "meet me at 10pm 🌙",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "42",
+    "plaintext": "hi",
+    "ciphertext": "სპ",
+    "ui_detects_as_ciphertext": false,
+    "ui_encode_output": "სპ",
+    "ui_decode_output": "სპ",
+    "original_decoder_output": "hi",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "x",
+    "plaintext": "hello world",
+    "ciphertext": "ფგჯჯტ ზტკჯც",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "ფგჯჯტ ზტკჯც",
+    "ui_decode_output": "hello world",
+    "original_decoder_output": "hello world",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "secret",
+    "plaintext": "hello world",
+    "ciphertext": "უნიხყ პყხხს",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "უნიხყ პყხხს",
+    "ui_decode_output": "hellf wfrld",
+    "original_decoder_output": "hellf wfrld",
+    "lossless_vs_lowercased_input": false
+   },
+   {
+    "pin": "secret",
+    "plaintext": "Quiz yay, QUIZ YAY",
+    "ciphertext": "ილფწ პაა, უავჯ ნმპ",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "ილფწ პაა, უავჯ ნმპ",
+    "ui_decode_output": "quiz yay, quiz yay",
+    "original_decoder_output": "quiz yay, quiz yay",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "Hunter2",
+    "plaintext": "Attack at dawn.",
+    "ciphertext": "სსლეხე ფლ ვცგჯ.",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "სსლეხე ფლ ვცგჯ.",
+    "ui_decode_output": "attack at dawn.",
+    "original_decoder_output": "attack at dawn.",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "CorrectHorse",
+    "plaintext": "the quick brown fox jumps over the lazy dog",
+    "ciphertext": "აცმ ფწკზზ ჰმოლკ ოოტ ნლფუჯ დუზკ ფცმ ჯეკა კოხ",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "აცმ ფწკზზ ჰმოლკ ოოტ ნლფუჯ დუზკ ფცმ ჯეკა კოხ",
+    "ui_decode_output": "the quick brown fox jumps over the lazy dog",
+    "original_decoder_output": "the quick brown fox jumps over the lazy dog",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "pässwörd",
+    "plaintext": "Umlaut pin test ÄÖÜ",
+    "ciphertext": "ბყდვდყ სხს ყჰტნ äöü",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "ბყდვდყ სხს ყჰტნ äöü",
+    "ui_decode_output": "uvlaut pin test äöü",
+    "original_decoder_output": "uvlaut pin test äöü",
+    "lossless_vs_lowercased_input": false
+   },
+   {
+    "pin": "🔑key",
+    "plaintext": "emoji pin ok",
+    "ciphertext": "სჰზდრ ზრვ ფჯ",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "სჰზდრ ზრვ ფჯ",
+    "ui_decode_output": "emoji pin ok",
+    "original_decoder_output": "emoji pin ok",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "a",
+    "plaintext": "aaaaaaaaaa",
+    "ciphertext": "აააააააააა",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "აააააააააა",
+    "ui_decode_output": "aaaaaaaaaa",
+    "original_decoder_output": "aaaaaaaaaa",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "zzz",
+    "plaintext": "zebra crossing",
+    "ciphertext": "ფიმტჰ ეტყჯჯხზნ",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "ფიმტჰ ეტყჯჯხზნ",
+    "ui_decode_output": "zebra crossing",
+    "original_decoder_output": "zebra crossing",
+    "lossless_vs_lowercased_input": true
+   },
+   {
+    "pin": "İstanbul",
+    "plaintext": "İstanbul ΟΔΟΣ ok",
+    "ciphertext": "ყ̇იოსნკიც οδος ერ",
+    "ui_detects_as_ciphertext": false,
+    "ui_encode_output": "ყ̇იოსნკიც οδος ერ",
+    "ui_decode_output": "ყ̇იოსნკიც οδος ერ",
+    "original_decoder_output": "ḃstanbul οδος ok",
+    "lossless_vs_lowercased_input": false
+   },
+   {
+    "pin": "key",
+    "plaintext": "Kelvin K sign",
+    "ciphertext": "ყვმოცვ კ მცგჰ",
+    "ui_detects_as_ciphertext": true,
+    "ui_encode_output": "ყვმოცვ კ მცგჰ",
+    "ui_decode_output": "lelvin k sign",
+    "original_decoder_output": "lelvin k sign",
+    "lossless_vs_lowercased_input": false
+   },
+   {
+    "pin": "1234",
+    "plaintext": "q",
+    "ciphertext": "ს",
+    "ui_detects_as_ciphertext": false,
+    "ui_encode_output": "ს",
+    "ui_decode_output": "ს",
+    "original_decoder_output": "q",
+    "lossless_vs_lowercased_input": true
+   }
+  ],
+  "edge_cases": [
+   {
+    "description": "leading space",
+    "pin": "secret",
+    "plaintext": "attack at dawn",
+    "input": " ადბზპგ მბ სბპწ",
+    "isGeo": true,
+    "ui_output": " ymjryd jj tecf",
+    "v3sd": " ymjryd jj tecf"
+   },
+   {
+    "description": "trailing newline",
+    "pin": "secret",
+    "plaintext": "attack at dawn",
+    "input": "ადბზპგ მბ სბპწ\n",
+    "isGeo": true,
+    "ui_output": "attack at dawn\n",
+    "v3sd": "attack at dawn\n"
+   },
+   {
+    "description": "exact",
+    "pin": "secret",
+    "plaintext": "attack at dawn",
+    "input": "ადბზპგ მბ სბპწ",
+    "isGeo": true,
+    "ui_output": "attack at dawn",
+    "v3sd": "attack at dawn"
+   },
+   {
+    "description": "leading space",
+    "pin": "1234",
+    "plaintext": "meet me at noon",
+    "input": " ვმმო ვმ წო აჰჰა",
+    "isGeo": true,
+    "ui_output": " meet me at noon",
+    "v3sd": " meet me at noon"
+   },
+   {
+    "description": "trailing newline",
+    "pin": "1234",
+    "plaintext": "meet me at noon",
+    "input": "ვმმო ვმ წო აჰჰა\n",
+    "isGeo": true,
+    "ui_output": "meet me at noon\n",
+    "v3sd": "meet me at noon\n"
+   },
+   {
+    "description": "exact",
+    "pin": "1234",
+    "plaintext": "meet me at noon",
+    "input": "ვმმო ვმ წო აჰჰა",
+    "isGeo": true,
+    "ui_output": "meet me at noon",
+    "v3sd": "meet me at noon"
+   }
+  ],
+  "internals": [
+   {
+    "pin": "1234",
+    "pin_utf16_units": 4,
+    "pin_utf16_code_units_hex": [
+     "31",
+     "32",
+     "33",
+     "34"
+    ],
+    "first_8_rng_values": [
+     0.29260778829748924,
+     0.48683574155132187,
+     0.8186054348057614,
+     0.40369926984508037,
+     0.7562664842131237,
+     0.12373190539044605,
+     0.8953768387193272,
+     0.019368830374295085
+    ],
+    "first_8_rng_states_u32": [
+     1256740881,
+     2090943588,
+     3515883570,
+     1733875161,
+     3248139816,
+     531424487,
+     3845614239,
+     83188493
+    ],
+    "shuffled_alphabet": "zsfwpuinlebxydkovgarcqjtmh",
+    "vig_key": "x"
+   },
+   {
+    "pin": "0000",
+    "pin_utf16_units": 4,
+    "pin_utf16_code_units_hex": [
+     "30",
+     "30",
+     "30",
+     "30"
+    ],
+    "first_8_rng_values": [
+     0.11145259256275664,
+     0.157893843752773,
+     0.7422928800206382,
+     0.2414459230474769,
+     0.9431411118579891,
+     0.13123549430892698,
+     0.6200055451178936,
+     0.9051572831592423
+    ],
+    "first_8_rng_states_u32": [
+     478685240,
+     678148895,
+     3188123643,
+     1037002343,
+     4050760230,
+     563652156,
+     2662903539,
+     3887620928
+    ],
+    "shuffled_alphabet": "bojiylweqhnsgptvakxmzufrdc",
+    "vig_key": "x"
+   },
+   {
+    "pin": "secret",
+    "pin_utf16_units": 6,
+    "pin_utf16_code_units_hex": [
+     "73",
+     "65",
+     "63",
+     "72",
+     "65",
+     "74"
+    ],
+    "first_8_rng_values": [
+     0.2188493605281341,
+     0.8884342058767645,
+     0.19785544350693363,
+     0.17406664233982252,
+     0.8122093281271423,
+     0.3800206981552813,
+     0.29734453728826354,
+     0.005555499346357654
+    ],
+    "first_8_rng_states_u32": [
+     939950846,
+     3815795858,
+     849782659,
+     747610536,
+     3488412501,
+     1632176470,
+     1277085063,
+     23860688
+    ],
+    "shuffled_alphabet": "iylojutcdkngbsmpqvazhrxewf",
+    "vig_key": "secret"
+   },
+   {
+    "pin": "Hunter2",
+    "pin_utf16_units": 7,
+    "pin_utf16_code_units_hex": [
+     "48",
+     "75",
+     "6e",
+     "74",
+     "65",
+     "72",
+     "32"
+    ],
+    "first_8_rng_values": [
+     0.1197212708927042,
+     0.24087910103632115,
+     0.7584165958125183,
+     0.15666213076483973,
+     0.26005447731820275,
+     0.9590864500401277,
+     0.31792504417661693,
+     0.15907055143245277
+    ],
+    "first_8_rng_states_u32": [
+     514198943,
+     1034567861,
+     3257374475,
+     672858728,
+     1116925475,
+     4119244936,
+     1365477667,
+     683202816
+    ],
+    "shuffled_alphabet": "lktroqmivbnahpcjxewyufzsgd",
+    "vig_key": "hunter"
+   },
+   {
+    "pin": "pässwörd",
+    "pin_utf16_units": 8,
+    "pin_utf16_code_units_hex": [
+     "70",
+     "e4",
+     "73",
+     "73",
+     "77",
+     "f6",
+     "72",
+     "64"
+    ],
+    "first_8_rng_values": [
+     0.9098835133271952,
+     0.6948165466764049,
+     0.5976005912752823,
+     0.39447487480809795,
+     0.2892064420248397,
+     0.6140860453280821,
+     0.3300926239066973,
+     0.09353737255873563
+    ],
+    "first_8_rng_states_u32": [
+     3907919932,
+     2984214344,
+     2566674995,
+     1694256686,
+     1242132210,
+     2637479481,
+     1417737024,
+     401739956
+    ],
+    "shuffled_alphabet": "zdipseunftclywkahqbvmgjorx",
+    "vig_key": "psswrd"
+   },
+   {
+    "pin": "🔑key",
+    "pin_utf16_units": 5,
+    "pin_utf16_code_units_hex": [
+     "d83d",
+     "dd11",
+     "6b",
+     "65",
+     "79"
+    ],
+    "first_8_rng_values": [
+     0.5597162234037454,
+     0.4078829589783873,
+     0.0922736814460423,
+     0.9937696319524594,
+     0.47061797498506913,
+     0.5935848878215964,
+     0.4821727435295872,
+     0.3203972483334125
+    ],
+    "first_8_rng_states_u32": [
+     2403962874,
+     1751843969,
+     396312444,
+     4268208068,
+     2021288811,
+     2549427680,
+     2070916164,
+     1376095703
+    ],
+    "shuffled_alphabet": "hfuziqsrntledxbpavgjmywcko",
+    "vig_key": "key"
+   },
+   {
+    "pin": "x",
+    "pin_utf16_units": 1,
+    "pin_utf16_code_units_hex": [
+     "78"
+    ],
+    "first_8_rng_values": [
+     0.5808112487617906,
+     0.1751578678784794,
+     0.7776591032225776,
+     0.10228063867014847,
+     0.9872840524155843,
+     0.15968371535644021,
+     0.208884685581756,
+     0.41133954897786945
+    ],
+    "first_8_rng_states_u32": [
+     2494565318,
+     752297314,
+     3340020415,
+     439291998,
+     4240352716,
+     685836335,
+     897152893,
+     1766689910
+    ],
+    "shuffled_alphabet": "lbufjkzigqrmoawxtnhydvcsep",
+    "vig_key": "x"
+   },
+   {
+    "pin": "CorrectHorse",
+    "pin_utf16_units": 12,
+    "pin_utf16_code_units_hex": [
+     "43",
+     "6f",
+     "72",
+     "72",
+     "65",
+     "63",
+     "74",
+     "48",
+     "6f",
+     "72",
+     "73",
+     "65"
+    ],
+    "first_8_rng_values": [
+     0.851068335783451,
+     0.39341775127533307,
+     0.03464794276157579,
+     0.0199900963390223,
+     0.17264565247405453,
+     0.9993545061441498,
+     0.4786721552905329,
+     0.41829986204819286
+    ],
+    "first_8_rng_states_u32": [
+     3655310668,
+     1689716375,
+     148811781,
+     85856810,
+     741507431,
+     4292194920,
+     2055881252,
+     1796584227
+    ],
+    "shuffled_alphabet": "cpsgvkeorzlfntmqbihyudxajw",
+    "vig_key": "correcthorse"
+   }
+  ]
+ },
+ "v4": {
+  "vectors": [
+   {
+    "pin": "1234",
+    "plaintext": "hello world",
+    "ciphertext": "ჯყЗშწწШეОლЭხДაიცსაააКჟДკქВЗЕწლბЙИЕეФОИჩნძЧХИРЮერШЧУСПცშმწЗიЪრМГჭХრიЖიЖყზЙა",
+    "is_aes": true,
+    "ciphertext_codepoints": 74,
+    "base64_intermediate": "fXoYcc5EvK+elAIaRAAArPlJVjomcKBqpmE1vpZMb42px/EQ540ywaYLcoI7Qtkd2QInInXGqA",
+    "blob_len": 55,
+    "salt_hex": "7d7a1871ce44bcaf9e94021a440000ac",
+    "iv_hex": "f949563a2670a06aa66135be",
+    "ct_and_tag_len": 27,
+    "plaintext_utf8_len": 11,
+    "decrypted_by_original": "hello world"
+   },
+   {
+    "pin": "correct horse battery staple",
+    "plaintext": "The quick brown fox jumps over the lazy dog.",
+    "ciphertext": "ფШნბჟВИИПЮშიРЙუХბИლფნთЛЭЕЦМЬნფობდЛჰმНСОЦგჯბУЫთУТკსЖჰლРНСოფФზИШЦღლКМЬეЕსაუზგЙЛЮამСვსპჟДЦჭШЩშღქУწუШЦპВПЕრУცუЦРყПწКЛსЗელП",
+    "is_aes": true,
+    "ciphertext_codepoints": 118,
+    "base64_intermediate": "U5MBPjppw/YIxqT2BpKUMHs+m3t9MUNBDsgLuyv3CfB08H0zJRngKxuyNU1Gp53WKrt9EmRATGCqs/ALyFROPl3d56YWV0cT53OjwmQ0aT3xXwcrsRoEKw",
+    "blob_len": 88,
+    "salt_hex": "5393013e3a69c3f608c6a4f606929430",
+    "iv_hex": "7b3e9b7b7d3143410ec80bbb",
+    "ct_and_tag_len": 60,
+    "plaintext_utf8_len": 44,
+    "decrypted_by_original": "The quick brown fox jumps over the lazy dog."
+   },
+   {
+    "pin": "pässwörd🔑",
+    "plaintext": "Unicode ✓ — Ünïcödé 日本語 😀🎉 ქართული Русский",
+    "ciphertext": "ЙჟПЙტФფწრჰЙГВპლПჭეБАჯШჭუიჰუСდჭშЦИლРЪჩЪჟТცЙქლფთძНაСმჯვჰГСШЪЦღაТМКოБიНგАოფწშКბТАЙყЛЖЭФღუწჭბაბЧЮგЛკЖფაИჩЖАზЙЕგФდხЕჰИПЖჯწპგბშЮჩბЮПყЭმბბУДჰდЖЧДЧБЙОФЕАПЬЦЛЫНჰЦოუძრЧჭნწშЩჩპЧჩბТჰ",
+    "is_aes": true,
+    "ciphertext_codepoints": 170,
+    "base64_intermediate": "qPwqS1UcQgqkjOKwdEihf5dTIgTyDdY3pKx7Z7PzaqVKUHbuAyLfFgky573WAztrNiIuChNUcYrBzhqXsn+1WTcdBAB4/CsJnUApZnhGqmC1DemgpwnfcOCBY/ZB/wX+LBB0lgDn4l4iqv1mhw93s8ug3NTbQ4dMcY6ZO4ZBzg",
+    "blob_len": 127,
+    "salt_hex": "a8fc2a4b551c420aa48ce2b07448a17f",
+    "iv_hex": "97532204f20dd637a4ac7b67",
+    "ct_and_tag_len": 99,
+    "plaintext_utf8_len": 83,
+    "decrypted_by_original": "Unicode ✓ — Ünïcödé 日本語 😀🎉 ქართული Русский"
+   },
+   {
+    "pin": "Hunter2",
+    "plaintext": "Line 0: the quick brown fox jumps over the lazy dog.\nLine 1: the quick brown fox jumps over the lazy dog.\nLine 2: the quick brown fox jumps over the lazy dog.\nLine 3: the quick brown fox jumps over the lazy dog.\nLine 4: the quick brown fox jumps over the lazy dog.\nLine 5: the quick brown fox jumps over the lazy dog.\nLine 6: the quick brown fox jumps over the lazy dog.\nLine 7: the quick brown fox jumps over the lazy dog.\nLine 8: the quick brown fox jumps over the lazy dog.\nLine 9: the quick brown fox jumps over the lazy dog.\nLine 10: the quick brown fox jumps over the lazy dog.\nLine 11: the quick brown fox jumps over the lazy dog.\nLine 12: the quick brown fox jumps over the lazy dog.\nLine 13: the quick brown fox jumps over the lazy dog.\nLine 14: the quick brown fox jumps over the lazy dog.\nLine 15: the quick brown fox jumps over the lazy dog.\nLine 16: the quick brown fox jumps over the lazy dog.\nLine 17: the quick brown fox jumps over the lazy dog.\nLine 18: the quick brown fox jumps over the lazy dog.\nLine 19: the quick brown fox jumps over the lazy dog.\nLine 20: the quick brown fox jumps over the lazy dog.\nLine 21: the quick brown fox jumps over the lazy dog.\nLine 22: the quick brown fox jumps over the lazy dog.\nLine 23: the quick brown fox jumps over the lazy dog.\nLine 24: the quick brown fox jumps over the lazy dog.\nLine 25: the quick brown fox jumps over the lazy dog.\nLine 26: the quick brown fox jumps over the lazy dog.\nLine 27: the quick brown fox jumps over the lazy dog.\nLine 28: the quick brown fox jumps over the lazy dog.\nLine 29: the quick brown fox jumps over the lazy dog.\nLine 30: the quick brown fox jumps over the lazy dog.\nLine 31: the quick brown fox jumps over the lazy dog.\nLine 32: the quick brown fox jumps over the lazy dog.\nLine 33: the quick brown fox jumps over the lazy dog.\nLine 34: the quick brown fox jumps over the lazy dog.\nLine 35: the quick brown fox jumps over the lazy dog.\nLine 36: the quick brown fox jumps over the lazy dog.\nLine 37: the quick brown fox jumps over the lazy dog.\nLine 38: the quick brown fox jumps over the lazy dog.\nLine 39: the quick brown fox jumps over the lazy dog.\nLine 40: the quick brown fox jumps over the lazy dog.\nLine 41: the quick brown fox jumps over the lazy dog.\nLine 42: the quick brown fox jumps over the lazy dog.\nLine 43: the quick brown fox jumps over the lazy dog.\nLine 44: the quick brown fox jumps over the lazy dog.\nLine 45: the quick brown fox jumps over the lazy dog.\nLine 46: the quick brown fox jumps over the lazy dog.\nLine 47: the quick brown fox jumps over the lazy dog.\nLine 48: the quick brown fox jumps over the lazy dog.\nLine 49: the quick brown fox jumps over the lazy dog.\nLine 50: the quick brown fox jumps over the lazy dog.\nLine 51: the quick brown fox jumps over the lazy dog.\nLine 52: the quick brown fox jumps over the lazy dog.\nLine 53: the quick brown fox jumps over the lazy dog.\nLine 54: the quick brown fox jumps over the lazy dog.\nLine 55: the quick brown fox jumps over the lazy dog.\nLine 56: the quick brown fox jumps over the lazy dog.\nLine 57: the quick brown fox jumps over the lazy dog.\nLine 58: the quick brown fox jumps over the lazy dog.\nLine 59: the quick brown fox jumps over the lazy dog.\nLine 60: the quick brown fox jumps over the lazy dog.\nLine 61: the quick brown fox jumps over the lazy dog.\nLine 62: the quick brown fox jumps over the lazy dog.\nLine 63: the quick brown fox jumps over the lazy dog.\nLine 64: the quick brown fox jumps over the lazy dog.\nLine 65: the quick brown fox jumps over the lazy dog.\nLine 66: the quick brown fox jumps over the lazy dog.\nLine 67: the quick brown fox jumps over the lazy dog.\nLine 68: the quick brown fox jumps over the lazy dog.\nLine 69: the quick brown fox jumps over the lazy dog.\nLine 70: the quick brown fox jumps over the lazy dog.\nLine 71: the quick brown fox jumps over the lazy dog.\nLine 72: the quick brown fox jumps over the lazy dog.\nLine 73: the quick brown fox jumps over the lazy dog.\nLine 74: the quick brown fox jumps over the lazy dog.\nLine 75: the quick brown fox jumps over the lazy dog.\nLine 76: the quick brown fox jumps over the lazy dog.\nLine 77: the quick brown fox jumps over the lazy dog.\nLine 78: the quick brown fox jumps over the lazy dog.\nLine 79: the quick brown fox jumps over the lazy dog.\nLine 80: the quick brown fox jumps over the lazy dog.\nLine 81: the quick brown fox jumps over the lazy dog.\nLine 82: the quick brown fox jumps over the lazy dog.\nLine 83: the quick brown fox jumps over the lazy dog.\nLine 84: the quick brown fox jumps over the lazy dog.\nLine 85: the quick brown fox jumps over the lazy dog.\nLine 86: the quick brown fox jumps over the lazy dog.\nLine 87: the quick brown fox jumps over the lazy dog.\nLine 88: the quick brown fox jumps over the lazy dog.\nLine 89: the quick brown fox jumps over the lazy dog.\nLine 90: the quick brown fox jumps over the lazy dog.\nLine 91: the quick brown fox jumps over the lazy dog.\nLine 92: the quick brown fox jumps over the lazy dog.\nLine 93: the quick brown fox jumps over the lazy dog.\nLine 94: the quick brown fox jumps over the lazy dog.\nLine 95: the quick brown fox jumps over the lazy dog.\nLine 96: the quick brown fox jumps over the lazy dog.\nLine 97: the quick brown fox jumps over the lazy dog.\nLine 98: the quick brown fox jumps over the lazy dog.\nLine 99: the quick brown fox jumps over the lazy dog.\nLine 100: the quick brown fox jumps over the lazy dog.\nLine 101: the quick brown fox jumps over the lazy dog.\nLine 102: the quick brown fox jumps over the lazy dog.\nLine 103: the quick brown fox jumps over the lazy dog.\nLine 104: the quick brown fox jumps over the lazy dog.\nLine 105: the quick brown fox jumps over the lazy dog.\nLine 106: the quick brown fox jumps over the lazy dog.\nLine 107: the quick brown fox jumps over the lazy dog.\nLine 108: the quick brown fox jumps over the lazy dog.\nLine 109: the quick brown fox jumps over the lazy dog.\nLine 110: the quick brown fox jumps over the lazy dog.\nLine 111: the quick brown fox jumps over the lazy dog.\nLine 112: the quick brown fox jumps over the lazy dog.\nLine 113: the quick brown fox jumps over the lazy dog.\nLine 114: the quick brown fox jumps over the lazy dog.\nLine 115: the quick brown fox jumps over the lazy dog.\nLine 116: the quick brown fox jumps over the lazy dog.\nLine 117: the quick brown fox jumps over the lazy dog.\nLine 118: the quick brown fox jumps over the lazy dog.\nLine 119: the quick brown fox jumps over the lazy dog.",
+    "ciphertext": "ჟДЖЙИЮПЬЩლЫზДიЮФРვЭЧოЭსЩჟაПქჟიАХსშЕМОЦЫГГხსწშკКპМნდჭთმЩლЗПЛАზЫЪЮუСГეАჯწშჭშწЛЪშНტХЭრკლНЧეგჟШჯლДЮЙЩШასСნШციПХბფსЙსთფЕЛЗЖЙხღსჩЬეШბТბГОტЫАТუВმღჰФცთაОტცძძЗჰЬზგХზПФთЖБЧვЭДВРЖჰЩრქკЭЪჭსჯЫБჰИცРАБპთშჟჟღЕЙქიპწСტСიЙოМХНБვЖПჟსТფЭШЦКაოქЮИტჰРიГჭხСფყХცსЖქზАНВСЖАЛპმХღქЫოზსნУЫЫცШФЮჭპИИგГჯცГთЗლძХუПქТბთვЪღტМჯზДЗОზЙЛღЧЬზზООდЙზაУЦЬძЬცხСჰღღЩУმКНХЛწოТსყЖАЫНЭჭწფბდუЪვСოიПСЕТБცყЦჰღჯფЦБЕცЮპთღЙВბБშჩიКЕЮАТფზფБჩЫჰპძСЬგკСЙЭМჯწАХმცჟЧპАКРნძწგჟРУГОალАДЛშსРცყცრЛტატფსშЖძНЪЛმთღავტჩЪТყჭხЬისРНუТჯთთШოЖსВპФხУКბოЩახЖЛЦდსწРზრЬღუწАორცსფწშБХПУოЩУЪКИყУЙყჯДМბЭШИოЬИУსფЗთЪРЧСვМდРРХსდРАპТАბჯЩГЖДჯЦჟЧვЙЩЛФОРწШბთტიСБყЭМНრЫფქჭნТწწАБჩЧძЧОპЛშჟКმმШШყЭМტპЭეЬТჭФლქჭვРЛГჯБНჭЖღЫმჭРქХНХХЭძВაЪნЪЙეВЛგღЪპზღЩРГХძღЫჩბУЗЦГЧЩოძНДМЖИპЦოЖჰЫЮМდЦეРოქЩიБრსნТშშჟШОЕნკუწლვბТკრШჰოგრაЮზშრღДჟჯФხდრიШЭთБნВЮПЭЪცВუსშპმНЮოზФწБОუპხლაДვЫКზზმშФყЭქხФИპჰპძУპკკБძЛჯრსВЧტყЫოРჰფსჭГხმთОეფხბრЛლპЗვუტცსუНღИნНЙНКПნЛეიაყმყЖღДზШრЧბლФღტЪЪШღჰჰძШთცНБЫლТУЛწЬჯМЧვППГვაЧКЬПТქХდუგЖУმფЩწპხНთკЖМჩЖეკЭЗОუЭУღАГკЫТძეЫВОЬНЕაგУНТПცЩგცჯТЧЗЕУЛრეЬЭრცმდჭРფბЫსЬДაქРჩზЛყФДჟМЮФЬჩЦБლЛბДКძЦФООЩუОჰИЗდЮТЫУაСოЦНЩქნЬღუთსრБხძЩЪЩკЛЗДტЧПЙმЬნწЫჩУВთაЪგლЛЛНლАშდКწРСჟВАვЧСუფЪვშЗღღღХЕОრЦТპძვქЬЮეЪДЖჯდТქგეСОГХცЙვОАХზკВლჟლТМАКუტუოკვპЮАЗძСამქვЮქРПაჟЛღЕЗიЬიმНლხЙЗЦჩბТდЮВЖაЪЗბВთАЭЬჩთტПДჯჭЬმგЪЖУოსჟЧКკვЛРუЮლპСსЧВპვჯЗРკБხჯჟჯქსნთნЦНვფХОМХჰლკЫოაპЧАНЗЩიЦნჟЫЛСИЮМჯГიქიБЪცТგეЗღЖШВИბГჩКЖЕМფКЫბნРНზЬПჰშჭУჩЖჰБЭРНЙჟზვТВРЖЭფეЬჭეГლВСბЦТკНვლრИФЮპფსკЦАОქოКშპხЕჭГМფЮЦЕХწЛДЭЭჩძზჩЕЕКПЮუЗნჩზფლჭЭზნჰМტყქЭაЮრჟვТწБზНდСХეКАწПძГმЗნКჟМჩჰგЫიჰსოЬЬჯЖღქЙძოЭმპШЕЩПДთრЧკლჭПЭУჩზძУЪჩბГГლაХთჩბვШМქუჯЮუЪჰУჯЖჯღვТЧЬЪЗЛუშЛდმჯЬლჯАСРპნწЬЫТცძЮАჩСკხვტყОმქПМხჯФКყოპРУიРჯЖგЗАСЕНПНЧОქКУУჩძКუТწწდЩღРФУჟОღЗრИმშТწხЧСХВლკგМგოЫღდХმЙЦბДУყსჰАკАყდზგОФОიხყМЙლქЙსЦკХჩШბМრძЬძუЛოФРღТცზღბХსვრНОოНრУსაЮВШБЩიშთიჟИფჯქყАეДНღПДტИЕЮბჭРЙოФТЭჰМВშძჯМპყჟოЕიღპჯФუЛЬფბღЗФჯШЭВქსჰცკოთუშТნზლლპგЛДღცკОტШთЕჩმЭჭМЗთჩЗნТБЩჟЛთძჯЖСВЧУБვДЫლМწძЙჯЗსПბГბმძНШСЩრტდჟПБУწЩშСБჩჭშზЫბЗПშპზსწქბბჯქაМАდХТმყნШЮЙАЙЬდბნФხЭЗЧРДჯბრЪნჭХძЮОМСქვიშღЫГბაკკჭЧმЕუЩМЦძВЧВდЕРჭგაუЖЙგკიЮყლცУჭЖცჩგსიგШННЮმЭჭრЭყრთНსჟრჟჰРპЛАЩეტცАოსჟმუბფЧГცირАეНჟსФჩПოყЫცЪУძაЩდუЖКЦАქСЕТჯРНმგВРЕჭზგЬВЙЕДაუგჩგМძლАშკШცЬაჭზყЕსშВჩოКГХУთУИБქЫპჭნЛრААЭЪჯწრШЦДჟЫხდЦТЮდЙХЮჟნГИუВЧТСЫПЮЫხКАЧОЗჯЬМელЗЭМГБლАტОГГზГწАБჭკВრმШООჭჯКФჰგრქნЭჯყჩЩიГწЪКГხЮЩЭკშკИეЦქხЧИПჯЙოხОМლსლЫКშუОЪლგტВСაღБВგლСჭИთქნТჰДჰМქგნКЮТЬქНФზРЬЖФЗДХЦჰობველИჰივМАЕჯაГტХПტპВჰთГПძИЦლЪЩძНАაАЙფცოვყБЙჰХЗფოეჭРვРდდЩЧЩЧდფვხწსШაНВაЮიУБთღВОბЦქშნჰИГЩЬლКФЙФპნХСჟЦჩჩოულЗЖЪККПЮჭХლჩНЕЗიშТЗრЩТტЙძმლბИКჭФМექЮФЛდЭКТუძცЕФჯტქჟრЛЖЬНკყЪიზძЦძШТქСლფმქСХЛაЫუცЭსВИხТКაოЛეშЪМიЦЩვზრჭბვЦПХღЖაХპШМЧВწЗჟГცЖყჭЖЩსВხЩწЭდЭШოაВუჟЩსჰЩლОЮРჰჟეИЩРЬრЩЬЦПШЙეწფНკЬეზტჟშჭყგუცწლЖეВოტНვПУЭАთТЦგДКზრПეГნЮОფЮПДჯშჯЙმკბЪЧგЗЕЗუКЛИმОНУლЦპЮსიТძჯЖყმბსАХЦБჟМტПზСГЖВბჭნПლГЭОბЧГНძПჩХБЦზЕЦПЪЬიИშЕЩშვГМЬბЫФЫОГУარУსთБშნყЬლХЙФუЮჩძДლწТКბМЦშДЮოზГЛТლЙШლВЪძЧЛНЦЙЧММЬЮЗЫეЙჯნЬФДЦАТლხУჭЮჯსსЪСЙტრТილღЮГღჯთОბსაჭბХЩღწდЙБХГРღნЫდВТЬЖИბЙჯЭფღКჩПОЛრПМგსოЩБძლწДСპჭНხЦმЮწეЮდპУგუЫფფРЗემდОЩРЭბტОეყღპლПЬКსპფფЛТცღჩსШЛჩТჩЦСЙქჭვრОნЫЧჩშЙЩდЛЪМჟჰნИძЫტზОВЛПСწМგВოЪკხქგЕტЛШУაЬთპაЙწშლСღორჩЩთვყРზЫჯკლОბღოღТჭЦЮჟДУМფკЙგვВМნИШხЖფჩპЭТЗჯПზЦჟჯРვნПგМჭЧრШჯТსიდЦბრპმნЖУშმნჰთძშლЬლფСГДЭЮРРლЫМწПЕტНწХАღСХბპყАნЭЛБჯპხЦჭНჭღПრУЩბИХФЦჰНწКЩდМЙშღბვჭЕИოპგЫღДЩЗჩდღЭЩჭეЩყგჰРАჯმვგიОФგწქБზქЦЪრძხპЧМНსЧЙცმМქМიКუჯზრИЭკВღუჩАბШЮБХჯЫЪჭЭУთЮტЛЗძЦატАკჭფРЖДიოРЦСТИУსБღწუЩБЮვЙლДШБქШЛაИБЖფითТСИტმოАჩЭЧМЮზჩრთღქქსმლეპЪПტუЮღОგნჟНძხღთКტაЛЭЬАჩჟЕზიВГბЬხჯხФტХჰღЙЩМЖИვნქჟАეგУფЦჩჟჯჯМპЕТძЦНღШТВგСოზХბწყქძЫჩЦОთღОЫФЛЖჭოღბჩВЬШЖРსРЩСЙЕითშკსУხКЗშГЙРხიЪჟჯვГზჟЫქიДБФТბჯРჭთჰФპჰРЬЙბЬქКღჯНჩПЕБქМЦКЧრკჰГИმტЙЫლბБЗრშპЮБРГДЦЕЭШჰОტპტБЙძЖლЗჭМეНТЗჰЦШაფიОГიЫპУეМვჯწოპჩШЦНყმზЪპუЕხეჯВЙჟგაНყЛთოСრჟГჟკღБШლУქწЭშЕბУოХყНЖВვდЖРИცწწУЮმХვზხანМКЧНЮШЛЫЪწИЖАდВაშჟЮუჩააШНПეჯПЫღქჟЩბქДვВთბЧწკჯმტსბჟДდЖგპШЪБЬПჩლУოქფდЗყყცმЫАჩჭКტЬПЙზხАკფქИРВУЛთЗყЫСЦარყეტსЛბБოემПზმЫХვჭГГჯპБОჩЬოПძდЭКტკМწМИФცЗკЙიОЗРЭЦკЙჩПტЧეЕЩХოსეოЭრშУემსუეკДწბვЩუიСჯШქУЦისЗШЛЙДЬპЦსსГТფუЛბსОძდЪФАდЫსდФЙУСზФВჰპოМდხЩჰРЭზძИსХგრВКЩЧპზწპЮИრტЮქოЪПნქЛკНჯთიხცღВიღტЭოЖФეЪЫტПЛაყПХოჰЪМЕნЧВტЭყთЛФЕЪЦСЫЦნდЮყВКლИჭშЬდХტВჟМპВАЗრუყДЭФЫЬწЛМკცრკწЕყწსЦაЛწСლЦРВИСЫВЫჰტლЩაЙРЦშბქЖИЧЫЮЫБВШჭМნЗЬЬЭЫЖოРეისნდჭყСთჰЫФВЧЦЩთგჰБКЪЫხზЩუღЭШშფფჟჩღЮПИსЫЪЮЗБКЩძТხЗლწშЮАИВЪვთГУЭფКრპჯღიდЗСნფЦШჟЦლჰთხЬЛხდჯკფნЖКვОვРტСОფГლТსЖШБსЬДЛყЙკგГჟАიОКШЧКკТТღეБშЦღნტЗლОЩფღთიМდრტЭШშღЭაღქИცძმЬყმშЖЩწჯპЩჰЕწაХФПჭДღЮШЮВЦჩზშМЫვЧღРОეЮЮმტЕЙИЧКჰცკლИისმაЫСЩХЩТЖრძძЙВპТКსВქШНქხძქშენეБრჟზშХაბეНЧЩРЩЧნБმОЛТЦტТჭСЕმჟცОЗუსДდВწСხდპИНფШГЩაСАცЮСკოЕАЛФОЛЧНОБХБНყИБოЕყჭЩტЗЬЬჭВსღფФვЬცზЛჩУЕჯღქЩБფრსДЧყიЭჰЦФნუХჩნჭცთმსПფრНითღГШმჯОშЧპТНЫბილМკდЖСრჰქИტЗოДთშЕВЪყЙБვЗეНჯბხШРატქგწБყბშНЗვხცТხფГბჟВრЭБპИИჩЮტОЦთЙИФცცჭГუШЫმზშЮЖღყჰСზШЗჯСმНვეყШЪАღსბЫППპთთტმცХУფყწოЕჰЖღДУრВГოჯУНწპБЧცХЧЦЭხЙწРსყЪВჰჩЖგКსЪშჩძСЖშЬЩНСОიУშთЩМაჩტШჟებИჭСაჩКხოდЫვЗСძვЙმკОФჯოРჟლპკპСჩწქისАღხყЦИЮЦФცნხყყЦЛკАЭდჩМფჯБტГЪჰЮეЩВცЦНკსძჭპწХТШტЭХიЧშაЬЭრწმქძЬЬНაფლძЙГЬჩპЪჰЬМНОЧწГДЫЙეუპტსჰმცТРГАსჯკЫИთლКსიოИღПჭშღЧზუОუФძЩჟИЗცპბЙღზპნЮქСЦГიკჭШღჰЗიჯКЭИУЬკУოЗПოვЗЬФკუФდДკვМუწНТირИძУИლЪТიКВშძКНქЙჭТСКУმვშНზЧЖМღНდჭЮთСДქОГГკУჟღРИЭპფნკაუЖЬტლМნЛАРხვვჰАყЮЙდЕსრძНЧНწСДГЮТЧაგИსФЕჩИძჭთОЦЙგПЛЖХРთტპУპСფპЙჭკჩОღДЪМНЗЫРძММПუევლხპფЗДთუОეПЩФУБАЖБხТШАЬკТლქЗდРლЛРСმГЩბდПЛИწკჩწწЦთГХოТტЦდЪМფმწჩბროძოЮხძიАЬЕზШხწООМიХზხАФИტЩМჯУცУВრჩხმУЭმეჩფშПეРდგЮХСБდПქУჯНფეპმЪტნКდვმФრОЕტთГФЪტძვზიბდЩჟჭЙЩЮჯОГЛЮЫძპЫთდჰდრიБყძჩМეგЕКЪЩРყძУჭბნტЫხუЮხჟВПომრუჰОშყეოЩЛჰКფОБოღფКპჟნჟМЧსФჟძფხჩОФЬЧოЮАუმუВლПШზზЦХНЧЩНოინЛსცსლფЛАЦზМშტთყФთქნЖЦЖდЫЩჟКვСძჯВვეხწლНგЬოაყШЪვЖეეცВЧხაწალЫპНЦТხპკწТЮЮუსჭყგიЮНაჭცჩШТდХЫჟТИНჯვლШტЮჯИიიГშყГცМЬდЫზქფჟЪბსანЧПУСТРРПზЧЬბЖЙწУეზკФНსСნСრЭთЙСЦРდსჭჯქЕЕტХძШჭЗცჟЮЫЕჩНПლბБოჭქკჭЭქეЮრფჰНყСЖГЗძპნელძЮХНიოГМЮათЗზЬВწპВხУУУჟПჭგძЙНქВზზჟБძСრДთლЛГზრეЩСჭპЖოЫბშპХФჯАთჯჟსЫЦПТძჰფЛЙჭჟШრЖტЦВლБМРЮОЙიТДЖჯღარЙფიЙВქდყЗЭАცЗდЭЗЦთრЮЛЛთФУმЦЫეტბბШრЙФეჩჟფაБცდქეШფЭპЕФИიღსЪСწდრსტმაირღЪპრჰЪჰЬაეპЗრДგМეМНდშჯხБРМსხნალიჰღВЕЧწპШწვსტჭზეМШსШНЦЧМსГЕნეტЙჰბფგТჭОЫСქჟეАრჟძИვЫИშИჭИძШკЩРОЗЪЦბБХОჰჯЕჯაЦგგГМТЙეКНФჩქФხЙЩღГТქიЮРЗწИწЩСУსГწЬუოკძУЦვЛИПზპჟЙГნხХЬХЬდДЭМვНიПპСИძЭГჰჩჟვჩХЙРЫЗЭშციგЖხВტლУჭღაЬჰКЦВჟЭყЛვЮღЖტანЬЧБРტКВიოЬМაჯლტХგყრЧЭЫФშЧყძКრГოუДკХჭДХХИტპსირკმჰВИდЛЫЪСПუЪჯტწუБЕჭტრქხფЖТსოЛიЬАЫტშქფЦცБნДთწგჯჭКხვჟცМЙნЮოუУРუДვВხЮჩდთეСოკაუШЮმГჯРЭიიხჩЭნЮВЮიРჭჰლШთЬმტЦწГმОჰქЭМНЛჟИრკჭზჩХბБАქოПСმЪОზЗძზიეСეПღწФოცპშЗჩФЦЛЪСთქФТჭЭჟცОქპНყტЭОШცკСЮჟყჟЪЛლЙკბძТჟБДაТСძპЧГБტპХЭეკთდОЩЩიКЩДდЫჟტლЬმФცღЩბЗჭგИჟЫჯЪძДზЖსუЕგჩჯДკНძთჟგხრვБოЫვЖЦრСუფღდმჟწჩაწОნბБОДთУჟЦფწФსეУБდПფТშჟრЫСКАვЙჩფЫВЦრჩРმЫჭЮუЪწЕЧღЖЗლუკლსХმШЬЩХპШЖტთХაЬСЙБჰჯჯჯЪშნიКЬბЙОЭქЭჭХЫდБЗСშპРДЛЕბТСცУსღКБТШДХЛცЫЮТОМДЪბДОЪეკმХწФიუЖОЫგნЧРЭღАიЕეЩბПნЩТФОЕФЧყლვხთვტიЮწЦზქЛЫЪОКИНДКღЧЙოЗЛЮღЬჰХტხფЙვჯХГЧТЖხმКჩЧიКძუИჰცვგპШხთПАНЖЗმСЧСცЗШЮთЭВცЮხММЛტდტმНЗДწТРГТზნИეთბოЖჭЛივАკცБНЬჯЪПეოოკმვწФღЩცЗძРЬАОЪჰუКОЫБВШЗნЙპЪხБხჭჩСЧСვოძსВყИЭМШБუჟДОცცწლПРНЕИპვცფАЫწაЧДФЖГБვუცЧФძЭტЕЙФРУსЪწშშყЪЫЬგპОფჰСლФКუშЮხЙЫЙრტვЬცФТБნლЮЗჩЧЙМეРჭდვЙსЕსმУЙЫპსჯზПღვვИИЪЮკОრФსშВНЧლУРВАГდЩЕეყЕВჟХწონИყზВიНლჩЛპწვБპჯშНნეჰББМმზМРЙვФЙოდჟსჭИЬტЬრჯბგაЙმЦЪრგЪწЙშЫРბრჯჭძჟვТХФდჯЪЗЮვАПВხНდჭКიУთЪБСЙВაЩШეწКეჯგაწУბნАЖძУჭРჭაღტყТჯБძიБЗТЫГნЩВУЧДსიЪТЙКჟღЬბნГდტნПიЙККЧდთწБШპЧბჯЗВუვჟხХАაფლყიЛАОЭჰუБრЦგჭБЭВВსЧბЮჭმშჰОშმთღდნОВუცБქЖნჩАЛОწСსთЦოДЬЦვულОЖНДგЖМРხБვიყღТПЩგჟღМОყსკკЛრЩУტЖსყРჩბწჰბუთიФთბХჟლПДაИჟხТСДშАРЗЛჯცДრჟЦფჟГჰЬნШკГგЩСХსკТჯНოდსЧშОАУნკЭთშПЖთИვХОЙუОШРЩЗღაЬიოჰღСკჯხდВЪЧდწЬОГჯЪЩМАქСТტპთОУКТХთРХვქЭЮБზებЧЦФძხНГЖЩცВСჯПВШЭИშუჭყლУНჭТშЙКРჟАეЕოЭშილჯჭЫქЩწБПევЪСПИПКОЕСВკТძЭჟАУუსშლეЗჰЦხЕაАЦРЧНРჭტქდყНჩЪბნУმფЭЗხРНწგИВЪПСЙიკЧთЗლФЭჯЬღГЕЦФФБწმЖკთძფეВისЭჰБნФЙნОМკცძუЮზЧრძძმЭЧაჩოОლЮЛხЧШტრზლღბხსგუწფЗЪДშНპИОЛრფფბШПეТУЭტДგЬБЩРБბХХЖსЙაВИВДКხზЬРყРჯჟძЫАჭМГვДНВЗრნЭЮАЙუЬჭЕДთККЮღГუქჩლДწЩХჩბИЗУГУჟФИრზჭДპყყДჩაГРფРზბეЗჰГФЛЭყТФჯЮЭშЛЙЪდნСРДიШუსგНКღღნОЮჟიАТЗАჭШტЛХზჯПЮДЪАხგეБფЮЩეჯВВЭДРТეСЧსЛდჩჭჰქუაШФუტმЦЕაЦЪწბხბЫჰჰძძჩАტСУყაბШЭШეტЖЪცპქОАТტქЭიУნРშნВგВВОდОМЖბჩდშოჯЛШყТცЗЛНნოЗЙპჯჩРჩეწСКИღМეГЛЦЬიФნბФШზДწТПადთЬშბცწთშკხСკСხრაРЛააДბუПБЧМПАЧЙИსლРზЖცშძГРსგჟფჰФВჭРღДТოოტЫКთბДპჩДХЩОუЩЬМმЕАცპქზლკГЫგლЭღДპჭПჟНЫМЩქბჰНАТЫБУზНФცЬთმქВკЙЪთДЬЭЛნპპБМოეЭუთაძჯპВგღხЪАჟАЫღიზოღძЧდЬქნЪТВდЭАЩქЗЕШЛსГГЕეკНЛჭზЗФЫძРჩГქЩЕЬძუГტჰიЖБშჩხЩგСГЭმუЫАსРღХЦჭხЙკოТПქАტკგტХЬფუსჟიჭოГშიЦЗვМგЗუფЙЭСЙჭჩპНАუძРАგШБვЖზოТნЛკУჯჰЕღპსდეЖყХცФЬპყიჩღბКაზСХღЫОდთუბყДოლЫლთКცფЪТძბПИკიЩიძЙПЧძაღПЫУЩშტЩУგბლუჭბთЗЙКწუМუდკვЙგЩЛხმБИპჭკშვეწГჯАШჩბЦМЗნФაჟДდЩКИნЬВლОსქШვფХЮЬРПЩЩპტЗჯГზჭАЖშსГВჭეВბთЧიРჭიЙჩშღჰჯვხცРУრბჟЗიფЭЫღუვვМხღЦЛგჰЦჭწვФცთპტЭზღИГტЫწНიდЪძЭჩაიЧЙШლЪУКШჯОУკშჯროწხცვЭЭბДმფЭცვФЦЭАЛШДქწЕЮჩგШხშЧჰგХЦЬЪპჟЪმЭუПЧЧХЗლპЙძჰგИოვРჭლЪНთРზსЗОჯФჟЮშЦჩოდჭწშАწОДზევღУЮБშЕუСЧЪზОБქИНნვმტОГАჰГДსჰთხЛოЧГხმЪოЙვЩიცზღЛДკღჩФЭხეЧШСხწშЗჭჩСУლКცФყკპЩცჭყТИრРМРქРქჭთჩМზЙУШწდრწჰЗმУათჟშდКФჯყОКტეჩცЗლФКტБЙХПВСДპАეРЫხვჯЮაЭРПპЬჯქАჭქწცХБАძპხУყდПСჯЭტშЫЛФუПჯთИЖცრდქჰОვТХЦყБთმЗშЕИЕВეТჭАЭზЛდძჩნუЬჩბАდგძФИЮტვЗღЦНЭЖცЛФГშტЮШსოაРЦЧძБАპЭЦОბფვЗჯФЦვЩНЛცრრОრღტТკЫЮგსძЛСზТშУСეФИЦხმფმОЧშСЗБКИЭЦМჟსТბМАДЩხТЗЭძტადთЩთЪთთВЕЙიГფКლЬბაТშიЪლВЕვგგკმძჰЫЩდრლЧცЖემლЪЮЕმГЛЮქЧБმხДНШწИХЛШСМЙЛფПმქЕВХიРეФЧЗНლასფРЙБეЦპჰზძГИИЮНბკВლБЙჰჩოЕჟფბЖპКეГხОМВЕЖჰმУიВРЦПთИოგყЛНჩЩსДЗГვЙЙИნძКЩБზЖქაჯზЖქМБმძЧЪგჟФПЖძГყЧХჯЧВეიЩИჯსЦჩჭФჟЖЙშЛოოГТრჭДМკЫვყხპЙღშШხშძიНღეПЗაХБВფჩბძЖჟჟნЛთИზКჭჭწКეЩХИჟფხღВჩბქნშЗჰმСჭეФიЩХОЙБწНხჭჭХძУხოვგГБჟЭჟნЫოЬზუБდწძЖФჯვПუპГძოЗლწკტЩЙჯზБЭკДდჰДლЫღБთპთЩტსЙპВДღგჭაძსგЩЮОСЧПЧМექЩЕღიხОИჟЙჭთმწЕძნГშწჰШОზВჟხМწდКღЙБЙჭუწДვხაყВძჟЬБОლУკფგდЭШწთჟძლზმდოЙაჰРყჩლОჩРТАШЖსАЫКЩХСქГЭრმНშკღЗვოხЕჰМაცვПჯНმჟთПმНЙЭრЧგშჟიОЫРЭЫფრიЦЭშკჟძЭЬЗჩОЛЖდФЮჩЖდზწფპЛЪХАУჭЭЬცცГМიჰЙЖუНЭყნკქწჩტХჟლღჩАძОЕჰВХШБშЗЗჩБლБმЙЫЬიყიქКМЫКჯЬხზСДОპНნВСФСАჟჭЦმЛდკММХჯჟОეტЪЛЗКჭყყСБШცჟЦკხХМЮЗიПბყუЕПთიუЕКЬჟჩМწოკЮУДჭВთლМИოЗВხყВჟБრსЖჩЭჭვოАღთЙლქყეუმჩნГЖЪЫГუზგრЬЧ",
+    "is_aes": true,
+    "ciphertext_codepoints": 8711,
+    "base64_intermediate": "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",
+    "blob_len": 6533,
+    "salt_hex": "3e59eaa7fc3de8af06948ff5c45fb837",
+    "iv_hex": "e47a3c0c153c88764589adbf",
+    "ct_and_tag_len": 6505,
+    "plaintext_utf8_len": 6489,
+    "decrypted_by_original": "Line 0: the quick brown fox jumps over the lazy dog.\nLine 1: the quick brown fox jumps over the lazy dog.\nLine 2: the quick brown fox jumps over the lazy dog.\nLine 3: the quick brown fox jumps over the lazy dog.\nLine 4: the quick brown fox jumps over the lazy dog.\nLine 5: the quick brown fox jumps over the lazy dog.\nLine 6: the quick brown fox jumps over the lazy dog.\nLine 7: the quick brown fox jumps over the lazy dog.\nLine 8: the quick brown fox jumps over the lazy dog.\nLine 9: the quick brown fox jumps over the lazy dog.\nLine 10: the quick brown fox jumps over the lazy dog.\nLine 11: the quick brown fox jumps over the lazy dog.\nLine 12: the quick brown fox jumps over the lazy dog.\nLine 13: the quick brown fox jumps over the lazy dog.\nLine 14: the quick brown fox jumps over the lazy dog.\nLine 15: the quick brown fox jumps over the lazy dog.\nLine 16: the quick brown fox jumps over the lazy dog.\nLine 17: the quick brown fox jumps over the lazy dog.\nLine 18: the quick brown fox jumps over the lazy dog.\nLine 19: the quick brown fox jumps over the lazy dog.\nLine 20: the quick brown fox jumps over the lazy dog.\nLine 21: the quick brown fox jumps over the lazy dog.\nLine 22: the quick brown fox jumps over the lazy dog.\nLine 23: the quick brown fox jumps over the lazy dog.\nLine 24: the quick brown fox jumps over the lazy dog.\nLine 25: the quick brown fox jumps over the lazy dog.\nLine 26: the quick brown fox jumps over the lazy dog.\nLine 27: the quick brown fox jumps over the lazy dog.\nLine 28: the quick brown fox jumps over the lazy dog.\nLine 29: the quick brown fox jumps over the lazy dog.\nLine 30: the quick brown fox jumps over the lazy dog.\nLine 31: the quick brown fox jumps over the lazy dog.\nLine 32: the quick brown fox jumps over the lazy dog.\nLine 33: the quick brown fox jumps over the lazy dog.\nLine 34: the quick brown fox jumps over the lazy dog.\nLine 35: the quick brown fox jumps over the lazy dog.\nLine 36: the quick brown fox jumps over the lazy dog.\nLine 37: the quick brown fox jumps over the lazy dog.\nLine 38: the quick brown fox jumps over the lazy dog.\nLine 39: the quick brown fox jumps over the lazy dog.\nLine 40: the quick brown fox jumps over the lazy dog.\nLine 41: the quick brown fox jumps over the lazy dog.\nLine 42: the quick brown fox jumps over the lazy dog.\nLine 43: the quick brown fox jumps over the lazy dog.\nLine 44: the quick brown fox jumps over the lazy dog.\nLine 45: the quick brown fox jumps over the lazy dog.\nLine 46: the quick brown fox jumps over the lazy dog.\nLine 47: the quick brown fox jumps over the lazy dog.\nLine 48: the quick brown fox jumps over the lazy dog.\nLine 49: the quick brown fox jumps over the lazy dog.\nLine 50: the quick brown fox jumps over the lazy dog.\nLine 51: the quick brown fox jumps over the lazy dog.\nLine 52: the quick brown fox jumps over the lazy dog.\nLine 53: the quick brown fox jumps over the lazy dog.\nLine 54: the quick brown fox jumps over the lazy dog.\nLine 55: the quick brown fox jumps over the lazy dog.\nLine 56: the quick brown fox jumps over the lazy dog.\nLine 57: the quick brown fox jumps over the lazy dog.\nLine 58: the quick brown fox jumps over the lazy dog.\nLine 59: the quick brown fox jumps over the lazy dog.\nLine 60: the quick brown fox jumps over the lazy dog.\nLine 61: the quick brown fox jumps over the lazy dog.\nLine 62: the quick brown fox jumps over the lazy dog.\nLine 63: the quick brown fox jumps over the lazy dog.\nLine 64: the quick brown fox jumps over the lazy dog.\nLine 65: the quick brown fox jumps over the lazy dog.\nLine 66: the quick brown fox jumps over the lazy dog.\nLine 67: the quick brown fox jumps over the lazy dog.\nLine 68: the quick brown fox jumps over the lazy dog.\nLine 69: the quick brown fox jumps over the lazy dog.\nLine 70: the quick brown fox jumps over the lazy dog.\nLine 71: the quick brown fox jumps over the lazy dog.\nLine 72: the quick brown fox jumps over the lazy dog.\nLine 73: the quick brown fox jumps over the lazy dog.\nLine 74: the quick brown fox jumps over the lazy dog.\nLine 75: the quick brown fox jumps over the lazy dog.\nLine 76: the quick brown fox jumps over the lazy dog.\nLine 77: the quick brown fox jumps over the lazy dog.\nLine 78: the quick brown fox jumps over the lazy dog.\nLine 79: the quick brown fox jumps over the lazy dog.\nLine 80: the quick brown fox jumps over the lazy dog.\nLine 81: the quick brown fox jumps over the lazy dog.\nLine 82: the quick brown fox jumps over the lazy dog.\nLine 83: the quick brown fox jumps over the lazy dog.\nLine 84: the quick brown fox jumps over the lazy dog.\nLine 85: the quick brown fox jumps over the lazy dog.\nLine 86: the quick brown fox jumps over the lazy dog.\nLine 87: the quick brown fox jumps over the lazy dog.\nLine 88: the quick brown fox jumps over the lazy dog.\nLine 89: the quick brown fox jumps over the lazy dog.\nLine 90: the quick brown fox jumps over the lazy dog.\nLine 91: the quick brown fox jumps over the lazy dog.\nLine 92: the quick brown fox jumps over the lazy dog.\nLine 93: the quick brown fox jumps over the lazy dog.\nLine 94: the quick brown fox jumps over the lazy dog.\nLine 95: the quick brown fox jumps over the lazy dog.\nLine 96: the quick brown fox jumps over the lazy dog.\nLine 97: the quick brown fox jumps over the lazy dog.\nLine 98: the quick brown fox jumps over the lazy dog.\nLine 99: the quick brown fox jumps over the lazy dog.\nLine 100: the quick brown fox jumps over the lazy dog.\nLine 101: the quick brown fox jumps over the lazy dog.\nLine 102: the quick brown fox jumps over the lazy dog.\nLine 103: the quick brown fox jumps over the lazy dog.\nLine 104: the quick brown fox jumps over the lazy dog.\nLine 105: the quick brown fox jumps over the lazy dog.\nLine 106: the quick brown fox jumps over the lazy dog.\nLine 107: the quick brown fox jumps over the lazy dog.\nLine 108: the quick brown fox jumps over the lazy dog.\nLine 109: the quick brown fox jumps over the lazy dog.\nLine 110: the quick brown fox jumps over the lazy dog.\nLine 111: the quick brown fox jumps over the lazy dog.\nLine 112: the quick brown fox jumps over the lazy dog.\nLine 113: the quick brown fox jumps over the lazy dog.\nLine 114: the quick brown fox jumps over the lazy dog.\nLine 115: the quick brown fox jumps over the lazy dog.\nLine 116: the quick brown fox jumps over the lazy dog.\nLine 117: the quick brown fox jumps over the lazy dog.\nLine 118: the quick brown fox jumps over the lazy dog.\nLine 119: the quick brown fox jumps over the lazy dog."
+   },
+   {
+    "pin": "0",
+    "plaintext": "a",
+    "ciphertext": "ფЩცЗძჯბსრცУზკჯმძСშჭკხნფАЫჩტცვცქჭЙთდოУРგХჯРჩТყვტССლЦფМЫЭლЛЦტდ",
+    "is_aes": true,
+    "ciphertext_codepoints": 60,
+    "base64_intermediate": "U6aobfBRQa0GJfLbyYdJeMUh8ZSaFaVdqHDN0xC2fxZzXFSyyK3Ut8+Ks3SD",
+    "blob_len": 45,
+    "salt_hex": "53a6a86df05141ad0625f2dbc9874978",
+    "iv_hex": "c521f1949a15a55da870cdd3",
+    "ct_and_tag_len": 17,
+    "plaintext_utf8_len": 1,
+    "decrypted_by_original": "a"
+   },
+   {
+    "pin": "secret",
+    "plaintext": "line1\nline2\n\ttabbed  ",
+    "ciphertext": "ЩჟშНქЦუЬძჩУКЧВუЙპიТЖАЦყფНფურჰЙЮზУЫЛСЮჰНეჟცЩზПაზНკშЮკКბსთთЬესჯЬДნЛЖტЩაყჟЦЙТქწჰხუЧდЩღТЖლГ",
+    "is_aes": true,
+    "ciphertext_codepoints": 87,
+    "base64_intermediate": "6PYuV3T9bZ0r4jTqOIznh3XUuUTQgq/G08sy/guEPa6GwAGuJY/JrBRHH9ERf9lMsnS6AXP3qzVcgeT4D6WznKk",
+    "blob_len": 65,
+    "salt_hex": "e8f62e5774fd6d9d2be234ea388ce787",
+    "iv_hex": "75d4b944d082afc6d3cb32fe",
+    "ct_and_tag_len": 37,
+    "plaintext_utf8_len": 21,
+    "decrypted_by_original": "line1\nline2\n\ttabbed  "
+   },
+   {
+    "pin": " spaced pin ",
+    "plaintext": "{\"looks\":\"like json\",\"n\":1}",
+    "ciphertext": "პნცФБჭЗЙШზსСОაშთვТЗოЭВТჰძღჩჩჟცЕВЭჰБზБუჯЗКზРძრЩხლЖВЪОჯპЗჯწრЫЭვიხეЫდოШВМგЖწლწЩИУЦЬФწთГზსყჰკნქМНჩГ",
+    "is_aes": true,
+    "ciphertext_codepoints": 95,
+    "base64_intermediate": "OMa1idoq5GRyvAYHFzoN+jzgbWZZPamj+giGiTforGxbQ6eKnj7vfOofcQ8+FIeE8DN5jtCncKc6p0391cHkGRXgJMVtuZk",
+    "blob_len": 71,
+    "salt_hex": "38c6b589da2ae46472bc0607173a0dfa",
+    "iv_hex": "3ce06d66593da9a3fa088689",
+    "ct_and_tag_len": 43,
+    "plaintext_utf8_len": 27,
+    "decrypted_by_original": "{\"looks\":\"like json\",\"n\":1}"
+   },
+   {
+    "pin": "12345",
+    "plaintext": "abc",
+    "ciphertext": "ЖЛქმУჰაЦყИჩМФდსЖЩБყНОВთПЧЗლბСჯნშგМთნЪჩСФЦხЛЖЖძЙФЧციЭყჩЭეРТДნЮქჰ",
+    "is_aes": true,
+    "ciphertext_codepoints": 63,
+    "base64_intermediate": "nsVL0gA3XpZt1DRn6iXuvjHw4oKByfMYCtHM7Zy13esnnbq14aI+XZ+ExzlM/Vg",
+    "blob_len": 47,
+    "salt_hex": "9ec54bd200375e966dd43467ea25eebe",
+    "iv_hex": "31f0e28281c9f3180ad1cced",
+    "ct_and_tag_len": 19,
+    "plaintext_utf8_len": 3,
+    "decrypted_by_original": "abc"
+   },
+   {
+    "pin": "🔥🔥🔥",
+    "plaintext": "🔥",
+    "ciphertext": "მДСДქჯლგნკЙТტЕХშზТმЬკჟГЮფГბГОვДხშფЫФФЛАცჟКსჩКმЬგბგЭნჩხЙЩძდИШჯЮუს",
+    "is_aes": true,
+    "ciphertext_codepoints": 64,
+    "base64_intermediate": "LlylVfKCMJqzSm2YGzL9JPk/UkBkvFleYU811shaPrRZrL9CBC+MZeq6bDp5f/TR",
+    "blob_len": 48,
+    "salt_hex": "2e5ca555f282309ab34a6d981b32fd24",
+    "iv_hex": "f93f524064bc595e614f35d6",
+    "ct_and_tag_len": 20,
+    "plaintext_utf8_len": 4,
+    "decrypted_by_original": "🔥"
+   }
+  ],
+  "ui_roundtrip": {
+   "pin": "uiPin",
+   "plaintext": "typed in the stealth box",
+   "ui_encrypt": {
+    "output": "ჯЪზЖЭჟАЧლჰБვВЙფყჩფზგЛЮБთАГპЪქЫცБВიუშЗჭХТლპЮШТВИПСЦИВეძЦЧცПფსЗჩДჭკტჭთაზძЖმფაТმОМЭЩქძშხГჟМЫБშ",
+    "mode_label": "▶ Encrypting"
+   },
+   "ui_decrypt": {
+    "output": "typed in the stealth box",
+    "mode_label": "◀ Decrypting"
+   }
+  },
+  "decode_edge_cases": [
+   {
+    "description": "trailing \"\\n\", plaintext utf8 len 1 (blob len 45)",
+    "pin": "p",
+    "input": "ფЙЦგШБЫЮცეФПჭСФЛЦЙჭЦБუჯჯУვВლწჩრრАროМЩყЭზРგБჩღЦКხიЗსГყცУЕხРЪС\n",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "InvalidCharacterError: Invalid character"
+    }
+   },
+   {
+    "description": "leading space, plaintext utf8 len 1",
+    "pin": "p",
+    "input": " ფЙЦგШБЫЮცეФПჭСФЛЦЙჭЦБუჯჯУვВლწჩრრАროМЩყЭზРგБჩღЦКხიЗსГყცУЕხРЪС",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "InvalidCharacterError: Invalid character"
+    }
+   },
+   {
+    "description": "trailing \"\\n\", plaintext utf8 len 2 (blob len 46)",
+    "pin": "p",
+    "input": "უФლЖმЦჟმოჭГТახყХЭЩბЦდქებНЦხტქღაЙინლКბტЩМვნЕსЛМპღЫჩЪბმКჭჰЫმყტТП\n",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "InvalidCharacterError: Invalid character"
+    }
+   },
+   {
+    "description": "leading space, plaintext utf8 len 2",
+    "pin": "p",
+    "input": " უФლЖმЦჟმოჭГТახყХЭЩბЦდქებНЦხტქღაЙინლКბტЩМვნЕსЛМპღЫჩЪბმКჭჰЫმყტТП",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "InvalidCharacterError: Invalid character"
+    }
+   },
+   {
+    "description": "trailing \"\\n\", plaintext utf8 len 3 (blob len 47)",
+    "pin": "p",
+    "input": "ახВუთЮЬყჰЩЭაЮსЗდОჩლПЛЙЕХУმფღПმტშმЕЪВკЮპთშЗიЙქАЙБЛПჟლოШჩКფЙჭАФზრ\n",
+    "is_aes": true,
+    "original_result": {
+     "ok": true,
+     "plaintext": "abc"
+    }
+   },
+   {
+    "description": "leading space, plaintext utf8 len 3",
+    "pin": "p",
+    "input": " ახВუთЮЬყჰЩЭაЮსЗდОჩლПЛЙЕХУმფღПმტშმЕЪВკЮპთშЗიЙქАЙБЛПჟლოШჩКფЙჭАФზრ",
+    "is_aes": true,
+    "original_result": {
+     "ok": true,
+     "plaintext": "abc"
+    }
+   },
+   {
+    "description": "space inserted in the middle",
+    "pin": "1234",
+    "input": "ჯყЗშწწШეОლЭხДაიცსააა КჟДკქВЗЕწლბЙИЕეФОИჩნძЧХИРЮერШЧУСПცშმწЗიЪრМГჭХრიЖიЖყზЙა",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "InvalidCharacterError: Invalid character"
+    }
+   },
+   {
+    "description": "wrong pin",
+    "pin": "12345",
+    "input": "ჯყЗშწწШეОლЭხДაიცსაააКჟДკქВЗЕწლბЙИЕეФОИჩნძЧХИРЮერШЧУСПცშმწЗიЪრМГჭХრიЖიЖყზЙა",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "OperationError: The operation failed for an operation-specific reason"
+    }
+   },
+   {
+    "description": "one character changed (tag check)",
+    "pin": "1234",
+    "input": "ჯყЗშწწШეОლЭხДაიცსაააКჟДკქВЗЕწლბЙИЕეФОИჩნაЧХИРЮერШЧУСПცშმწЗიЪრМГჭХრიЖიЖყზЙა",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "OperationError: The operation failed for an operation-specific reason"
+    }
+   },
+   {
+    "description": "truncated to 12 chars (blob < 45 bytes)",
+    "pin": "1234",
+    "input": "ჯყЗშწწШეОლЭხ",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "Error: too short"
+    }
+   },
+   {
+    "description": "raw base64 (no script substitution) is also accepted",
+    "pin": "1234",
+    "input": "fXoYcc5EvK+elAIaRAAArPlJVjomcKBqpmE1vpZMb42px/EQ540ywaYLcoI7Qtkd2QInInXGqA",
+    "is_aes": false,
+    "original_result": {
+     "ok": true,
+     "plaintext": "hello world"
+    }
+   },
+   {
+    "description": "ciphertext of EMPTY plaintext (UI never produces it)",
+    "pin": "p",
+    "input": "აქუШЙშძАსВЪრБძწИЛღჩაВИრБЬწЗწЪზМЙუქФღЩВИჩЗЭЙლИხძცМЪხЬЪპდИხონ",
+    "is_aes": true,
+    "original_result": {
+     "ok": false,
+     "error": "Error: too short"
+    }
+   }
+  ]
+ },
+ "detection": [
+  {
+   "input": "hello world",
+   "isAES": false,
+   "isGeo": false,
+   "isV2C": false
+  },
+  {
+   "input": "გამარჯობა მეგობარო",
+   "isAES": true,
+   "isGeo": true,
+   "isV2C": false
+  },
+  {
+   "input": "ПРИВЕТ МИР КАК ДЕЛА",
+   "isAES": false,
+   "isGeo": false,
+   "isV2C": false
+  },
+  {
+   "input": "привет мир как дела",
+   "isAES": false,
+   "isGeo": false,
+   "isV2C": false
+  },
+  {
+   "input": "ჰელლო",
+   "isAES": false,
+   "isGeo": true,
+   "isV2C": false
+  },
+  {
+   "input": "ჰელ",
+   "isAES": false,
+   "isGeo": false,
+   "isV2C": false
+  },
+  {
+   "input": "ჯყЗშწწШეОლЭხДაიცსაააКჟДკქВЗЕწლბЙИЕეФОИჩნძЧХИРЮერШЧУСПცშმწЗიЪრМГჭХრიЖიЖყზЙა",
+   "isAES": true,
+   "isGeo": false,
+   "isV2C": false
+  },
+  {
+   "input": "╾※•✦დლ✧რო⌀Ш ო⁂ლ•ლე✪Н⏣⍟•⎌",
+   "isAES": false,
+   "isGeo": false,
+   "isV2C": true
+  },
+  {
+   "input": "კმუუჰ გჰდუტ",
+   "isAES": false,
+   "isGeo": true,
+   "isV2C": false
+  },
+  {
+   "input": "╾hello",
+   "isAES": false,
+   "isGeo": false,
+   "isV2C": true
+  },
+  {
+   "input": "  ფЩცЗძჯბსრცУზკჯმძСშჭკხნფАЫჩტცვცქჭЙთდოУРგХჯРჩТყვტССლЦფМЫЭლЛЦტდ\n",
+   "isAES": true,
+   "isGeo": false,
+   "isV2C": false
+  }
+ ],
+ "indexeddb": {
+  "db_name": "czeroode_db",
+  "db_version": 2,
+  "stores": {
+   "vault": {
+    "keyPath": "id",
+    "autoIncrement": false,
+    "indexes": []
+   },
+   "files": {
+    "keyPath": "id",
+    "autoIncrement": false,
+    "indexes": []
+   },
+   "playlists": {
+    "keyPath": "id",
+    "autoIncrement": false,
+    "indexes": []
+   }
+  }
+ },
+ "files": {
+  "single_real_constants": [
+   {
+    "label": "small PNG-typed image (random bytes)",
+    "constants": "real",
+    "pin": "1234",
+    "input_file": {
+     "name": "tiny.png",
+     "type": "image/png",
+     "size": 300,
+     "name_field_override": null
+    },
+    "record": {
+     "id": "1790812126750",
+     "name": "tiny.png",
+     "cipher": "ЧბЧხЛსЦჰყხЖჩЛნუЙДЭყПნწჭბЦРნГДОიЧСყВПვГТსღТЙШФკდБЛЙТТშშСЖწხРЪიბპМლШეБДЕЮВწПისТეცვЮИГЕЩДЛლრჭФყტჟჟჩХპЙპЛხჩმცცЩСლგყЮЭჟЩВიწაТნКВკვრნსფუЕКТჯЖНჟიაეკЕДტლუГნაფვДუИЩტქკხВШЦЭСჰМკИტდЬჩЙპЛზЗМПТქცУჯჟИვЬВკიРლТწგЖყЦჩЪГЫФტТЙუცოЬტЪზცЮАЕრИდЧბИНვნГЩჩჰОბЮМდუზწქღЮЩШПВძხლდგღГЗЩИКბჟШჭპЗТАЗშАყჟЭჯჯჩრЭВძЩТღედჰქБАДპЗტЦჟშჰლჰДძЕჰМЕЕოქპზჯУХლღწვЩЙჰინეМმლქСჩეДПბეТИЙვგჟЬლНეЬРЮძБЬКШЮЧХЗტЖЭიЫჩდპყრყКМტცЭЭგЛАთრზЪЩЧკЪСЮცცოОსБЧЙმВსКფСიХგცЬГზФЦРეДЬწწჯЩЮЬОოცЩხУМБДხШშსლუЫზДოРНფЩУჯСНფჟЦზВЙЖЬგЪფმზპСФსჟОХმკშრПГყЩЗЭББტЩНРჰКЖКღპუЗყЫთჩЪჰოСჟХГჩАЭლყЦქონАჰКვოჭЙსЫИЦБФრჭღგწКზЧЬზЬЦЮდღვხЛХლВფРთЕზშГდჩЕЦСЬრძЙУЭДსმЛაЩМКЬФУГსკვღШЭРფКწთჟЦЩУФЦЙПУნОკОლЦУГПმМუქოცფЩკუყШდВНЖНპДЭМЛზДეხზЧЧლმТЫШდძიუЪЕყНШლლАჯძКОТОრშГნშЫხЭუТდვЬНოდЮლКЮЙეფЕზЗრგСРВტУქძვჯЮЭმრ",
+     "isChunked": false,
+     "mime": "image/png",
+     "ext": "png",
+     "type": "img",
+     "date": 1790812126767,
+     "size": 300
+    },
+    "expected_plaintext_b64": "IQHFT9HQGrIldMs3iq71sQgIkRkzuetP8iml5Ns+VxQBKOD0+uJ+B/EaQye36UVUrYU7s8zVtNTUVNONbSYAx2Cw1ErtzI6REGDcBTbNn9CFFMbABEwHTzl7OF2/ycDam+GQ97ygSAq70+qhcBhlDXkRcZAYWlemqsadQNzWmi3agcEtaOxgCy/ukpS8bktuttUCCvn97l3gkciU3/cuWagipP+jysYy52WUFhWYT9iuRZ64IfkzG3L5EVDXLydPJz/21tO4AtOF1MktbBL6sHhuyGAHwqZw9Xao7TMuVyO4JjsuN/WtKOkm1kvn2zhCLVcnliv9DguGNvxnuyb9PHnepsrDcv69szXm2OZfcurXxlkiKk09hlRXMF+H/LqQ8JkiDvRYf67/+h7y",
+    "expected_plaintext_sha256": "367af29d153fefac4355fab1cd28191040c6af11af9bcc24bd8b9072a4f37884",
+    "original_decrypt": {
+     "mime": "image/png",
+     "download_name": "tiny.png",
+     "bytes_len": 300
+    },
+    "decrypted_payload_json": "{\"v\":1,\"type\":\"file\",\"mime\":\"image/png\",\"name\":\"tiny\",\"ext\":\"png\",\"data\":\"IQHFT9HQGrIldMs3iq71sQgIkRkzuetP8iml5Ns+VxQBKOD0+uJ+B/EaQye36UVUrYU7s8zVtNTUVNONbSYAx2Cw1ErtzI6REGDcBTbNn9CFFMbABEwHTzl7OF2/ycDam+GQ97ygSAq70+qhcBhlDXkRcZAYWlemqsadQNzWmi3agcEtaOxgCy/ukpS8bktuttUCCvn97l3gkciU3/cuWagipP+jysYy52WUFhWYT9iuRZ64IfkzG3L5EVDXLydPJz/21tO4AtOF1MktbBL6sHhuyGAHwqZw9Xao7TMuVyO4JjsuN/WtKOkm1kvn2zhCLVcnliv9DguGNvxnuyb9PHnepsrDcv69szXm2OZfcurXxlkiKk09hlRXMF+H/LqQ8JkiDvRYf67/+h7y\"}",
+    "ui_progress_text": "✅ Encrypted: tiny.png",
+    "ui_file_info_text": "🖼 tiny.png · 300B · image/png"
+   },
+   {
+    "label": "text file, custom name typed in the name field",
+    "constants": "real",
+    "pin": "correct horse",
+    "input_file": {
+     "name": "notes.txt",
+     "type": "text/plain",
+     "size": 34,
+     "name_field_override": "My Notes"
+    },
+    "record": {
+     "id": "1790812126830",
+     "name": "My Notes.txt",
+     "cipher": "КЪТუღთზწცვხЗზЩოНУიЦეПბЛОЖუХЧЦТჟწКკЭКეგაБჟვსЭჰНХღЩოქორЭЗფწოწჩრЮჰАИძЩСვჩЮЮМუЛЖაЬЮგРЕЩჟშბЙЧცჩЖზОკЖჰქАЭГСДმზИМЬФЗცპფПХФოГЖწდწუმУЬРბსკქПФოКЬФАДზჭხგიРხობИЕქრМИსТФЗФრკცფСЙფОსჯცყМთШოოКПЗნЕჯზდკФპЬЕჩНწШТБუЧზეИგМОდკБაСХЪუЗВТЖყЫКწქРЦჰНУЗდГ",
+     "isChunked": false,
+     "mime": "text/plain",
+     "ext": "txt",
+     "type": "file",
+     "date": 1790812126854,
+     "size": 34
+    },
+    "expected_plaintext_b64": "RGVhciBkaWFyeSwKc2VjcmV0IHN0dWZmIOKckyDwn5iACg==",
+    "expected_plaintext_sha256": "673690f5adc16cfffd6f40638a6e858e98f2be8677fecc8ad42d8485ec10b638",
+    "original_decrypt": {
+     "mime": "text/plain",
+     "download_name": "notes.txt",
+     "bytes_len": 34
+    },
+    "decrypted_payload_json": "{\"v\":1,\"type\":\"file\",\"mime\":\"text/plain\",\"name\":\"notes\",\"ext\":\"txt\",\"data\":\"RGVhciBkaWFyeSwKc2VjcmV0IHN0dWZmIOKckyDwn5iACg==\"}",
+    "ui_progress_text": "✅ Encrypted: My Notes.txt",
+    "ui_file_info_text": "📝 notes.txt · 34B · text/plain"
+   },
+   {
+    "label": "audio file (used by playlist vector)",
+    "constants": "real",
+    "pin": "pl-pin",
+    "input_file": {
+     "name": "Song One.MP3",
+     "type": "audio/mpeg",
+     "size": 1500,
+     "name_field_override": null
+    },
+    "record": {
+     "id": "1790812126914",
+     "name": "Song One.mp3",
+     "cipher": "ტКრჰტთМნქჰЦЮიИЪჰრЮგჟШხЩЛპყФსგЮკლТკФდТЗჰРЬСЬИАРИჟიდვЕЭსოქЖკწЙაფპზთЙუეპХშЕНთСწЩჭიუხოკღაღნპАДХЧიИდСОКჭპქრტЦДყШყოКФწЦЖსЖღეყПმმვცპრВჩიЪХძგТЙУფჟლДყТძГუДლРწЪგЖვმდЭღЩფჩИზЗდЬЗჟჰქЬЧჰკაბЛЖЛЫძდУБკლМყТჟჟჭЩცხТრЮЬპЪМЭРЩსჯგპЮЛКეჟრნგშმდОლУИЫვჯყЮЕუფГუЭПЙზქცოგძЬეТყთკრПჭეციВცზყЖნწЦЭБგУნძუჭЩმჩმЕჭЮწЭჰЖЩჰეДЮხЬყЦტМСეუБЬИНЧზЬღწКტხЕАДცდჩსოМВღუზრამДაДФАЕЪდЫსЮРЬრქЪჯკТჯანჯДЧძშპზЙШძშყვყСრЙჰწУთშЗДცЩЩოყჟЩНЛცფთВშძЫწТობხწვШცЛრნЧმზЛწГარЫნრწЙЦშАГФგШЛიქღХДШБШЬიЕეტჩНФლჭЙСМБЦЙДლუმზჩЧშХნარМЕჩივღჭЕШწთОაჰხვДპთკლТწОРძწИЬდАპფკზСშჰლЫოЖლСჭიდშТОВფУОГთШЧპЮЬოშОХხФСПЩთჟჭფЮЭГЧაყდЬЭМკყШЫბЮЧЖდМПთაქქЮექცხგШМЧვФჭХყუЩПЭმვЧეЦჩМლПვპპГЙჭБვВდБЬЫჰოЧჯЛტКЧზჭიЕИვЗУЕТШპВოძძЮХДბჭოЦДსჟВЙЦДЮაРიФМჭПბЙПოГხფХზЬსОЦნყჩБФДოძქტРტზსБროყФМВБქსШМთОГНრვკაДЩძდვჯძСПЬЮСფСჭЦჭჟღმХТხვთЪღვРაТფБლОЛჩღХКჰЛХცЖუЪВМტШოШსЬტЦმЫკЦЭЛЩჩეზდჩЬЩლШჯჟხИჩЙЕუკШЖჩНЖდოДУЪფქქХАდЙГЛЭКამЖღთЛკაფბГОნჰვნპМდჟშდჩКდЬტბУაბЛეპგხიპСდАЧნКССჩМჭჟЦეЗЕბპტჩტРმლЮბЖხჭყჭგШЦრЫЛСТПЖჟრЕМდნТДКТДРწქწოლჯЖЫЩჟჯИხЗИფСჟЖჟЕФღПЬკთესЕტქვВძრძЭუნშყკნИცოჩУЫოჯგგУЧТჯოЕАСხხАФБЙაУჟოАХЙЮЭჟიЪწოЬЩუУРЮსწტიქაწმЪცКქШზЬღჩცТბძЪხЭБძПკპОПЪУჟჯВაცხИДКГИაჩЪსУთКფაСჟტЧИЙჰღВეყЮХБრთჟმФლНТЬმКЬМღქЫНШსიაНძჩЖСКოდЩКჩძБშМბОჯძნეОბჟჯხესЧСჟიФРჯЧЧЛРრГცპУБГჟИგთგРჩХვЙЕГВვსგРЛჰმცდУЖგრძცЩდГХЗპხФЩჭФუЦგცЩწМБШЛხЩბДЙГЪკკШუЬთЧპეМЪტწИტშვГОფღიღრჯФПФАКჰრФЖკძრЛГЪხზКტზუЧПСწოდЫБЦЧაჩЙМЪУЬМИШРУШЫЪპჯთАЫВეჩЩЩТМჰყФФЙСშЕЛЛЬЗЧღУჰДრუЗძЙუუЦყДყრაАჯხჟЙПТУტРქქЩЙჭწჭჭЩხეშСЬგПძფპკლდლАივჯФЧგშჯКშჭიЕფЕიშღქკმცჟნპბВლФჩДСЦოТЛЗПდნНგЙЮТМრძმბხმღმЮТЖХЩხУეДწЕოუШМიВДპცЗЩდბИЭშРცჭპЕჭФჰტხИСღЮნშქЕაЩВზОЙტФრТЫЕყЫДХსИღЙღლმღგპНЙცБლЫჩოცგЕАოტЧთЧხმვდЙГბუჩყჩЭУხЫДმბქЕღБლСГკხМოკЪВთВჭНპЧОსЕУГКЦВВЮМЭОუქხჟლПЧИЩНЩЧშВრმЩЪЬეზТმЧБМშრაუყНმЭБაАოცჭЮСЮხХШТხЛაБУზЕმЖШШლთაქაЛჭУტჯყСЦЖჟОოკИФგААპგნშკპფზთЭღИწУუНწძჯПМმИმДზჰგუწНჩეაНყВСЛЕТფხძПჰВძშБКმულРნЮთდყЧქБОПცდჭЛნЬქტСЧწეჭГЛკИЛუЛცლЗРდრბრДხტყრწСТღШკФაШენღწცЕЦПზУХРЭღჭЬლფუУთვЖგფქრიАგОЩჰგცЙთЩსფგЙსЗМУღჟჯიФყЗЮВკგДღუИДვЭВФუЫЙცთბБვზМღПზთЕწСპЬაყტШწИლЬЩЦТთЙУგБაМლჩშВЙЖდПმРЩСУყМლРცნდდАНЛოЛГეხМЩეПსჭჯИАტჰДДШЗცგხზКПძЩНЬკЩპВЛЙЙЦЮჩЗЪმРРძУწძДМძყლЪМეკკჰზМЛАААЭბქЩფЗЩუჟხზЦჭწუЖსაღბЧЙჩთგხЛვქვშБკСჩეЮპაჰფქПსНხეთზЬხცლПვГზЦБЦЗЕთკПНФУУგპგდბКЮღТЫგОბადЭწგДფЬЫხШძШიყЖТაВФОლვფყУМანჯШღАზЩვდტეБფАБხЪХძღУФტОეДЦძЪЙჰსზТცСცДზСჯდВჰЬჯЛЪУИფЦУГმცთХშАცკცხОЦზტШოДШУБЩცМКЙЮგღЖЙЮჭპჭცშთტჟФჯაЖЩИშჰჭЧЩПБიუББЫЧშტლМგУВჭგЫУნჟЭМცტჯЗკЩЪЛУრჟპКგАФТფЙЮКШВხОМყЖУЖღЪЬШОШფИვთქЧСდТБЙსკეგЪЩЪჟორპჰЛდППЩძСЫКნფНბგФХხЮლაЦЛლტიЫჟხგЩМერШპუგლაწФუПწეОФХსვჩДВНვСУჟმსჩЩЩМჭჟტღერНЦლჩМოЫДმმმТУოЩУწშЩჯცТБთЖШВЛყიЬСთპМТГЖЦვФАСუУჩღЕУწფვგЧვზЮნჰШОჩКМჰჭЬთЭძВქჰОჩგჭბЧЛЖПЧЗОკბЕლСУКНИზДЮჭОФМმФრფМЗУИთგუმИილსЫВჰმЖიფღჟწეთФხСფჰШწღჰვРЦვსუჯყХМДლЖგრფიЫМლგПИЫУჩძШკიხЖИფძЪРЪიСსВОფნფცწЗკАსფვნАჰИეღДКდბХЗДШФზქფЬИЮЙმЩЭФვსბცЕბდРრძმთГАСჭცჭტЩჟეХნИჯОჩХЧგВშრЕნიჯღჯНЫღЬКოТთმАწსАЛოპშИუЭსШრიБჰЧИЫЧМВსფЬქКტლჯგნЮОЦეВნКШჯЖФГცЩიზკთФღПვЬБДქტЪОწსУღჯტШЛისსЖЙცЭბჭЮЧЗნჯშТთჟММაХЮЬЮВЫსფЛСბაზЦფდПიჭზჩШკმСუЛНЬЕღიძფЖЫწდმЪჩჯლЭСვАЕВКტქაძКლოთЙЩყГЬვЙММათვპИზУკГრЗაДЕЮზАЛშПШГЩვПოТЩოВБЛპТქყБჟЗЛУლვГნჰფსჰხЬУჯღДИნხოКЪიГზპძДВПЛЙШჯდЦჟრНეЖЬЕЦჰეყლაომფპНჩჰСГგЗწЕЗჩМიჰЙზიზРЭწჰცХფაОაЬჟჰცОЭХХჩЧДЫЫღღძგქКდМტხთოЩოСЛჩЫნСჩგუЩბЪГპცზა",
+     "isChunked": false,
+     "mime": "audio/mpeg",
+     "ext": "mp3",
+     "type": "aud",
+     "date": 1790812126932,
+     "size": 1500
+    },
+    "expected_plaintext_b64": "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",
+    "expected_plaintext_sha256": "ed73162df03d97d9af782abcaecd251faf9af581f3e2cf7cee5da2219d535abf",
+    "original_decrypt": {
+     "mime": "audio/mpeg",
+     "download_name": "Song One.mp3",
+     "bytes_len": 1500
+    },
+    "decrypted_payload_json": "{\"v\":1,\"type\":\"file\",\"mime\":\"audio/mpeg\",\"name\":\"Song One\",\"ext\":\"mp3\",\"data\":\"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\"}",
+    "ui_progress_text": "✅ Encrypted: Song One.mp3",
+    "ui_file_info_text": "🎵 Song One.MP3 · 1KB · audio/mpeg"
+   },
+   {
+    "label": "second audio file (used by playlist vector)",
+    "constants": "real",
+    "pin": "pl-pin",
+    "input_file": {
+     "name": "song-two.ogg",
+     "type": "audio/ogg",
+     "size": 700,
+     "name_field_override": null
+    },
+    "record": {
+     "id": "1790812126995",
+     "name": "song-two.ogg",
+     "cipher": "ВჯწПЮმУСКწБФბБრЕაЛАМჭფЧМССწВЛყСФНДЭტმჩСჯШტТЬЛППХГჰИდტПვლმЗВПკЪЪЙТЬთღფЫИРХშВЩЪმГУЖპალფიДოგნСЗШПპСთოჟБФРШტოჯУКДШიИფЪცЕზНლქСЫჩდწЙЧჯფРთОტМეტძБФИფნუთЧსЭПИძკჟჭЖЬვМДЩნЖდღНУЗსОქАЖФწოВთვძლშЬფპЗთЭЬИУჯზეЙТГХკХФЮგუЫგСზЩУЫფქკЬЭჭОმЛЖღოЫИЮЗСЛლЭფАЧЦЫЖУყწЭჩწპჭМეზაАБსოЪკУხოТТშЗდოЙფდბЧНდცზგОვძЕჭეХУტОუДЧОმПУზტФЫПФЦტსსჯცЗუЬდЕთЫЧСჭЖწШრЙЗПოЬЖЮცვსФზუჯოზჭუДჭЬსგეთშდმეჰუРუЪაფМСღЖგპЮРკუГМდЫჯმМძРЬშЖЙკШОიდჯზჟმЩРУღზლქჩმТШШმУМბГჩЫСЭიГОЭМგЙЕЙВЧЖგЙბЕЧБჩАჭХდლМკФიЪნЧძიძეЫЦჩЪსПყცЖЫძВБშაЙЪРИЮზДАჯРЧЛЪСტთჰშძЙხКЬЖრპПШფუდЕჭდპПЫფჩАЫცჭЛТЗზქძნბЮწაЦრთКЙდაХვჟХБМЩЗМკЪლЫНПИЖЧმღჟძსბძტНწწЙНთდЕუОიზЫძყზქСჰЪქიЮЧЗშОЭПЬРНЧტჟХნმУЮძШვგოЛთТწВსПცოРუკЧЦძუУპჯვЗЪვВОГჟჟТღЙლპქБდნჩშХფნГВЫრნНКხუძხჰსЕფАჩაშСმრქძШОЩРნМჩხშსГღТრწИТძГМრИდფДГსОЮჯРშЪზზКღЧЦКМფЧპДКეЕთФგარЧჟРირЗКთკИЙФПЕЖСНРУКრაЖОჩЦჩმმШადშწწბБდЙЪლЪЧФჭМრეაВЬთკკეპჰლჰНუძЛБСტИჟВშНЭЫოჯჯДშმОცЧძБЛჩცეИძფФИЫმЬЗЧელვეჰЧТჰУნიЩგФიჭЬცჭკდოუყფИძქШСВმუТФЕძყЕჩБღდჟМეღЧБЙСЮГრИბЪДКЛჩუНფჰჭქУФОАბძЛЭСПკოჰИშДЭГვღФქЬვქღჭАჩЪფЙჯХЙЪСТპსИЪОფვХლЦНАჟШГხАБჭღХЗჯჩაკჭЩჩღმფУВДტЩЦФჭБიЧძУЖწჭПბპЕთჯЬიВЬЬგДДპЪმКდბЛУЩКხთჯოШჩეГЧცЭПნუСყХМვჟЗჩМЧФЦჩФЕმФЫЭყღПეყТИვწჩჭპუზღრЛკЗჩМЪГეФმСЮТრНАწეღДვЙკჟდДნთПЦБჟРЬЗრЙზთЬძЧОЖყБჰБУბთЛЮკპნდГЛЕვЬჭМЗნღჩГჯქЫУЪЕНМЛВЪЫფГЮОЩჭუФჩაЖჰსთПჟЙჩХჩზТХპЮПაЩЦლფპССჯЧДКმლСეПШУЦღჭИფშГЩდწეცФპКეყზთეНЮფИიХეГЭЪტМЖვრვღЫვწჭღХჟЧЛჭУЙУპПЬЧდЛБშგჰМУშУპნქაЛЕუგПЕХჯЛჩქყეეЧШთТეჯწმЛДЙბლფჰХჭზყЛКაეЧჰДЖДრჯХВჰЫЩАბთბლЮჯლРჯუპჭШВზზРჟБრЛЬАШМЧნსЮსბШვЭჩფფСტЧДკაАეყЦАჩДღКვПჯЦКწწალცქОЙმЖწწრკКთДЕЗსცტЮИДЫФღგვЫОქლПწაგЩღЬЮლჰლТКЩშЪოცГჩЦწГКმეТჩГЧЛუЦხმУЭოАგЪცЭЕСმЛУЙრ",
+     "isChunked": false,
+     "mime": "audio/ogg",
+     "ext": "ogg",
+     "type": "aud",
+     "date": 1790812127011,
+     "size": 700
+    },
+    "expected_plaintext_b64": "YwNHScvzQwQPTwEKg4rLT7f3pIK7UWHWFU2h0fvnlGPQU92e2EWb2qWfVpGV6hlg4Xahw4B/Q1e0LUJ0oKl8BUaAVhz0QWnizP7pPmtXTgaJtoVq2c9UHtb1YOpAe4CY1qmtMAOLpU46hOAxtwnIBYw2lYKBIyVF/xN628mK28S5HlydUoe9SVWXhQqSWO28r92qbgFf+ZMcPw2x5rsAFIWiK8ddS8Fh0e+fKFOA/dIl6VFZjnX1/ZUppedSdPm5nq20pYtYuOiAmd47Ml4zFtbsNjhf0tk5gfb1GRpJ1Gf1AWA4QFWz6vZqvp40m800BkwuDysc5+vor2zcJ/WO0o+WdtcTBZhctp+iOwa7tRAzuQYD+8Xouo9wPk9ZruMbr5geEmfghC4e2S2X1ZcjS0CGzp/qXH53f575LiQaNCz7CXGWODDtycWJG0Fg57lrXt3XtLaboT0yq8yGicbJ0d4Bc/Y5AyUQk/a5xGdJ9q7yuUV4avLLfGovM3Xe4BbiSZo43vTiC088ZcmIUU4JAYimBUWgb7Z1mdFiKC3P3bUGrOvc12/jfyn47rF8kRavpG7m8xgyZ8I+fYy1FKjos/VuxWFpSaJxDCCoJPmh/LUPQGTOLjAxLZ9eASSz1PhgyohuASetOYmw+XMghn3VPJUapk/AQPs7DhSxhjiK93OQSX6MWrwVzy4kA/mAVMR+o3JHRmU0afhgEjB/P0YYxDlh/r3bcX9nLatOUH5B/7SM0Q9rv+XHb4u8Ftj5sxagSYlHz8qDeYiTZrohn/2N/Qn568sVkDGeejRWXNvQGwV62+R03EZEQn2Of8CB2zkxwwCE+rD1e/vXNjk71u5T0YNUpe2SranhyH4mRklHBKMvTiVUfDp0DYgBDiM/Rp2bilwhBkg5rFyutIiO7Ypmc1am3zjAqOGlbE5kLw==",
+    "expected_plaintext_sha256": "6c2318d7416df577d56fac9312cefa729140d2e962c9bdfa7e8942b954387d83",
+    "original_decrypt": {
+     "mime": "audio/ogg",
+     "download_name": "song-two.ogg",
+     "bytes_len": 700
+    },
+    "decrypted_payload_json": "{\"v\":1,\"type\":\"file\",\"mime\":\"audio/ogg\",\"name\":\"song-two\",\"ext\":\"ogg\",\"data\":\"YwNHScvzQwQPTwEKg4rLT7f3pIK7UWHWFU2h0fvnlGPQU92e2EWb2qWfVpGV6hlg4Xahw4B/Q1e0LUJ0oKl8BUaAVhz0QWnizP7pPmtXTgaJtoVq2c9UHtb1YOpAe4CY1qmtMAOLpU46hOAxtwnIBYw2lYKBIyVF/xN628mK28S5HlydUoe9SVWXhQqSWO28r92qbgFf+ZMcPw2x5rsAFIWiK8ddS8Fh0e+fKFOA/dIl6VFZjnX1/ZUppedSdPm5nq20pYtYuOiAmd47Ml4zFtbsNjhf0tk5gfb1GRpJ1Gf1AWA4QFWz6vZqvp40m800BkwuDysc5+vor2zcJ/WO0o+WdtcTBZhctp+iOwa7tRAzuQYD+8Xouo9wPk9ZruMbr5geEmfghC4e2S2X1ZcjS0CGzp/qXH53f575LiQaNCz7CXGWODDtycWJG0Fg57lrXt3XtLaboT0yq8yGicbJ0d4Bc/Y5AyUQk/a5xGdJ9q7yuUV4avLLfGovM3Xe4BbiSZo43vTiC088ZcmIUU4JAYimBUWgb7Z1mdFiKC3P3bUGrOvc12/jfyn47rF8kRavpG7m8xgyZ8I+fYy1FKjos/VuxWFpSaJxDCCoJPmh/LUPQGTOLjAxLZ9eASSz1PhgyohuASetOYmw+XMghn3VPJUapk/AQPs7DhSxhjiK93OQSX6MWrwVzy4kA/mAVMR+o3JHRmU0afhgEjB/P0YYxDlh/r3bcX9nLatOUH5B/7SM0Q9rv+XHb4u8Ftj5sxagSYlHz8qDeYiTZrohn/2N/Qn568sVkDGeejRWXNvQGwV62+R03EZEQn2Of8CB2zkxwwCE+rD1e/vXNjk71u5T0YNUpe2SranhyH4mRklHBKMvTiVUfDp0DYgBDiM/Rp2bilwhBkg5rFyutIiO7Ypmc1am3zjAqOGlbE5kLw==\"}",
+    "ui_progress_text": "✅ Encrypted: song-two.ogg",
+    "ui_file_info_text": "🎵 song-two.ogg · 700B · audio/ogg"
+   },
+   {
+    "label": "dotless filename, empty MIME (ext bug: ext = whole name lowercased)",
+    "constants": "real",
+    "pin": "pässwörd🔑",
+    "input_file": {
+     "name": "README",
+     "type": "",
+     "size": 17,
+     "name_field_override": null
+    },
+    "record": {
+     "id": "1790812127077",
+     "name": "README.readme",
+     "cipher": "ჰЗЙწფЩИწЛЧმანУსХყტЕზМВЙაЧЪЖЕФЬნბნოქЩЫНГЦЗФЫДЖЖЖთტЮრჯЪაჭИჰდЗჯგხშქЩრჯმЛЫდთძБСФЦღЦХსნЮოშჩНნВლХდЪწიგკხპიბჰუჩოЫძАЧზВძЗКხხოШპძЗТზდСКЧЭЖЕЦოЮФОჯКЖნЬჩცЪლსჰცწჰბბთОიწფЮШЮЮყჰქЭИმდЕუЗЖЭყჰჯЕუჟჭნბКღКჰРЮკქПიБზოНИСკМზЧილძУПჟЫФЦЖფЛЭЫფყლრ",
+     "isChunked": false,
+     "mime": "application/octet-stream",
+     "ext": "readme",
+     "type": "file",
+     "date": 1790812127094,
+     "size": 17
+    },
+    "expected_plaintext_b64": "bm8gZXh0ZW5zaW9uIGhlcmU=",
+    "expected_plaintext_sha256": "32d38eb1cd051fa247e415d8db73ac020527f95b627692d610436b96868caefb",
+    "original_decrypt": {
+     "mime": "application/octet-stream",
+     "download_name": "README.readme",
+     "bytes_len": 17
+    },
+    "decrypted_payload_json": "{\"v\":1,\"type\":\"file\",\"mime\":\"application/octet-stream\",\"name\":\"README\",\"ext\":\"readme\",\"data\":\"bm8gZXh0ZW5zaW9uIGhlcmU=\"}",
+    "ui_progress_text": "✅ Encrypted: README.readme",
+    "ui_file_info_text": "📦 README · 17B · unknown"
+   },
+   {
+    "label": "multi-dot filename",
+    "constants": "real",
+    "pin": "0",
+    "input_file": {
+     "name": "archive.tar.gz",
+     "type": "application/gzip",
+     "size": 64,
+     "name_field_override": null
+    },
+    "record": {
+     "id": "1790812127154",
+     "name": "archive.tar.gz",
+     "cipher": "ნკზТცФჰლქღჟგЬМБХЪშБЛЕუТЗღჯსდუЩპЬუОყМეБЦФნББЕСვЖЖეЙიГიხჩპХუვДჯბМუკნდШთაბРლვДЫშჰЩЫТხМჟАფწგლЬОდГლЬსЖИЪЕОЙღატШვჭფЦФნЪგიЧშმეЭეУგბხМНФФყქჟВИШნფЛОსЖჰრძДჯშშГЪშმЭСბდЧჭჟურЙღТВზზჩლნგქГბЮრდЦუЛშცჟლХУВЦЛგВШИЖФოИეВჯძჩაЮფბძშЗტЙშТჰტЦკჰჰჭჰОბლАЖЬყПჟЫიჭРДტИქფრНჩნЦნიყესპДВსბШდЮАШჟქძჭЩКჯИბЩზБჩმხუБОЮსჩგЗსДШЙАთნКქЕვЗფ",
+     "isChunked": false,
+     "mime": "application/gzip",
+     "ext": "gz",
+     "type": "file",
+     "date": 1790812127171,
+     "size": 64
+    },
+    "expected_plaintext_b64": "hAQEDDRn+VOgRfzuK3SOelotmKmLITIOiQg1hgFGofR6IgLIEa0+XcN1Gh1qZyq2YdDYnEoQl3oWQL0q4zKjaA==",
+    "expected_plaintext_sha256": "8b748b8d30fc0d0d0134998ae3de658885b03200c7975038cf0bb3a2b6c99554",
+    "original_decrypt": {
+     "mime": "application/gzip",
+     "download_name": "archive.tar.gz",
+     "bytes_len": 64
+    },
+    "decrypted_payload_json": "{\"v\":1,\"type\":\"file\",\"mime\":\"application/gzip\",\"name\":\"archive.tar\",\"ext\":\"gz\",\"data\":\"hAQEDDRn+VOgRfzuK3SOelotmKmLITIOiQg1hgFGofR6IgLIEa0+XcN1Gh1qZyq2YdDYnEoQl3oWQL0q4zKjaA==\"}",
+    "ui_progress_text": "✅ Encrypted: archive.tar.gz",
+    "ui_file_info_text": "📦 archive.tar.gz · 64B · application/gzip"
+   },
+   {
+    "label": "empty (0-byte) file",
+    "constants": "real",
+    "pin": "e",
+    "input_file": {
+     "name": "empty.bin",
+     "type": "application/octet-stream",
+     "size": 0,
+     "name_field_override": null
+    },
+    "record": {
+     "id": "1790812127230",
+     "name": "empty.bin",
+     "cipher": "შЭეჰგლაФЬნХჟდგЮИМტნИЫსЩსЩფКЛКვЧУგЬკქБჭჭსХЮეИთეУМИБჩЪთГЧუРგИЮლყცЙზШРВზუЩЦვგძБყჰწფეЙკЛЧქХრКЙЙЫტპГБრქЦხИცჩმЭქПЙოАКАიНСТდПЬხეЖЕЛყМЕლტშშЕАФНПცჟШიძოხВუЗЕდმЬСჯАყსЕЬЖСНРთთЕკУБფПჟთსЬყდДგРОმხრ",
+     "isChunked": false,
+     "mime": "application/octet-stream",
+     "ext": "bin",
+     "type": "file",
+     "date": 1790812127247,
+     "size": 0
+    },
+    "expected_plaintext_b64": "",
+    "expected_plaintext_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "original_decrypt": {
+     "BUG": "payload.data is empty string (falsy) -> modal shows the payload JSON as text, no download offered",
+     "ok": true,
+     "shown_as_text": "{\n  \"v\": 1,\n  \"type\": \"file\",\n  \"mime\": \"application/octet-stream\",\n  \"name\": \"empty\",\n  \"ext\": \"bin\",\n  \"data\": \"\"\n}"
+    },
+    "decrypted_payload_json": "{\"v\":1,\"type\":\"file\",\"mime\":\"application/octet-stream\",\"name\":\"empty\",\"ext\":\"bin\",\"data\":\"\"}",
+    "ui_progress_text": "✅ Encrypted: empty.bin",
+    "ui_file_info_text": "📦 empty.bin · 0B · application/octet-stream"
+   }
+  ],
+  "wrong_pin": {
+   "pin": "nope",
+   "record_id": "1790812126750",
+   "original_result": {
+    "ok": false,
+    "error": "Wrong PIN or corrupted entry."
+   }
+  },
+  "batched_reduced_constants": {
+   "WARNING": "Generated with original-script.reduced.js: LARGE_FILE_THRESHOLD=1000 and CHUNK_SIZE=400 instead of 15728640/5242880. Record/payload FORMAT is identical; only the split points differ. Decoders must not assume chunk sizes.",
+   "constants": {
+    "LARGE_FILE_THRESHOLD": 1000,
+    "CHUNK_SIZE": 400,
+    "NOTE": "HARNESS OVERRIDE — real values are 15728640 and 5242880"
+   },
+   "vectors": [
+    {
+     "label": "batched: 1234 bytes -> 4 chunks (400,400,400,34)",
+     "constants": "REDUCED (LARGE_FILE_THRESHOLD=1000, CHUNK_SIZE=400)",
+     "pin": "chunky",
+     "input_file": {
+      "name": "clip.mp4",
+      "type": "video/mp4",
+      "size": 1234
+     },
+     "record": {
+      "id": "1790812157769",
+      "name": "clip.mp4",
+      "chunks": [
+       "ЕზქАМცტЫКШფპუТЦОТНრტИჟРპЗАჯდСЬშშЧБУფФლკЕЧИЬპყРზჭფფზღЙძТЪРირТБЫУДწПСბჰეЕЪТУЭТСЦრგГЭБწიЧეძЧУძჯФЭყЫПНЕგეОЫჰწХგლჟჯЕАТშშზჩУჩОЗФБЙოაШსЕПШГЧДЭდნЙფЦკФЗКЬნЪხЧАЬქჭШიბყსЕანМშტНგიЩვЬЦЖЩქეზСოსეЪЭპРლЮხГЩბЖЩМუЭითზჟეНОზუКჭЮუГღЖВთცგЮშვაკჟЦჟლРოБეЧცყსაХЭპСსცЩოФჩКУЪქსЕРტРЕშУქУაФჩცЧცძშჯგИБЙОღდნძქლნპКНსჰГჩЪქХბАჯმუБМდИრიЖდРАჭჰЬБШჟСუЙЖიЦПქСჩЙВУАЭЕტეპИЖЮნაЭჰრთЬТლЮნგКЫკნТკპზთაფОЖვტჰლЕხუმდყნფრაჩნЕХყწხლУმАდზაშШკТაТპРფბГზХაშქოუШИМЩОვცФივგПნხფМქთჰКრცგძЗლყАИДИძვЙВწჩდწЙЮქШჯდჭЩЗთფტМძეЕЬქთღიპნევЕШЩРოეЦსჯკЕОШვЭЩლზოЛОეძღЦქЪტღხზააУОАხნღჯОრКИЪЕЙЮБЖჩოჰАპАშЫСЪოЪЙЭცФПАათЦУДძიДЦЦტრЪეЪПЫჩКუიЗЬИხრВვჰსЩჟღიРЭქЕРИპЦИХგძЕძვკცცკტЙგТსЭАოვПჩДეВდГШЦთФЪჭშმАჯძტჯРძრЬОფЙჩძყШღЖრЫМჩეჯთЬჭნჰჯჩაТЙЮძЫქОРЫЮბЛДჩЫეУწУგЗИРაОწეЭЫოძჩЭЫСვЬТჟГთЕМეЭხОНშჭკმРმЬთФГЙУРШНლჯТპННბკქЩრКჰწპЛЛუიჰДპШСВЫძნСვაბძცШАტТСРნШბНЬМЫЦЛВგЦЫაყБსПჯკЬხბЮПАაЩЫРЪჟИФМЭЫЗЭყთЫლრГგРКწკЪЖБვРრთЭОკჟღЫჟდЛЖსნСХეШცМОცЭЬგოფАМწФЛყღჯЦЗСЫტЬЭწЭქგპსЭКИКСЮბსЦВОოხЗჟБთღმЧЖძქЫПТგტДგЪКქჰРГЮЦЧჰХძДЦუЦЙЗჩზСსნჭცУЙრЭხЩЛ",
+       "ИწЧჯჯЖОლЪსЫრГМჯესუККЕურაВგილТЭჭБЫწჯЩЭიკЧБცცნტგდდბჯСმЩКШРთПЧჯგმვДЦЮმცМПჟРფНგსЛჭვПჟЪმოოЩЧКНხჰაЧთჭЭჯЖცქКЧЗЩНАბშИოФПЖიОЧსგЮЩჯგЩФნილღღზЙსხწБდИФЮОჭცЩშЗქГბГლПცვხჭБხუღХვГქთნრЗტЖრატხПЖჭНСკРВყСЩЩМДРСსЦЭდЛგЭСРГყЫТღШლწკყЭТЮზАდЖЖХფჭЭЧАЧჭჯЩМძდЕქეНСთქУБჟИЗმთვლЫЦჟЙფლრЩხუვЪЕპბგУЮჟჭურЧЕЪНШАდОШტბოМჟИФეღДქთაЦОხЗყАჯХყტშძКჭБПეყХМЕბრაДГხჭჟТნМПУკБძცყШღЦБЙРჭАნМЪბГდФხრრვძყცცЦБЭსხЬცХწЮეოჩპქГЦპБღპფТსОПფგჰღЭПბსაПФდაШლОРЪГფУПმБუყМჭМეЩწჩПმცЮЪფЬЖЖФДბЮЮვრმЪИლძЛЬУОЙСიბფთნრკЗდАНგძრტდნУრჟЖცГღТტდИჯჩЦჩხჯხსიЧფПჯОЫჯМЕსცЪლხГОГЛЦШსხჩФЬМშგძЗЗხლУМЖცმტЛხყДჭღდხИდბЭქჟЗჰნБლШВВЗეСЧლЩკМЙფГუЪККბЮУЫუХჰМღჩЕვიГჟЭИხყГШჟЮკრწქოШОყЪУიЪТთУШყჯმპჯოძჩნლქАპХЭЩხცЖПპХჭმოკჟССИდჭადრვშოЭАЭიШჟЪშШწცცკზЗჭცЛНЭФნღТПუმჟთМნთპოЗნЕОხУჯЩღჯДЦქЭДკუთცЭღМЫИАოხპЛეНლსТОШცУФჟДაДზУზЬЮილძГქცაღხСГჰФვЫИУЫЩЬჰნХთЩЛЭზТჰტქწვТНЭПოЬЬთЮМВУКღჩძИРტЫგშСრზЪმღშსპНკМШუმვМპГФЧლЮБლВქრШიХსУАჭКკРერЮბФАЛЕუУКტЦქДპФჩიЙЙჰЩქზჩРЩЮხЩЗჰზРЩЕჟჯЦშДტКЙჭАЮЖჩლქГОმბЪЙЪОწЧფФЭცაოპДმЖსიИЩДსНვღკმცჩРჭღძჭЧაЙხХჭМЖРრდЪჟვГშქფ",
+       "ტЩЫწЙВЦРЫრЬჩТღღძЗГЧГХჰჭვЛტАФრЧიЧЭჰპპზУЩნЭКВბШНთСОПყმოფრЧღЙЪყყЦЗВЪთПაЕЪФრЙგЧЧБძტჩЬიЖჩჭМჯნШЮჭხშყЗЛОВთლЪრБЫТДსგჰრზУГТჩЮЛТПთბყПთჯСკЫЦბსლიЭЗცცნმალნЫОრКბОЫფეЩОНХЛლЖЫჯსЮზვЭპენძეკЩრБЦЦჰЗჰფТთაФძВქПУСЩШАЬСაВЦУბЪИპუТღჰЙТФШფზЪპეМდაЬЙფღСჰГМХქЫფДЖხИЖძРთТЕЭჯЛЧჩПКЭჟძЮКХბМТБШთГШМВЩუЖჟპЪЮდდУროКპცთშშЗშვოლცСვრჩДხზКჟსАჯცჰვЮშცატИყНოТტტჯჟШЦЦФუЙБმЗრეШНЮუПვჯწყლშНХტКქთФЧЙГЦБჭზЮრმლუЛФზნАიდცЬМВНთЮიფЛПИЬЮუШЛყРЮЪЪტრБЕრლნБწნნუღЫჭЭВСЮყЩГძოიХЧЭუЦზИЦОფფЧТЙჟОბოსქლНАЙЗКჭფТБნПЛაЖტЪЫЕШБСჯГШХცცუიშАძზЭЪРТЖგЭПძЩთКძХრჰБიИЪპЪЩНЦЮცГЮДჟეДდლკАხТპЗЙცТТФЖფХЭТПИЧХРЗტЕШირუЙმЩЭЩБНჩჰЮУვГФაეფЕლООნЛძსОჩჩთქთჯნპМИИოНМРЗცУЕღჟЧТჭТЬУტЭჰნოМძЖИРЫუЦПეИაАЫჯზМჩТპСუკწშЧლტთРხჟყХხКლЩრგჩტКსკПЭОაШჭИადСთГჩბДრყНჩლაჩუЭბДЕИოშდიШЛჩრგცЕЮპЭხქЗჟქზЬჭფმОჯЧდვПოიТპაЪტЛНЫჟШღაШЗოესგრკТЖЬჩАНЩიჟლИუიЖოШМОუჩДЭჭჯაბკЬისГГჟჰყეХЩЕვЭნდცპვЖყАდფТჟГПГქღПუღЫვნყЮВზკჟЗტЦКღДЫნსКკСЧЩХМЮВБნЕБლჩЗВКლკЦГდФოЦდЕЮდიდუГწДСМСეЮВВჯШВЙჟУЗსЕЦБჯЖДЭჭაРГოხლЧБტპШკЗვЭპСთხТЖგპჩღთჭყდმტლტЫЧЮДЦბხКთჩМყხЗჟბეჰცყძყЙФЭГეჰ",
+       "ИМჰЭვКЗЕთნნЦყЛАПვჩФფЬАЬშЩЪძЙტЗოЧЩХსჟმჭШქАЦზბЛЫМЕჟდნУოЛნЦქУკТСЦცსიЩყЭმЧზЛაФТწვკოЧБგეМცПИШბჯოЙНიპძКЪნЬЭოოБВოПЗТЭЙКОუთჰსტტლТЙჩქჩЕჟრნОმჩბМოЪყპდЩსОНუჩГდჰТთКქჭჯФყШესЫეიЛჩТკАზДЬЖჭИმიВბღССФუБВჭკპТხЦქМძИტЩთНЭТზЦჟზОდთЧЗНყიФИსЪНЙიЗპშРძღОიЬЩკЛრРОТბფჩლჭТЦწИГჰაიЙზБЗთЩЬშაქბჩ"
+      ],
+      "isChunked": true,
+      "mime": "video/mp4",
+      "ext": "mp4",
+      "type": "vid",
+      "date": 1790812157971,
+      "size": 1234
+     },
+     "expected_plaintext_b64": "awtuM0f/v9P9qqGFR9gO8EPSrUksUvz1M1hP/AZSv4bIrLnl6jxbOJdpUckEcz2u+PdWIMzS9GrFGrGe9OvN1vYPSGwt1HWR6cPMq6Znj2/fpIV9qMLzPYbVi03z4VwoloOoCiEzfn4NGhYJp56XAL5iQ29E+UyoZZen86IzyquWiEaqajdq706bNnkF1bP9PYu5Altmbc+m96kfsc5v4iR6Wj+n/oda6hC1IXGdgQBskOUKgBxTQwYGBGZhvm150dnroWzAS+dQYH4pSDSm5xLSLA8sOGeIVa5Q4qiYnrRe5abZKSgxf+dqYG3nIUJhaq+24nAXhTDBrdKr7Kr++bpH2V7ynvVfLY1uNm8ix2vpELnWG4pb3EotQfWEtOMigFH7SbsDbxLUrjIgTDVxJAVKW8RYWz+gQCj+qkG/xznC8xhmj8eYO/JcMSZo8gGHKUENX63jjVMGTM6OlexUaN3Ga4hpSGARGe7G0A13FkvQy0Ziopihpmc9m/6R2SLF2zXmvDmIhSHTLX9rZjQrwnWGmNto5I8lv4HSbsVvGlnTnFBwQT0KTEPhaOzFl/rC+K1MKiwtBU1Iq1Wo1h20VcrgybRe01/Dwejbc4/EUgenhSOuf7VJGIuEb5zXXsoB6lZsZScS+Xe57wPKw3MIP8vcVsWNekIbD1b7TTO9kdhz8GNivmMGK1o73oIuI0pauk0FmeXoYqMphxRBq5c4BoIWGdpYrCdocr8QOauBYTtAbphzi4G3cvTgyJDCFNx2z0PAA3IVgxHWyNtH2PF3u1pKhvEN6/dlhFO4DaZRSlmTDsQvgSQBYmgcTpzfFsc4rRJ7YDxbafukGNpLwgf8XB+iGtS311cEY6gRCnSR6vhwic5SYAZDx/8tJ2Bu3zeWgYY6Uvt071tfZ5F4ghIFfd52P8kI5b5R5Plc3Qt3JPwcSn4YmWYwW8dJ4hsgQ+yGkjLcXMaamjsykcQ+Y3IjFOGho1AgzaiwwtKXfZkMp+wRjjWbRmhKrgWMxjU/j/vH3rHSbxBhJ8rAGC2t61bqN5YUmRfmwVEKh0RiVwVHpzCBD1bqvC0gaVbr7S3YDUYfNsD1gaZ+4WSYThVYHCI6JH/vBykFJ8BKaLT0T7KgIFpkJiT7zpLWC9rGuP4fKqC41DoYdt0EJY8GyKQgnoLoxeFr63VSp20Aup/FpaKLP5YUM1mCimbOwT4qMNe3SvkavtWy/7oeh3OJTI6muJ214S8IdKGSsln5p8BjJN0rBsXcSptQCZon1+UwdnZHUrCNZ/RS666a0CE+CWRuIJFq3I9ctXrIu8W14iGkyXH3Tgbom6jKnDtEnrKSVVmPBYaxfSJa1jjFp3b5o0LJg52k51pK5noOwyDW8ccwpVWLvTYh2juQeCx7pG1zpA7IfMTLEz9S7/NWB1ck2Sp4t9ePrQEdbpfmfSWCLSSfcncLSOKQqbnjJOHgSqRsEX7RShb5nA2EH6vzmG7+cy5qdF1OWj3MQ4dsaDdKV6JIhVp1lb5v3R+5/PzAM0EA4Et+tO1t+HlpD7lvCviN/d72p1EaBOYhv34jsKXlBLV5ptiGWOFiSngctlax7MJ+tr1gHS+UgQuUXg+zJzFDW8DV0VOrCGtUeXRqW8U4PDCFaJ2FqcQ2YA==",
+     "expected_plaintext_sha256": "ab7719da6d1573f455c80c99da8c27242196b289f4a13357c60259400d66d482",
+     "decrypted_payload_jsons": [
+      "{\"v\":1,\"type\":\"chunk\",\"index\":0,\"totalChunks\":4,\"data\":\"awtuM0f/v9P9qqGFR9gO8EPSrUksUvz1M1hP/AZSv4bIrLnl6jxbOJdpUckEcz2u+PdWIMzS9GrFGrGe9OvN1vYPSGwt1HWR6cPMq6Znj2/fpIV9qMLzPYbVi03z4VwoloOoCiEzfn4NGhYJp56XAL5iQ29E+UyoZZen86IzyquWiEaqajdq706bNnkF1bP9PYu5Altmbc+m96kfsc5v4iR6Wj+n/oda6hC1IXGdgQBskOUKgBxTQwYGBGZhvm150dnroWzAS+dQYH4pSDSm5xLSLA8sOGeIVa5Q4qiYnrRe5abZKSgxf+dqYG3nIUJhaq+24nAXhTDBrdKr7Kr++bpH2V7ynvVfLY1uNm8ix2vpELnWG4pb3EotQfWEtOMigFH7SbsDbxLUrjIgTDVxJAVKW8RYWz+gQCj+qkG/xznC8xhmj8eYO/JcMSZo8gGHKUENX63jjVMGTM6OlexUaN3Ga4hpSGARGe7G0A13FkvQy0Ziopihpmc9m/6R2SLF2zXmvDmIhSHTLX9rZjQrwg==\",\"mime\":\"video/mp4\",\"name\":\"clip\",\"ext\":\"mp4\"}",
+      "{\"v\":1,\"type\":\"chunk\",\"index\":1,\"totalChunks\":4,\"data\":\"dYaY22jkjyW/gdJuxW8aWdOcUHBBPQpMQ+Fo7MWX+sL4rUwqLC0FTUirVajWHbRVyuDJtF7TX8PB6Ntzj8RSB6eFI65/tUkYi4RvnNdeygHqVmxlJxL5d7nvA8rDcwg/y9xWxY16QhsPVvtNM72R2HPwY2K+YwYrWjvegi4jSlq6TQWZ5ehioymHFEGrlzgGghYZ2lisJ2hyvxA5q4FhO0BumHOLgbdy9ODIkMIU3HbPQ8ADchWDEdbI20fY8Xe7WkqG8Q3r92WEU7gNplFKWZMOxC+BJAFiaBxOnN8WxzitEntgPFtp+6QY2kvCB/xcH6Ia1LfXVwRjqBEKdJHq+HCJzlJgBkPH/y0nYG7fN5aBhjpS+3TvW19nkXiCEgV93nY/yQjlvlHk+VzdC3ck/BxKfhiZZjBbx0niGyBD7IaSMtxcxpqaOzKRxD5jciMU4aGjUCDNqLDC0pd9mQyn7BGONZtGaEquBYzGNT+P+8fesdJvEGEnysAYLa3rVuo3lhSZF+bBUQqHRGJXBUenMA==\",\"mime\":\"video/mp4\",\"name\":\"clip\",\"ext\":\"mp4\"}",
+      "{\"v\":1,\"type\":\"chunk\",\"index\":2,\"totalChunks\":4,\"data\":\"gQ9W6rwtIGlW6+0t2A1GHzbA9YGmfuFkmE4VWBwiOiR/7wcpBSfASmi09E+yoCBaZCYk+86S1gvaxrj+HyqguNQ6GHbdBCWPBsikIJ6C6MXha+t1UqdtALqfxaWiiz+WFDNZgopmzsE+KjDXt0r5Gr7Vsv+6HodziUyOpridteEvCHShkrJZ+afAYyTdKwbF3EqbUAmaJ9flMHZ2R1KwjWf0UuuumtAhPglkbiCRatyPXLV6yLvFteIhpMlx904G6Juoypw7RJ6yklVZjwWGsX0iWtY4xad2+aNCyYOdpOdaSuZ6DsMg1vHHMKVVi702Ido7kHgse6Rtc6QOyHzEyxM/Uu/zVgdXJNkqeLfXj60BHW6X5n0lgi0kn3J3C0jikKm54yTh4EqkbBF+0UoW+ZwNhB+r85hu/nMuanRdTlo9zEOHbGg3SleiSIVadZW+b90fufz8wDNBAOBLfrTtbfh5aQ+5bwr4jf3e9qdRGgTmIb9+I7Cl5QS1eabYhljhYkp4HLZWsezCfra9YB0vlA==\",\"mime\":\"video/mp4\",\"name\":\"clip\",\"ext\":\"mp4\"}",
+      "{\"v\":1,\"type\":\"chunk\",\"index\":3,\"totalChunks\":4,\"data\":\"gQuUXg+zJzFDW8DV0VOrCGtUeXRqW8U4PDCFaJ2FqcQ2YA==\",\"mime\":\"video/mp4\",\"name\":\"clip\",\"ext\":\"mp4\"}"
+     ],
+     "original_decrypt": {
+      "mime": "video/mp4",
+      "download_name": "clip.mp4",
+      "bytes_len": 1234
+     },
+     "ui_progress_text": "✅ Encrypted in 4 batches: clip.mp4",
+     "ui_file_info_text": "🎬 clip.mp4 · 1KB · video/mp4\n⚡ Large file — will encrypt in 4 batches of ~400B each"
+    },
+    {
+     "label": "batched: exactly threshold (1000 bytes) -> 3 chunks (400,400,200)",
+     "constants": "REDUCED (LARGE_FILE_THRESHOLD=1000, CHUNK_SIZE=400)",
+     "pin": "1234",
+     "input_file": {
+      "name": "Track.FLAC",
+      "type": "audio/flac",
+      "size": 1000
+     },
+     "record": {
+      "id": "1790812158122",
+      "name": "Track.flac",
+      "chunks": [
+       "თტგტЩვАУტЩტდზХЪგქЪУჰხიწიგტმპთვТჩРШზПფვРЛლЬვყჰდШИЙЬტტსტღგЙДბღВЫთფИიღკოცЗЧЖსХჯЙТნღДФწმИЖჟბაუფГწვგყშჩЕზПჭРЛЙგНდჩპჩიჰკПСФГშძБფАბЩიკბღЦნუЫЕხძმვЦყАბБИჭПწგჰდპЛПЙყგИЦЛქТდСკЦЛჟЛФШსДТკვგცРრლОდფყОЮაძПჰფოМჯჩნЫმლეГНЧХჰჟНვთჟწკუჩფШЧОШСძწრНЪЖჩჯჰშღЩЭЪЮფსЙХღფოპძრЧსЪНДУჭვССЮცРეაჰხХТГქხლჩЖВრЪპЛთШДСჟეЫЩОუგИმНგЗთЬГჯგЛნფЦქЫЗციბთკСბპНწЪდოЮЧრდჯიტთექრპკЩეТВЫХჟჭФცჯძეჯССპჯЙОღЭЭАქქОყЖძწვგშФეХხსდითФЕმЮМდГПЧЮეЬთიЖКФჟჩძТჭჟიЖჰეБЧტРთОვШსЮКუპЕჩФЧИაპЦთЫФШქბფაХШООცხოЩჰიИУეჭრრსურქჟსწთლშЙდШზТჭЕЗბჰჭПპკГჰЪსПЗტჰЮღЪЖГЭОდДОРЖზЦაგრОПხМგგღЕЬЗЦАქწხოНЮკЕКВწჩЪЦРჰУИДМოიცХЫძЗЧДნთЛზПქწТФბЭХჩЙРზდНЕნШძჰНЬჯЩკЮკცვФЪპУЖЧმСძქოЮპცЬЪВწЙჩხДნძცЖშყსუТჰაეიЦაФУზჰУЩМЧნЦЭმЭЮოსЬЮКДЮЬХჰЙДЮენГლეყღკთლქნჭМწШმИЛХУМГАШშТЙЮრწУწნСЬუნდЮЬУЮКДოვХДლგშЧწბЕდЕვМყСჩზბТФღზШჯგШЦწბЬВВЧЫგსჰУაჭЦИიБЫშОხზЧნЩЮქზსЮЛზჩЦВЧელწბЬუФАЙЛМღБჭЫЩХცბХპЕპქყПУფШЗКჭСვჟЮნРღნШЧМჯზУРგნპყოჟЧЫДЭწლЪყწГვРРჯШШПЮЖდЕიყБემЧЮЪМწძღუღЮЧЖრცგტЦХСЬЭყЫნდОЬწგღМЗКЙტЙШАბГწოზდЛყკყჟჭვთზიბЬФШЮМЭპდიჰЪЪЛЛЧЛГრЪლЧცფვЛФЛМპოძЬИეМზშНРАЭЫ",
+       "УИЩხრРШბიზЭმАლდАЫთშВЫЦЭღМГქЪაოЗГკРწЮჟКჟჰცЗЙყСЫЭСფТწОБუЙელშდВწლგЗЗტღНМПტГУფЮЪუМნიТპსხდსНვФУშბდიЧРცუჯუЫЦცЧЖЩКაНხДЙტИПგყდФЭუყБტჰჭზდОФДМძქФჯЧУჭХАტბზლხТიКСМტსСЭძШБეЛრსЪДიЬВЫЫაЩფЖЮМФძქშწЦძრЮЧყГВძეНღБჭჟЩСКუზხღძხუქუმЧჰლნბТრონუДქРჯპმЭУЩურჭწГენღდГВნდნПჯЗИლპБზსВТზვნყЪМБნკვЦზЧЖყМУბვტЗბВბЮЗთგზНФЕСЭსТძლТЬშУНЭრვუეСოხВИЫქЭმჰყЪჟТქЭრფЪუВლЪმДსХკვЪჟХБრРსЭშლЮრბნНლშЕЕპЩОჭТგფАЛМДКიУსЖРЮРТИСკჟტЦგЖჩКპЮСЙОИЙАРაИШგТოტსზყЙჯПკГАГКაშჩЖПХცივЕჯფУТჯЫვფЩЦძოШБფთბნАვДგЖუХУЧსИШЧЭედКЖЩБიЙГმЩიოЕფЕЮჟНДფЫЖЪანფბბსჩЛЦოТБЙЛვШმЗПФნЛХДМცЧЙხИИУნВხЕოხიაЗМЮშДЕПЫკУჯТგПჯწЬშВШПЧЪЮБწСБვПშბეპოყნЕხძТფЩАЭჯАХЧთГბХЦЩАЧАЭРზИქბპიЧშძაЛებჩუძჰძნВქწთქბეЩპგძУჯწЖТგვЩეძКЫეჟჭიჰგЙდИუМსუЩКქЦЖზЬყЦЭჟТაჩУАИრЗკЩძაФანყХჯГЗАЦჟРნთМИВЫПმოИУТკჩЕფЮუЪГხИიЬМპЮცЩფჯЪნყШУრЪФМПტУИჩЦაИЭრВЕЫხჟლთფЮლОБჯპჰცВპზПКОლხუЖზმОგЩბУსკმЩჩვჰეტყЦშЧХМОРЦСშТЭЗМОტსღუცმЩოЧნდУგმЮЙყქДფЩМЖЛЪიХЕЩЬჭЖცНჟკატკზЛШჰБითТტეაწდАЙСВЗპЬნИНЛЬზФჯვНЬБЖფგЬЩჰКШЬაЮФЖბЬნაЬბიპЛСКრუჟЬЕთЬЪქთაТЙღჩააХЧАტЮჭცპЛВУГჰკСუოЭავჯРКრСПЫЬსაИШАГ",
+       "ლЖТდრЖთЮБЭЙვთОМრრЛЬეЛГჰУშДდგЬდძНЦყЪДЗვЧСღყЧЭდПЛეუСБგЛუგЕნსჟААЩХჭცძИСყძАУЗბყქქღშხქშКЙЬვჰЪЭბЫПБТაჯЗПХНЛძУლშცცВНპზგჯაЩЩЧБუჩფДЪზМЕШКტდცცЪОნЫКЖЙПГჭფლКЕკყЩოДЗЛЩძჰლმМლწБГმАПЛДღნМТგЮლასზვКЬГჯТЭპვგЫХЛЭფЩვЫიОЗესჩუხაპЖДЦФაОХЛПდჯზЪЦწЗქЬЫოОШЙბგСШДყЭЙКჭБЦТიКЪЭТევХЭХХფИФЖუჯეЗЗვჟДაცЖფცОИღВსХიОТვПБცღЩჰღფდძЬეიЛОძГთРქВგშДქМთღძყეЧШდЮНЙჯფШАაცПЧЬტСЩУთბძЪОპЪძვკყНЖძჰЛБღდИОჯЪТპყღძჩნЛკЮЕЩШЧოჰწИჰЦჯთЭზЙХЫНშვცჭიЦТЭУДოთНЕრჟЛЕრრЛШბГქЩოТჩცშხჭპძოოДЫხჭყლჟЧЫუФგЪЭმტლჩტЖდИДЦზჩჩუГМტЕქЭПხეТნლბეУЮЮსГკШზპვბძჰთЖЩЮКთЗყЕიხპცЛვФბავძЩТგჟფШფПТЕჰЩთОტМთმჯპჩაყჯკმЮჰჩРЮძყჯდოХაЕУრძИТУДБИФХსСზЪდკსЪძАოЫუწა"
+      ],
+      "isChunked": true,
+      "mime": "audio/flac",
+      "ext": "flac",
+      "type": "aud",
+      "date": 1790812158260,
+      "size": 1000
+     },
+     "expected_plaintext_b64": "jAwtdrhrBYRSoFxh7yZLxa4IkWIcIq8trx3bq/zzihFi3WazI9T+v/GDHUX7/g54eFEvfwa9IEdnd07At3ASu9O0WA5a3x+N96+klllAAqvh/Paze1VOF9fH7XT27C/yXfLgUucnXUgUnlWh/a2bEDWGfVFwcbxfJbYSRFD6Xxi+W1UNMl4riKAqC6D/o7tuF3I71rd3MbBfnwKS4whfwTW9p49BZ5rJDLTtuD2ENvCUoITJGXIRoLbmx9wA7ud4W8o0TvYf1/E4xE0KMLryIKWg/iaPZspWtFx8lAFkl0ULCFAly0Z4QyfiBbn1Qn28EUROslpwOYv5W1jXfa+96MIMsVkQIr0JqoJU4XBJsBHw2nEF+5sKlPKdknWZINI8kq4rDBPuoDCdCOwKj1NBgv0Iq3SFyhGULFyMzt+UhfJhjPfOTC1EqAQV5wqiSj3tE5/nBXQZCVbZzQDX/g0KtvC7QupRIPPcEL59k3HauZgJpRaBcIOsSbwJrX0lbY+uXUP6PLIGxWB40lTWZmq+L7wF5H1/pNv0iXUtKxnoXlucfWQUYpJZKm7Ntpwsfg5H6sIw5YjByu5seIG+2kT+oh8aNgaO3L5EX2fR8v9aYet8zEmcYxq/M5MQfc9zgh8cLAtCfcXC0YUtOY/uuKPEIuNbHMghvSdDkFgrqW86CtkxrwnTLIbeelkJQ1Dszm5XkHVmDphWAr+p9NLr4TGkswz1mP9/HHD14mOsUDq+tNyA08RyBDG7qWYEHMIcK5OmJ8gs8JrituF6zvy64F+7mmb1UNvuFWrjXVdbWnnV1Sz7M9ZUJA7f1UfCRANAKny8Oe3rd2MhAp5ebthY2OK6GBX771BbEU+NnlX6tqR88pH5HNvD/juCFBzsWxWQstgarbuyKZhVFZ9mo8WubN6tybinqpeWzfSJj8liPrmdhu6+AtRCSA54Y6A43sYeOlLyP7S4zHIiBkIUXkQpauyEpc5Q4Wj0bqEPt0vpc7rtVk8Fa0fKb6g6c+g5I2Tl3IRLHIwP001VdgaEImWHkcx0VoHe4HnPZc5FDTSyHOzyAiuHxQtyqhDJmyFuj6Aj6/BfVI8ppvsxSKoRuc+hR5fwrkXX36A6mBPcu+36aQ7wMs/xz8aG3ZkaOHnwFqmgRlnsjdHTVUIlmMjNpf5DQV8HqJ75KC4WuCzap25UTnxpBCtOVUyfYjLWMqRT8+KWFz1wJUfxNdnv/2nRMlwwK4oD6DPM/Z3YKOC0t6R6a3ovW4Bf2dYOAKR6YKo7BCudbeRdCdsXWHqZYDnLA9jNIZEL4NAlZxUuAL0Bai0L2onAcDz462PAupQY2g==",
+     "expected_plaintext_sha256": "19043f63d256a980d3ae98a694477d786f69948a36818c4d2381fc22b847a0bb",
+     "decrypted_payload_jsons": [
+      "{\"v\":1,\"type\":\"chunk\",\"index\":0,\"totalChunks\":3,\"data\":\"jAwtdrhrBYRSoFxh7yZLxa4IkWIcIq8trx3bq/zzihFi3WazI9T+v/GDHUX7/g54eFEvfwa9IEdnd07At3ASu9O0WA5a3x+N96+klllAAqvh/Paze1VOF9fH7XT27C/yXfLgUucnXUgUnlWh/a2bEDWGfVFwcbxfJbYSRFD6Xxi+W1UNMl4riKAqC6D/o7tuF3I71rd3MbBfnwKS4whfwTW9p49BZ5rJDLTtuD2ENvCUoITJGXIRoLbmx9wA7ud4W8o0TvYf1/E4xE0KMLryIKWg/iaPZspWtFx8lAFkl0ULCFAly0Z4QyfiBbn1Qn28EUROslpwOYv5W1jXfa+96MIMsVkQIr0JqoJU4XBJsBHw2nEF+5sKlPKdknWZINI8kq4rDBPuoDCdCOwKj1NBgv0Iq3SFyhGULFyMzt+UhfJhjPfOTC1EqAQV5wqiSj3tE5/nBXQZCVbZzQDX/g0KtvC7QupRIPPcEL59k3HauZgJpRaBcIOsSbwJrX0lbY+uXUP6PLIGxWB40lTWZmq+Lw==\",\"mime\":\"audio/flac\",\"name\":\"Track\",\"ext\":\"flac\"}",
+      "{\"v\":1,\"type\":\"chunk\",\"index\":1,\"totalChunks\":3,\"data\":\"vAXkfX+k2/SJdS0rGeheW5x9ZBRiklkqbs22nCx+DkfqwjDliMHK7mx4gb7aRP6iHxo2Bo7cvkRfZ9Hy/1ph63zMSZxjGr8zkxB9z3OCHxwsC0J9xcLRhS05j+64o8Qi41scyCG9J0OQWCupbzoK2TGvCdMsht56WQlDUOzObleQdWYOmFYCv6n00uvhMaSzDPWY/38ccPXiY6xQOr603IDTxHIEMbupZgQcwhwrk6YnyCzwmuK24XrO/LrgX7uaZvVQ2+4VauNdV1taedXVLPsz1lQkDt/VR8JEA0AqfLw57et3YyECnl5u2FjY4roYFfvvUFsRT42eVfq2pHzykfkc28P+O4IUHOxbFZCy2Bqtu7IpmFUVn2ajxa5s3q3JuKeql5bN9ImPyWI+uZ2G7r4C1EJIDnhjoDjexh46UvI/tLjMciIGQhReRClq7ISlzlDhaPRuoQ+3S+lzuu1WTwVrR8pvqDpz6DkjZOXchEscjA/TTVV2BoQiZYeRzHRWgd7gec9lzkUNNLIc7PICKw==\",\"mime\":\"audio/flac\",\"name\":\"Track\",\"ext\":\"flac\"}",
+      "{\"v\":1,\"type\":\"chunk\",\"index\":2,\"totalChunks\":3,\"data\":\"h8ULcqoQyZshbo+gI+vwX1SPKab7MUiqEbnPoUeX8K5F19+gOpgT3Lvt+mkO8DLP8c/Ght2ZGjh58BapoEZZ7I3R01VCJZjIzaX+Q0FfB6ie+SguFrgs2qduVE58aQQrTlVMn2Iy1jKkU/Pilhc9cCVH8TXZ7/9p0TJcMCuKA+gzzP2d2CjgtLekemt6L1uAX9nWDgCkemCqOwQrnW3kXQnbF1h6mWA5ywPYzSGRC+DQJWcVLgC9AWotC9qJwHA8+OtjwLqUGNo=\",\"mime\":\"audio/flac\",\"name\":\"Track\",\"ext\":\"flac\"}"
+     ],
+     "original_decrypt": {
+      "mime": "audio/flac",
+      "download_name": "Track.flac",
+      "bytes_len": 1000
+     },
+     "ui_progress_text": "✅ Encrypted in 3 batches: Track.flac",
+     "ui_file_info_text": "🎵 Track.FLAC · 1000B · audio/flac\n⚡ Large file — will encrypt in 3 batches of ~400B each"
+    },
+    {
+     "label": "NOT batched: threshold-1 (999 bytes) -> single-shot",
+     "constants": "REDUCED (LARGE_FILE_THRESHOLD=1000, CHUNK_SIZE=400)",
+     "pin": "u",
+     "input_file": {
+      "name": "under.bin",
+      "type": "application/octet-stream",
+      "size": 999
+     },
+     "record": {
+      "id": "1790812158368",
+      "name": "under.bin",
+      "cipher": "შТლშჩУდМუწИრЙФუДКწჭЕტНВЗჭНПმსЬИწყДЗЦჭგЪაფЫГუხЧუნღЕპДМკდЪЪЮფШЭВბЮჭშЛჟღЕЪთЗЭЫНЦზЙააფიფРულლბВჯტზЭთრХРСКЭРწЭცპაებუჩხჩყЦЩყУმБПУღЕფლსნჭვხმჟლეძЭმჰТწნТჰОჟЙОჰАწპУЭЗდЪТХСცხცღГზგპთპСდЪჟСცღპძტქხშЩყეაЬРФჩАეБჟПФჩАნРЫჩდЗЛЪჰФტღდლФჰძპНუზფცЖРბТმესХგეჰШსФიЬДЖრВწЧТაძტნЕჭНჭКУЪЭეთВთმთნЮГБОЖრЦИХოЫТყЦშДყცგНქგВჟАდФАგჩЖგგტგЧДЕქჩГთგპპИპეЙЖОძეტЧღАЛჩფძЫЗПНПაАЭძХრЙЕЫფДწთუЫლლფგЦЛЕВპЖАჯღЗმჭხქОჩდწЭვცСაგКТВФწჰჰДМნმღУАსВУАჩნღНჩჩკუЕბЗკИОწЪხწЧВსОზШაჟწეШჭვЫЮЫЫმФТეЗЦჟЫპХუШსიЬУშКБПЭЗШЧჩЧილВვЕკცდЗერპზКკЕЩჟძჩსКფყჰЭმჟკЮЦჩდЩჭღЮБЩТქბთЫააპლმЮჰეწკმАარЧЫგЬЪГცКГЛЩფУჰჩБВლТАНГУბჭტАსგძФОДГЭЪШИЧНქწშყბГГЖყჰГბРგУმფუკცЪღЦНფДТВხВЦჟლВЮРРრОСУЧეცЖЦვმУშЖМЗვЕჟШბოჟძეЭშЖЫЕჰЧФРვჯრძცОККЦუგГძММდნЖცუЭრГჰკЛვთЭЦდსქშЖЬღნЧღპЖბСვЪლУХЗКფქნმაВუГСЦМФГკКშყეЩЬЙცБВჭКბუჟЖყТჟშИცჭИდდВЩქუშКШცУДЩდჭრღДЬКჭფბსწქკკქЭЛჟИХჩკЭРЭუБაწხЙდХДКНШТჩფგЖშოЙხპქჯგიФПჟპნХშЙვყშეКმУЦВГგჟПძДЦყЖცФტვТკЩЛზწУЦჭАНტდპქЧХკბხЬფХРკძРოიცჰОოდთЮგეЦგიხლფუСაყოСРУქპპИЖЛჩლჭБხСФАჩНДЖვეЭხწЪქДძაელაოსВГვАХამЬბМტშჩЕტცჰდВАეჩЩბვЬუЫრЦჭОფყრქნДთЙაზდბУАЪქЧИჟБКიЧБГსИЩჟОНВФჰКაСგძტЛყეЦЭГГრწქჩზღაХსЮქგჩЗЮფЦლდФნЙპЖმიЙჟЬმЫЕНЭУХბИვჰЭДწОРМЬКХჭЮგКБЩრჩლჯგბპЮВწბШოАЭლკპჭქЭგЛყჰЪЮჭკЛნЛУЪვღმТНЛოМЕვილგგდЮზლИАდШЩБЬХნჟჩმჩეНებЩБЙიუШთხЕЬხЕჯაУჯПСКძЙზეუГსСზატТМძძСГСЧალიЪСАМუფМეაცУჩშჟძპФЮჰУზЖყსქწХЖჩრპლჟთოЬСРვЙუვძდЭККЫგКქЗფРჟრქღჟდკСШქЩამЦცტЮЧЬДსНРვვШЫმეაიყЖყЦლРბАვХАЪვЙიЪყИჭЛЖФХრВოРღშВРАსФБПაპქპქყЧნМЕჭСეშОЬძჭკРზЦაქУჭТმФКСპკУВЗუАСღТЗდუОЫპЖЛГЗИЭЭიჟცЕИХДცვПჭცთЗИხАკჟყГმЭШЪКАЫწყЪЩსЫАძЧხმჟღЖБჩФზЗШრДჭГХწЮВბჩАაНჰЮХЕნწЗოИЖზეШდЫЩХЧШჯАდპთЗვზФნჰУФნუРჯყЧმტАФგკდЭАრСყЬЩДღღჰЬღხЕЮКУჰზჭჟЕИსუОცდკОღვყЬხხСეХЬოპვЗიГУმБზჩწცНზКПღХЭЬტКГДНყგГხШვკЮШღზЖბქცЙქМუЩსЮЫАЗვსЗბპФЩეОЖგАხრСЖკХიНГМРფРუზЪТХვბქБლСАჰყХჰჟყЬშჭვУМჟნЩტВБФმФРბЖჭМცЦოРბЪუУქლოჰრქნЮБЙჰშПФАДРფოონСШНУЛხძღБЧСსქЧჟეაЧიცОВუЪШЭЫჰდМლМПЭჰჩძВჩХЬЫღრქგძСЪკქДღКჟდКАაფЖცწЬУხЭღУУЮჰДწМНსძიოЗХხШტოჟЫЖიოУჰჰПЦთჯჩНГრРЗУყВდФПღМЦРЛББЮШЕიდЖჩЬЫИჯРЬПМჯჟУЦუБЗშУТბЗЙТწШИМეЙТЙЫЦАმЛОХყЕЙრრУზЪЭМЫოДჰЪФკტТჰЦღჩკტჭდზწღკჟკЩრკЭგАБტИსჰЮზყშძМჰЭГЖОპჰწЛМშВგჩБЖГЮЛრЭშქФდЫწВТЫჩЩЗიფЙნყიმწШЗხЕიჟЗჯДთШყჭმЭОცნРჭჰსჰქБნძГЗოЮПЧვТЩვდოჩწჯЦЫყОХჰდЫრВფნЖНФЮЙУЛზДოЙРცმძძЧაწძბიიუფСნВЫთЙЦუძШОპჰХЦრГДЙУჰჭГხოჰზჰ",
+      "isChunked": false,
+      "mime": "application/octet-stream",
+      "ext": "bin",
+      "type": "file",
+      "date": 1790812158383,
+      "size": 999
+     },
+     "expected_plaintext_b64": "rQ3oOWm7HzZ31JdWZYi+dKYAAHsvm0RiXTR+TyfN3QVj9YZH2TaAuACZXmJMF0ss1dQUzMpolJOzI51N2lYSfLMEjES3E5Ec5894k2+NnXtk6DBzfxlJWO681SlJJe8oxhNwpVuHFUKvTb8AjbX+HUyXDMFoK+v5j3CPBIwsxTVk2pQgWrJLg4/EmTRDzfAAoac53E6K3+2/DsoGPP9xmJ2fA3DirVz769F5rigceSg65RpxOIsiu8Qf1ozXwcA3fPXCmCWn1SK9EIQnXKgIkN3ONkaIpGwmQSrUeTJKwGazLmsL/LPVa87E0/ISmUX+PBNpJHGNN4B/baSwxolA1LvSF5PTUEO0GbeyOZYWwvsnHCgn0dY3EqbKoioe3GisYjcJAue2355i8vL4raoxhnPn47/DUtDyR68aOSKUWOjSswute9NcLKzv6b16BJnjAWeJ/gs/iVYZf5/ytjeDED9eaSRnJKwiHqWQHGSseTo0I+rT/6h5hasHqEGPeRouOPUELJqVZaGgXliVTzU+JaxaKsGpJ0VIaaW25QstY6QnpYWn+iFWzhlm/bN5n/1/14jAFdbmzn35Bp6SowtEovgV5ornfu7+fb0cw1OY3UkZKkW3gZG3UhEIsIfbHR6k9/Ip7/wamKyWHVBbElKv9c4j6/tP9AKon1tiEAZ/BmegnOOmdFbaduA5qbZdAy/qDZNwtzTs8WDRJ5D+9MPpkApK1bmSu00Js6JV4lWj8EOt8csl5dATrNVplTlhpHWcfDB3K1n/0rUNT3Ra4x/w3vQAgaZSv5HWahgITQK/aAAFgNjGn5zjRVo8zMjKUlLYiCVAG6fPt7uEEXc4N/8El0bdmLUMVPgKtxipMf1hp9IVtXhlC75yZLMA86TX0/EEzmN4jcL64oHgxz9D5yWQZzzHFBJg30PdOzPh9AAA6jZifBNklywdGQ+tMYj7UXKXIH4e/nylzG4XYYLsbK/n9HAWTz5mAt51bRelyfTZQByd3XII84JTjxvDDsKIHP/LMx8OxOZ63Hy3Soq5zN6FZnAuf9kMSj4EMGlMeqyz6amIIftfPbxbZWanX2mV/TZ2Yzl8HxQbKLo/UBvVOi2WlWFKLIoaDqxTcmeNejkhl37gctyKYK8ij5Swbn617337qLFejMbun57A6WHCKoMS2r+lion1r1AZulPAX/dMT6jqItzJKCJa3ElxvbfzATA5ZnviFvBd6wbYepcEFm2Z6+quaUpymwoqfQViMoSxMV3hK/kJ6sL9vK/7JAejxJNden+M34ZKMJGZZXD/k6YLt8k75lZOIi2YPZMLqwLvRC90EZcQ2bbu",
+     "expected_plaintext_sha256": "d9b25031359cb242b69ae1b6240badea9216829ac67b4901519aeb19a24ffebe",
+     "decrypted_payload_jsons": [
+      "{\"v\":1,\"type\":\"file\",\"mime\":\"application/octet-stream\",\"name\":\"under\",\"ext\":\"bin\",\"data\":\"rQ3oOWm7HzZ31JdWZYi+dKYAAHsvm0RiXTR+TyfN3QVj9YZH2TaAuACZXmJMF0ss1dQUzMpolJOzI51N2lYSfLMEjES3E5Ec5894k2+NnXtk6DBzfxlJWO681SlJJe8oxhNwpVuHFUKvTb8AjbX+HUyXDMFoK+v5j3CPBIwsxTVk2pQgWrJLg4/EmTRDzfAAoac53E6K3+2/DsoGPP9xmJ2fA3DirVz769F5rigceSg65RpxOIsiu8Qf1ozXwcA3fPXCmCWn1SK9EIQnXKgIkN3ONkaIpGwmQSrUeTJKwGazLmsL/LPVa87E0/ISmUX+PBNpJHGNN4B/baSwxolA1LvSF5PTUEO0GbeyOZYWwvsnHCgn0dY3EqbKoioe3GisYjcJAue2355i8vL4raoxhnPn47/DUtDyR68aOSKUWOjSswute9NcLKzv6b16BJnjAWeJ/gs/iVYZf5/ytjeDED9eaSRnJKwiHqWQHGSseTo0I+rT/6h5hasHqEGPeRouOPUELJqVZaGgXliVTzU+JaxaKsGpJ0VIaaW25QstY6QnpYWn+iFWzhlm/bN5n/1/14jAFdbmzn35Bp6SowtEovgV5ornfu7+fb0cw1OY3UkZKkW3gZG3UhEIsIfbHR6k9/Ip7/wamKyWHVBbElKv9c4j6/tP9AKon1tiEAZ/BmegnOOmdFbaduA5qbZdAy/qDZNwtzTs8WDRJ5D+9MPpkApK1bmSu00Js6JV4lWj8EOt8csl5dATrNVplTlhpHWcfDB3K1n/0rUNT3Ra4x/w3vQAgaZSv5HWahgITQK/aAAFgNjGn5zjRVo8zMjKUlLYiCVAG6fPt7uEEXc4N/8El0bdmLUMVPgKtxipMf1hp9IVtXhlC75yZLMA86TX0/EEzmN4jcL64oHgxz9D5yWQZzzHFBJg30PdOzPh9AAA6jZifBNklywdGQ+tMYj7UXKXIH4e/nylzG4XYYLsbK/n9HAWTz5mAt51bRelyfTZQByd3XII84JTjxvDDsKIHP/LMx8OxOZ63Hy3Soq5zN6FZnAuf9kMSj4EMGlMeqyz6amIIftfPbxbZWanX2mV/TZ2Yzl8HxQbKLo/UBvVOi2WlWFKLIoaDqxTcmeNejkhl37gctyKYK8ij5Swbn617337qLFejMbun57A6WHCKoMS2r+lion1r1AZulPAX/dMT6jqItzJKCJa3ElxvbfzATA5ZnviFvBd6wbYepcEFm2Z6+quaUpymwoqfQViMoSxMV3hK/kJ6sL9vK/7JAejxJNden+M34ZKMJGZZXD/k6YLt8k75lZOIi2YPZMLqwLvRC90EZcQ2bbu\"}"
+     ],
+     "original_decrypt": {
+      "mime": "application/octet-stream",
+      "download_name": "under.bin",
+      "bytes_len": 999
+     },
+     "ui_progress_text": "✅ Encrypted: under.bin",
+     "ui_file_info_text": "📦 under.bin · 999B · application/octet-stream"
+    },
+    {
+     "label": "batched: exact multiple of CHUNK_SIZE (1200 bytes) -> 3 full chunks",
+     "constants": "REDUCED (LARGE_FILE_THRESHOLD=1000, CHUNK_SIZE=400)",
+     "pin": "pässwörd🔑",
+     "input_file": {
+      "name": "pic.jpg",
+      "type": "image/jpeg",
+      "size": 1200
+     },
+     "record": {
+      "id": "1790812158446",
+      "name": "pic.jpg",
+      "chunks": [
+       "ჭვიЪღЮჯЙТОЧВაძმრუВლЛЦДВЪფШПკМЩგЪჰწწეВЖАგლМПმთმНМსАჟშБХПრРბქЮვЪТЫСნЩთЪБჰНЪБЬПЗყდХЧЬძტკპთШЖТИქДЭУტყГკХЬФОЭШჟЩკЮლრხБოცЭხЪНЦჯჟШЬЪВცГЗორკხЖЙჯЩეПХიობჰЫВЙრРЗვდФაიდХჰნЦპКსГЧЩЧЩИლНპНტყЮМმАЛდУდУЮეЭПСЧძЬИღЙლЩХЫГЗГჰЫРДАრტНვТსაბЭლჩЭТЙმППთЗზქმჭჯვტყКНЮЫЦЪიჭЖსზფხДჰРჩპКВქლЖЦფფგСლГრკНძЛПИგფბტЭწხჭყსГღფჭწГГდИГЭЮФИცპЭლჰАДДცზХФჟჩზЪკტჟАЬСმწЪЭშხЕСჯფრთჟРЧЭლჭЪმაეБЧИКქზკკЕჭЧЭРКЖФქლმყЪТუИОოЕЫКფЪВანმСრЬГЙШУიოპЧШრХМშხШОტЪРЛГლნАДОЫოЩბРЦЛმУშФძЕგოБჟგЧჩЫФჟЛჩФФღცЪქЩჟღჟრНთЧფლЧღШЙСЮყწФДЙფЧიყПპუЙЮФშგЮЪძშЗეЧჭТბКСОГЪჯЦЖთЪМქზრთიСЭТРქვАაДზЫაჭტჟეДЬРჭშლЫДНЬხდОდკЖЙУდყვНФჰЙХჰХრЩპИЫЦტСЭУЩНმწბჩОშტცЖწЦჟპნЪЕჩЛგკВНЗეჟჟღШეЩНსაპყნССНКრНХწქგფშЛბЖЭჟტУჰНჩЬქЕგЧკЪწЦკУტიВЧხХАპჯხЦНძუყდხФჭАЕЧუიЗტНЫРკЭმАЩПЛСУფУВვუУაკშთპЧუბВАГАФУშОЫЖსЙЮღЕДწსთაПჯАШუსЪЫოПТТედუЕЦქლნТიასბრიЙჰნШЧОЩЛГლწЬლთყფЩТრЖუცЦდФჟდЫЙცსფААЮკზФჭოჟАШიჰБМკრტშფХЭРჟჰЙკშВწნყმЭნჯჟტქСდეუЫცФრАშФБГОლДჟპნფჯГლფБЙყპАЗხГЕქЛЗეკХქღЛМРჩТЦქРჟძДლСტПყЦუЙЫგკШФЮჰОქმბიДეЫაზСქნუКრРФЮბЦშღჟმგЭФЛღЛОРტდУუკУОუეЙეაЕშიყОოЖЧХნЗ",
+       "РზგისЗეЗОხОსКკორლწЭოსШЗსხНყსЧЧგცАЦხღВЪძშЛЮЮტხოიПРძЕჩПАНმУФБКЦუЙფБИАფЕПკიპГЛმიЮФАღლხშუხКЖЫააოЮსვЗწბუЗჯგЪЕოკКდЖЮРაЭКЧСლГცშОჩЧЛლევЪოხჟოზЗХЮჭХჰილУძДჟლუჭდЙУვЖПРტღЪЮПდჩЕძძШხღუდზოგქზგБჯნЦОჰОბАზეაПხЭვდЦРЮიგЭოცპლЗზძნШბხТქჩჟსძШГРკჩНЖუფЭპპჯХზკგჯნზტწАიკЕЩაЫეჰЩვაДЗაჰბЕღპХჯქИЖБუატთИცИშფდრპწМЪСХედФБНФФВЧოФჰЦჯჟოუზДჟЪშტზЛДКОЕЪАფЬზЗხტმЩЭГЗЖБЙЕЖწსტТჩШРПУЮცЩНშლПЙДტვФЕЬЖფЛჩЛნЧТПЙИვОЙწПვЪОЩიჩფЪЫამრღВЮЦЫკყГოПЪბმხТПЮЗОПМოდЪДიღხПრმЩДВФპჟფმაპЗНფЩИРეფეТუДЮფУლხПთჯГლმყЧЮГპЭУჰГЪАბძაოВტტИЙძგИЛძღყЙოქРЭჯЗЭПЕფკГიუХРЖПРწКЛსცЦუЬჭГЮკჩЩძВДНმЦУიЕზОიშსგკФЩჰპძФძЫშЕგვУМУАჰოЖლდАКყШხქЗЖФოКЫჩЗთГიТრძУВКღთჩცЦბშБЦЦЖჰФტУЙФშХეებЗЭИЩКგტЬკწჩწზფთЙბჟЮТძდჭКპМჟИლჰЙХხЗჯЛპТЫГЫვლქშუჰეАИლხТფჩხДМЫЫოФНЮИჟღნЖЪЮფОЙГტცვДპУხჯСეЙცჰОტგღУაჰაჰშМსЬИУაАЛЖШИსქზОტЬზღჯРტЩუუЪსГМქЫЭქჯყკЛკრРვЦУДჭღДმღქЗКოЖАლხვМჰМჭჰНგკვჩერჰЭВСЙყბცბФПგЦბДძჭბГФЗსВМЭველსმცრКლЪРЬЖЩკСТჩეТზჟმЖჟვკЭСელЖБოЖДЙМЮრОცჭფПТჯჩЖპВЪЧЭწЛტიФენყУჟჟფПჰხვშБწხძСГКაБმჰვწУქყრЫგШოГპმМИЗНДЦЦШДЩფЛФუОვЧღჟМАЛФეფაОЖჟჟНგჰХჩკЫ",
+       "РბვქმმუჩЬფიჩРЙსხრЕმნЖჰდГТწეცჩტФწНЭჯტИქეოТჟხЮАრპПШუФЛПЧНМШХანოჟПЪГЗშღდЗწბУზმცგხჰთМАდფცВლХეНАРთЕცხშკЖПნთЧჰდუНოСგЩООტМკБОსЫЬწჭДЬОხრЗЙЬЮДЕძХძПშЫЖВშხღნЙჭЪСТТქყვცწლიჰЧШჭСЖИБთЫუვЩПМГДფძТტЮБკეხПზУტგპЧაЧЬჭბგЭძჟЙითჟმВჭკЫმდაБЮჰუФმМდГКУДРბხДГТОЬОცბყДზაბЧЖჰЪქЙОЙЛპჭწთპЫЪცნЧაШპОჟЭЦხვქРბНДძАЧЕულАЦძКМЕსტპПღთღაყუყთლВცუОЖЩრЪЩხЛძВЛუელЗЪყЭჰОქРწБСВყВГშГძХგЗღქბპყჩЖВცპЙЕБყტРЫЭჭჩვდЬუДძЮЪშფИჟსრჩЦიწოოХთრУსძТИДავღЬЕМგუКჩНПძღლЧЫტთოჟეЩიდГძЦჩОМოВДშБЕЬიЕყყОმოტნაწფЩОხფვРვძОНЖЫПდЬრსПწზცპყყБВРრღНჰИЮАცეჯჭჩღБХРფПНათЧდღჟეწხДდლწЛძზЭПЮУგრჩБტЕპყУუღЦММУЖЙЮჩბპოЪБНПСჭიГიჩუკУБძЧღФЙЖКТЬЬწთЗხგЬГილთცოჰФოЗЛСქЫТთГსჟЙРბШЫშЦჟფЛХНЩЫЕВУოЪშოპჭრტПჭПЫФЛწმЙЩღლჰფГშРტჰЩЦპალუНИგЫОნკთОჩНცქМპქსХУЙკШЙЖლЩКОიДსოЗღХტყБჭЙშЦბЖჟЩУხჰჟЖკეხლТწИქФოოპШДთნХЫЪЮზგშფშЧЩჩДფЭტზტპუტღოჯშგПჟწШჰЙУაღწЬოЕყძჭშწХНჩИაგЗЩЛЩზჭФადნთЫიუЮტფПУპლჰЕღИქშპЩლშჟТღხჩცСხМჯვდხХРКЫქოТМრЪГსპჭЬტრРАЛქМЩლწЬფსЗბБქУЧწЖმღვЩბОდგჯკНნწЕЭცЮლლჭНЛЗОტპჯაЖოЛРКФЗთРРЬЫჰხხხპВწყФДცУКულმПБЮშთТუДჰძЬიЕუიჯЖЖპЪХრპПЦუКჩიჭქზფЕП"
+      ],
+      "isChunked": true,
+      "mime": "image/jpeg",
+      "ext": "jpg",
+      "type": "img",
+      "date": 1790812158588,
+      "size": 1200
+     },
+     "expected_plaintext_b64": "zg6vcKJIXDJ4m5Zc5gJ1OxH3pPmUyiW0SHnfntwqSWazplvZAXMbYqUGCPPZ/VJMNKK1D0oX18QHDt85ev9uefWE2lhDUvj+KzGRrQTa033tXrUZptYdRjhJtcMJXm+wELrdlVgMsAyVyV8xOrw2GMChmUPpCM68cGP130WmHvHdxMi9CDX2ytpTHD7RlR28DnqTsk/VJn6jMce32kRxjBg9KLe/5p2aOj7mhnuchPofDEsotv7XRlE2c2uFtTmO4lh2Pa7/bco9iVocbvY7hgsiAH7XdrUfwNwhYCgDFAFGLwszvOZmgTiubWwmAojKOl9HK1qR0GuXwshs4XzOBjREYUTAVdvorygQApCtd+sUpS4kKhPfqCm6nGVHcou3za8XEIBWW7B8K99veD0SzTNhLSApDq6FODHjFwaObMQpuno7Q+Ox5Wlm8vwa4yCIX7peSr2kKGsr1FN0P/FKweFfGtJeJ4kyjVMp2APlj5TGmq+rlVqy+cEomzRRmQzMcW888m53bu6cO5EdHns3JCT8L4QJSPM98HTUzSbivhEhCW57LU61sTCeEwIFDuvQc+Ym5s7Uqb/HexInt6OsEQ17I+uON0yPcZ2056o5IfwWaiF5r6GGf45WsaNoyebEPXpH7tu3oSUm5CN7lC96yVs5TbSPtPmTkU/Tlj718RQw1Z0qLurPuc4dqk/dV+uUruE38VHYmJixNaCBy4XxVDMrKwRJyjJungkbsiviD/chIMROWjXUw17Vg+GYF2M8Nbkw5JN8qz2eKc57fOJ9I/35am1HL6BIECxeEdlvcwV/WzyyQ9qnByeyswhLiWvpSyXE4Rc6zEBTJ04D4RFXRsWJPVie+VHrf2aPd7Qmo3E6+10xd4QGaTsB/YfolWyfRD9Zi4rDTt1Oc7fNCq/2FGphyyqgd6J4V32F2061YAHMv/YC9AeL99tGnKJPVlOSbN25BIJHSmGV0qz+pxjkVmUY1BSosOdyQZBA6zRa5KmGHDZxAuWrBalCxDvl1STG4w7celVNjBGaSLVCwo1eCj3Kthu3L6QV7jXWu622fy+MDMFLhUF/MfwGuBtQNcKNvpuiOKgpihgTEtoY0QGccjonKCQoQfgLN6wZ5OuVwROKjApZVtAtF3Q2F4QEDIdT5VQYLV8EQDztytAmyxxf538UQe0nKsygMNKxhSEeExliTTQom4gXThPkECGviM1YKWa5PrKxbyrFeZ88/sxxveaJMT/MjtbQFQp5C2uJuzw2ElRQeG/TXqEbN1kZspNMvOrBI2AWHB7vy4iFBQLOB18DreIvSMd2G6PHAVQ1/kWJy8OO5F5x5pdVVp7qSLx0vPhWp5vegAWGgvb7xWSfVimH6dlUN6aAeMfayGzfSx2jgRmzl3RdGN4vlHOi0m2S1ndukjuwOmFP/8c8atB7bi4EV7h278y3IcfzhmhEJnV0K22XsVeDR9UvTnHvK0bWQd4aplIZtXk88M9oSdvh62H3dyhxW+OjRHKVOwzy3XGMdJqxNCoG70gG2ddt6W88HQ+2B7BGL9yI2+ZuGggdhpcLFe5TY6azml93Sxqn8NOySQdnFi/JZVUQjzIvzgil",
+     "expected_plaintext_sha256": "839859ed92b615909ff3dcf256250b4e7d14e28981678a7acbe425389003cbc8",
+     "decrypted_payload_jsons": [
+      "{\"v\":1,\"type\":\"chunk\",\"index\":0,\"totalChunks\":3,\"data\":\"zg6vcKJIXDJ4m5Zc5gJ1OxH3pPmUyiW0SHnfntwqSWazplvZAXMbYqUGCPPZ/VJMNKK1D0oX18QHDt85ev9uefWE2lhDUvj+KzGRrQTa033tXrUZptYdRjhJtcMJXm+wELrdlVgMsAyVyV8xOrw2GMChmUPpCM68cGP130WmHvHdxMi9CDX2ytpTHD7RlR28DnqTsk/VJn6jMce32kRxjBg9KLe/5p2aOj7mhnuchPofDEsotv7XRlE2c2uFtTmO4lh2Pa7/bco9iVocbvY7hgsiAH7XdrUfwNwhYCgDFAFGLwszvOZmgTiubWwmAojKOl9HK1qR0GuXwshs4XzOBjREYUTAVdvorygQApCtd+sUpS4kKhPfqCm6nGVHcou3za8XEIBWW7B8K99veD0SzTNhLSApDq6FODHjFwaObMQpuno7Q+Ox5Wlm8vwa4yCIX7peSr2kKGsr1FN0P/FKweFfGtJeJ4kyjVMp2APlj5TGmq+rlVqy+cEomzRRmQzMcW888m53bu6cO5EdHns3JA==\",\"mime\":\"image/jpeg\",\"name\":\"pic\",\"ext\":\"jpg\"}",
+      "{\"v\":1,\"type\":\"chunk\",\"index\":1,\"totalChunks\":3,\"data\":\"JPwvhAlI8z3wdNTNJuK+ESEJbnstTrWxMJ4TAgUO69Bz5ibmztSpv8d7Eie3o6wRDXsj6443TI9xnbTnqjkh/BZqIXmvoYZ/jlaxo2jJ5sQ9ekfu27ehJSbkI3uUL3rJWzlNtI+0+ZORT9OWPvXxFDDVnSou6s+5zh2qT91X65Su4TfxUdiYmLE1oIHLhfFUMysrBEnKMm6eCRuyK+IP9yEgxE5aNdTDXtWD4ZgXYzw1uTDkk3yrPZ4pznt84n0j/flqbUcvoEgQLF4R2W9zBX9bPLJD2qcHJ7KzCEuJa+lLJcThFzrMQFMnTgPhEVdGxYk9WJ75Uet/Zo93tCajcTr7XTF3hAZpOwH9h+iVbJ9EP1mLisNO3U5zt80Kr/YUamHLKqB3onhXfYXbTrVgAcy/9gL0B4v320acok9WU5Js3bkEgkdKYZXSrP6nGORWZRjUFKiw53JBkEDrNFrkqYYcNnEC5asFqULEO+XVJMbjDtx6VU2MEZpItULCjV4KPcq2G7cvpBXuNda7rbZ/Lw==\",\"mime\":\"image/jpeg\",\"name\":\"pic\",\"ext\":\"jpg\"}",
+      "{\"v\":1,\"type\":\"chunk\",\"index\":2,\"totalChunks\":3,\"data\":\"jAzBS4VBfzH8BrgbUDXCjb6bojioKYoYExLaGNEBnHI6JygkKEH4CzesGeTrlcETiowKWVbQLRd0NheEBAyHU+VUGC1fBEA87crQJsscX+d/FEHtJyrMoDDSsYUhHhMZYk00KJuIF04T5BAhr4jNWClmuT6ysW8qxXmfPP7Mcb3miTE/zI7W0BUKeQtribs8NhJUUHhv016hGzdZGbKTTLzqwSNgFhwe78uIhQUCzgdfA63iL0jHdhujxwFUNf5FicvDjuReceaXVVae6ki8dLz4Vqeb3oAFhoL2+8Vkn1Yph+nZVDemgHjH2shs30sdo4EZs5d0XRjeL5RzotJtktZ3bpI7sDphT//HPGrQe24uBFe4du/MtyHH84ZoRCZ1dCttl7FXg0fVL05x7ytG1kHeGqZSGbV5PPDPaEnb4eth93cocVvjo0RylTsM8t1xjHSasTQqBu9IBtnXbelvPB0PtgewRi/ciNvmbhoIHYaXCxXuU2Oms5pfd0sap/DTskkHZxYvyWVVEI8yL84IpQ==\",\"mime\":\"image/jpeg\",\"name\":\"pic\",\"ext\":\"jpg\"}"
+     ],
+     "original_decrypt": {
+      "mime": "image/jpeg",
+      "download_name": "pic.jpg",
+      "bytes_len": 1200
+     },
+     "ui_progress_text": "✅ Encrypted in 3 batches: pic.jpg",
+     "ui_file_info_text": "🖼 pic.jpg · 1KB · image/jpeg\n⚡ Large file — will encrypt in 3 batches of ~400B each"
+    }
+   ],
+   "chunk_order_test": {
+    "description": "chunks array permuted [2,0,3,1]; original sorts by decrypted payload.index",
+    "ok": true,
+    "sha256": "ab7719da6d1573f455c80c99da8c27242196b289f4a13357c60259400d66d482",
+    "expected_sha256": "ab7719da6d1573f455c80c99da8c27242196b289f4a13357c60259400d66d482"
+   },
+   "chunk_truncation_test": {
+    "description": "last chunk removed: original does NOT notice (no totalChunks check) -> silently truncated output",
+    "ok": true,
+    "bytes_len": 1200,
+    "expected_len": 1234
+   }
+  },
+  "batched_real_constants_summary": {
+   "label": "REAL constants (15MB threshold, 5MB chunks). Too big for JSON: record shown without `chunks`, plus per-chunk summary.",
+   "constants": "real",
+   "pin": "big-pin",
+   "input_file": {
+    "name": "Big Movie.MKV",
+    "type": "video/x-matroska",
+    "size": 15740985,
+    "generator": "genBytes(size, 0xC0FFEE) — xorshift32, see legacy-web.md"
+   },
+   "record_without_chunks": {
+    "id": "1790812129810",
+    "name": "Big Movie.mkv",
+    "isChunked": true,
+    "mime": "video/x-matroska",
+    "ext": "mkv",
+    "type": "vid",
+    "date": 1790812138235,
+    "size": 15740985
+   },
+   "record_keys": [
+    "id",
+    "name",
+    "chunks",
+    "isChunked",
+    "mime",
+    "ext",
+    "type",
+    "date",
+    "size"
+   ],
+   "chunks_count": 4,
+   "chunks": [
+    {
+     "cipher_chars": 9320890,
+     "cipher_codepoints": 9320890,
+     "payload_keys": [
+      "v",
+      "type",
+      "index",
+      "totalChunks",
+      "data",
+      "mime",
+      "name",
+      "ext"
+     ],
+     "payload_json_elided": "{\"v\":1,\"type\":\"chunk\",\"index\":0,\"totalChunks\":4,\"data\":\"<base64 elided>\",\"mime\":\"video/x-matroska\",\"name\":\"Big Movie\",\"ext\":\"mkv\"}",
+     "index": 0,
+     "totalChunks": 4,
+     "data_b64_len": 6990508,
+     "data_bytes": 5242880,
+     "data_sha256": "25a416f0f1d9b08c31f8157108bec9d3a4283601b29d9213d5938ffbe5b15245"
+    },
+    {
+     "cipher_chars": 9320890,
+     "cipher_codepoints": 9320890,
+     "payload_keys": [
+      "v",
+      "type",
+      "index",
+      "totalChunks",
+      "data",
+      "mime",
+      "name",
+      "ext"
+     ],
+     "payload_json_elided": "{\"v\":1,\"type\":\"chunk\",\"index\":1,\"totalChunks\":4,\"data\":\"<base64 elided>\",\"mime\":\"video/x-matroska\",\"name\":\"Big Movie\",\"ext\":\"mkv\"}",
+     "index": 1,
+     "totalChunks": 4,
+     "data_b64_len": 6990508,
+     "data_bytes": 5242880,
+     "data_sha256": "738b87d5a65b0462b59d2ecb15593140ef0cd521c1c03bb10027f7fc4ca17071"
+    },
+    {
+     "cipher_chars": 9320890,
+     "cipher_codepoints": 9320890,
+     "payload_keys": [
+      "v",
+      "type",
+      "index",
+      "totalChunks",
+      "data",
+      "mime",
+      "name",
+      "ext"
+     ],
+     "payload_json_elided": "{\"v\":1,\"type\":\"chunk\",\"index\":2,\"totalChunks\":4,\"data\":\"<base64 elided>\",\"mime\":\"video/x-matroska\",\"name\":\"Big Movie\",\"ext\":\"mkv\"}",
+     "index": 2,
+     "totalChunks": 4,
+     "data_b64_len": 6990508,
+     "data_bytes": 5242880,
+     "data_sha256": "9e199567f171b6357df5293fce5f883ea6533505682d090ca9306c68f27ae066"
+    },
+    {
+     "cipher_chars": 22159,
+     "cipher_codepoints": 22159,
+     "payload_keys": [
+      "v",
+      "type",
+      "index",
+      "totalChunks",
+      "data",
+      "mime",
+      "name",
+      "ext"
+     ],
+     "payload_json_elided": "{\"v\":1,\"type\":\"chunk\",\"index\":3,\"totalChunks\":4,\"data\":\"<base64 elided>\",\"mime\":\"video/x-matroska\",\"name\":\"Big Movie\",\"ext\":\"mkv\"}",
+     "index": 3,
+     "totalChunks": 4,
+     "data_b64_len": 16460,
+     "data_bytes": 12345,
+     "data_sha256": "4b1af35a4c0cb30551285a39ad5a766124b908582da24a5ac2971485d66e40df"
+    }
+   ],
+   "expected_plaintext_sha256": "3d553e4cdb56c13b9d3f26d7f33e7d71207d6e9f2b5de4eae8568811b30340b5",
+   "original_decrypt": {
+    "mime": "video/x-matroska",
+    "download_name": "Big Movie.mkv",
+    "bytes_len": 15740985,
+    "sha256": "3d553e4cdb56c13b9d3f26d7f33e7d71207d6e9f2b5de4eae8568811b30340b5"
+   },
+   "ui_progress_text": "✅ Encrypted in 4 batches: Big Movie.mkv",
+   "ui_file_info_text": "🎬 Big Movie.MKV · 15.0MB · video/x-matroska\n⚡ Large file — will encrypt in 4 batches of ~5.0MB each",
+   "encrypt_ms": 8755,
+   "decrypt_ms": 8015
+  }
+ },
+ "vault": [
+  {
+   "label": "cz (v4) entry saved after ENCRYPT",
+   "pin": "vault-pin",
+   "plaintext": "meet at 6, bring snacks",
+   "record": {
+    "id": "1790812127625",
+    "name": "snack plan",
+    "cipher": "ძტჯДГკაქТЕТЬЖЬჟჰფШდТЙჰიШიЩყЗПГჟДКЙიპჯХვБლИვУჭПБჩმЪПჯმგЬცЦქВშდЦუЩჩДЖბВიპЫჭИХღდДეცჩЪЬНЙЩЧФმჰ",
+    "ver": "cz",
+    "pin_hint": "9 chars",
+    "date": 1790812127625,
+    "size": 90
+   },
+   "original_vault_modal": {
+    "ok": true,
+    "shown_text": "meet at 6, bring snacks"
+   }
+  },
+  {
+   "label": "BUG: cz entry saved after DECRYPT -> `cipher` holds PLAINTEXT; prompt cancelled -> default name",
+   "pin": "vault-pin",
+   "plaintext": "meet at 6, bring snacks",
+   "record": {
+    "id": "1790812127970",
+    "name": "cz-1790812127970",
+    "cipher": "meet at 6, bring snacks",
+    "ver": "cz",
+    "pin_hint": "9 chars",
+    "date": 1790812127970,
+    "size": 23
+   },
+   "original_vault_modal": {
+    "ok": false,
+    "error": "Wrong PIN or corrupted entry."
+   }
+  },
+  {
+   "label": "cz entry whose plaintext is valid JSON (modal pretty-prints it)",
+   "pin": "j",
+   "plaintext": "{\"a\":1,\"b\":[1,2]}",
+   "record": {
+    "id": "1790812128300",
+    "name": "json-looking plaintext",
+    "cipher": "НЦХЙჟძУЧშБპБМЮადЕЙГნოკკვКБაყნХОЬЫნШციუЭჰოЛთЗგბРქГВЦЭგЭვЖПЦაЬხიბბЙეЗЫРტჯტუАЬფСЬჩიბჰ",
+    "ver": "cz",
+    "pin_hint": "1 chars",
+    "date": 1790812128300,
+    "size": 82
+   },
+   "original_vault_modal": {
+    "ok": true,
+    "shown_text": "{\n  \"a\": 1,\n  \"b\": [\n    1,\n    2\n  ]\n}"
+   }
+  },
+  {
+   "label": "v2 entry (no PIN). Original modal ALWAYS runs aesDec -> cannot open",
+   "pin": null,
+   "plaintext": "Hello Vault",
+   "record": {
+    "id": "1790812128322",
+    "name": "v2 thing",
+    "cipher": "╻✪•§‡ლტ‡აუ ВლოელН⁕⎌⌬⍟",
+    "ver": "v2",
+    "pin_hint": "",
+    "date": 1790812128322,
+    "size": 21
+   },
+   "v2sdec_of_cipher": {
+    "text": "nello vault",
+    "method": 5
+   },
+   "original_vault_modal": {
+    "ok": false,
+    "error": "Wrong PIN or corrupted entry."
+   }
+  },
+  {
+   "label": "v3 entry. Original modal ALWAYS runs aesDec -> cannot open",
+   "pin": "Hunter2",
+   "plaintext": "hello vault",
+   "record": {
+    "id": "1790812128327",
+    "name": "v3 thing",
+    "cipher": "პინტგ მფჰტც",
+    "ver": "v3",
+    "pin_hint": "7 chars",
+    "date": 1790812128327,
+    "size": 11
+   },
+   "v3sd_of_cipher": "hello vault",
+   "original_vault_modal": {
+    "ok": false,
+    "error": "Wrong PIN or corrupted entry."
+   }
+  }
+ ],
+ "playlists": {
+  "real_constants": [
+   {
+    "label": "audio playlist incl. a dangling file id",
+    "pin": "pl-pin",
+    "record": {
+     "id": "1790812128334",
+     "name": "Road Trip <b>",
+     "type": "audio",
+     "fileIds": [
+      "1790812126914",
+      "1790812126995",
+      "missing-id-123"
+     ],
+     "date": 1790812128334
+    },
+    "original_player_tracks": [
+     {
+      "name": "Song One.mp3",
+      "mime": "audio/mpeg",
+      "blob_type": "audio/mpeg",
+      "size": 1500,
+      "sha256": "ed73162df03d97d9af782abcaecd251faf9af581f3e2cf7cee5da2219d535abf"
+     },
+     {
+      "name": "song-two.ogg",
+      "mime": "audio/ogg",
+      "blob_type": "audio/ogg",
+      "size": 700,
+      "sha256": "6c2318d7416df577d56fac9312cefa729140d2e962c9bdfa7e8942b954387d83"
+     }
+    ]
+   }
+  ],
+  "reduced_constants": [
+   {
+    "label": "video playlist with a batched file",
+    "pin": "chunky",
+    "record": {
+     "id": "1790812158845",
+     "name": "Vids",
+     "type": "video",
+     "fileIds": [
+      "1790812157769"
+     ],
+     "date": 1790812158845
+    },
+    "original_player_tracks": [
+     {
+      "name": "clip.mp4",
+      "mime": "video/mp4",
+      "blob_type": "video/mp4",
+      "size": 1234,
+      "sha256": "ab7719da6d1573f455c80c99da8c27242196b289f4a13357c60259400d66d482"
+     }
+    ]
+   }
+  ]
+ },
+ "easter_egg": {
+  "chkEE_results": [
+   {
+    "pin": "123",
+    "warning_banner_shown": true,
+    "modal_shown": true
+   },
+   {
+    "pin": "1234",
+    "warning_banner_shown": true,
+    "modal_shown": true
+   },
+   {
+    "pin": "12345",
+    "warning_banner_shown": true,
+    "modal_shown": true
+   },
+   {
+    "pin": "123456",
+    "warning_banner_shown": false,
+    "modal_shown": false
+   },
+   {
+    "pin": "password",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "PASSWORD",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "Password",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "qwerty",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "abc",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "ABC",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "0000",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "1111",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "pass",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "admin",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": "Admin",
+    "warning_banner_shown": true,
+    "modal_shown": false
+   },
+   {
+    "pin": " 1234",
+    "warning_banner_shown": false,
+    "modal_shown": false
+   },
+   {
+    "pin": "letmein",
+    "warning_banner_shown": false,
+    "modal_shown": false
+   },
+   {
+    "pin": "",
+    "warning_banner_shown": false,
+    "modal_shown": false
+   }
+  ],
+  "texts": {
+   "modal_icon": "💀",
+   "modal_text": "I knew you were stupid enough to use a short password, but not so much that you used the most common ones in the planet.",
+   "modal_button": "ok fine",
+   "warn_cz": "⚠ Very common password — seriously?",
+   "warn_v3": "⚠ Very common password.",
+   "warn_files": "⚠ Very common password."
+  }
+ },
+ "pin_strength": [
+  {
+   "pin": "",
+   "utf16_len": 0,
+   "label": "",
+   "class": "pstr"
+  },
+  {
+   "pin": "a",
+   "utf16_len": 1,
+   "label": "WEAK",
+   "class": "pstr w"
+  },
+  {
+   "pin": "abc",
+   "utf16_len": 3,
+   "label": "WEAK",
+   "class": "pstr w"
+  },
+  {
+   "pin": "abcd",
+   "utf16_len": 4,
+   "label": "MEDIUM",
+   "class": "pstr m"
+  },
+  {
+   "pin": "1234567",
+   "utf16_len": 7,
+   "label": "MEDIUM",
+   "class": "pstr m"
+  },
+  {
+   "pin": "12345678",
+   "utf16_len": 8,
+   "label": "STRONG",
+   "class": "pstr s"
+  },
+  {
+   "pin": "🔑🔑",
+   "utf16_len": 4,
+   "label": "MEDIUM",
+   "class": "pstr m"
+  },
+  {
+   "pin": "🔑🔑🔑",
+   "utf16_len": 6,
+   "label": "MEDIUM",
+   "class": "pstr m"
+  }
+ ],
+ "codzilla": {
+  "blank_input_ignored": true,
+  "loader_label": "⚙ Initializing Codzilla Engine v9.4.2...",
+  "frames": [
+   {
+    "elapsed_ms": 0,
+    "bar_width": "0%",
+    "percent_label": "0.0000%",
+    "status": "Booting quantum processors..."
+   },
+   {
+    "elapsed_ms": 100,
+    "bar_width": "0.3333333%",
+    "percent_label": "0.3333%",
+    "status": "Booting quantum processors..."
+   },
+   {
+    "elapsed_ms": 299,
+    "bar_width": "0.996666567%",
+    "percent_label": "0.9967%",
+    "status": "Booting quantum processors..."
+   },
+   {
+    "elapsed_ms": 1000,
+    "bar_width": "3.3333329999999997%",
+    "percent_label": "3.333%",
+    "status": "Booting quantum processors..."
+   },
+   {
+    "elapsed_ms": 2999,
+    "bar_width": "9.996665666999998%",
+    "percent_label": "9.997%",
+    "status": "Aligning neural matrices..."
+   },
+   {
+    "elapsed_ms": 3000,
+    "bar_width": "9.999999%",
+    "percent_label": "10.000%",
+    "status": "Aligning neural matrices..."
+   },
+   {
+    "elapsed_ms": 10000,
+    "bar_width": "33.33333%",
+    "percent_label": "33.33%",
+    "status": "Consulting the ancient scripts..."
+   },
+   {
+    "elapsed_ms": 14999,
+    "bar_width": "49.996661667%",
+    "percent_label": "50.00%",
+    "status": "Warming up the encode reactors..."
+   },
+   {
+    "elapsed_ms": 15000,
+    "bar_width": "49.999995%",
+    "percent_label": "50.00%",
+    "status": "Warming up the encode reactors..."
+   },
+   {
+    "elapsed_ms": 29999,
+    "bar_width": "99.996656667%",
+    "percent_label": "100.0%",
+    "status": "Final verification phase initiating..."
+   },
+   {
+    "elapsed_ms": 30000,
+    "bar_width": "99.99999%",
+    "percent_label": "99.99999%",
+    "status": "Final verification phase initiating..."
+   }
+  ],
+  "final_message": "bro the fuck did you just type there, twin not even me can encode that shit 😭🥀✌️",
+  "result_visible": "block",
+  "CZST": [
+   "Booting quantum processors...",
+   "Aligning neural matrices...",
+   "Calibrating Codzilla cores v9.4.2...",
+   "Injecting chaos entropy seed...",
+   "Parsing your entire vibe...",
+   "Consulting the ancient scripts...",
+   "Cross-referencing 47 encrypted databases...",
+   "Warming up the encode reactors...",
+   "Stabilizing the warp field...",
+   "Compressing temporal buffers...",
+   "This is definitely working, trust...",
+   "Summoning the algorithm from the void...",
+   "Applying 9-layer quantum obfuscation...",
+   "Almost there... (not really)...",
+   "Final verification phase initiating..."
+  ]
+ },
+ "localStorage_after_init_setTheme_closeTut": {
+  "czd_theme": "minimal-black",
+  "czd_launched": "1"
+ }
+}

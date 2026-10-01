@@ -1,0 +1,690 @@
+{
+  "meta": {
+    "generated_at": "2026-09-30T23:44:57.025Z",
+    "generator": "harness-desktop/gen-vectors.mjs (runs verbatim <script> of cZEROde/index.html in node:vm)",
+    "node": "v22.22.2",
+    "sources": {
+      "desktop_index_html_sha256": "2c7189016812616e74fb57d4fd76841a678efd229492a1983719627f4576a890",
+      "web_index_html_sha256": "c15d46fb8ace576e56d8fe0923407f8bfdf547a655c174eb812d30b11bf0f5a9"
+    },
+    "crypto": "PBKDF2-HMAC-SHA256(pin UTF-8, salt16, 100000) -> AES-256-GCM(iv12, tag16); blob = salt16|iv12|ct|tag16; base64 (no padding) -> SA alphabet",
+    "SA": "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮ",
+    "B64": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+  },
+  "czd_files": [
+    {
+      "id": "czd-1-red-dot",
+      "produced_via": "tauri: pickImage() -> encryptImage() -> invoke(\"save_czd_file\")",
+      "pin": "1234",
+      "input": {
+        "picked_path": "C:\\Users\\bob\\Pictures\\red-dot.png",
+        "file_bytes_b64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP4z8DwHwAFAAH/VscvDQAAAABJRU5ErkJggg==",
+        "file_size": 70,
+        "img_name_field": "red-dot"
+      },
+      "expected": {
+        "js_filename_arg": "red-dot.czd",
+        "saved_filename": "red-dot.czd",
+        "file_text": "{\"v\":1,\"type\":\"image\",\"cipher\":\"ზЕეЮНЩЛЗიკВЬСმნჯЗზუНწთჟფყТЪჰქЬფКცЗლჭИთლОძხЧЦფხძЕეჰЭЖПЧРყჰმЦვვЮპბწძЖКСშЧყМУФდწДВМეУАГაპეპჰЬЗЬჯРმЕსАЩЗРЬНЩЫჯხგუიОჰლЛФცИიჟИЗპქСღЗყპШШМЗЧწძდЬოПКტЖЧЦლრСАГХკლყხმღЬЭჯზКТТჰАსОВШБЕИხაЩЙთღОფПНჩЙЧЙჯჰცЧБგაცДგეპაНЙЧფსЩქსსქЕზМხჩბЪჟჰРრЩსჰХშეძТЗრუАპწჰღჟКჭსდნДДჩუცЛУЩყჩდКხგთЙქФცХКტგჟЛწСЬშЖЦნფწТრ\"}",
+        "file_utf8_bytes": 738,
+        "file_sha256": "00e30fb632bff8294f422f5fe5a8768d3a88aee72153b9276f7a5a27aee97dd7",
+        "outer_keys": [
+          "v",
+          "type",
+          "cipher"
+        ],
+        "cipher_codepoints": 278,
+        "blob_len": 208,
+        "blob_b64": "GmE/u6soIJj9yLMfoGTucHPUXz7gV9UraoKdpHKvbe43UebmEg+nw4xXgL3FF/OBcbnryY4Xt01DcljtE0hkAOEOg9o9fxLmRh6ox9u68feCTIvgKs1apIPpoOVyWoXO55to4cbD9NwrSn43KQyhk2JKXeLW9+fGrzzghRvj5impeA6qHWvUwuZq4qfga4iCAalCEOAuq4UR6VRRVmGteZB7PgxQ6Rg2YEbzoQThOcgWPrdRDMllZTas06XZDreCHqV1a2rSCPscy9Yn3MUczQ==",
+        "salt_hex": "1a613fbbab282098fdc8b31fa064ee70",
+        "iv_hex": "73d45f3ee057d52b6a829da4",
+        "ct_len": 164,
+        "tag_hex": "1ea5756b6ad208fb1ccbd627dcc51ccd",
+        "inner_plaintext": "{\"v\":1,\"type\":\"image\",\"mime\":\"image/png\",\"name\":\"red-dot\",\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP4z8DwHwAFAAH/VscvDQAAAABJRU5ErkJggg==\"}",
+        "inner_keys": [
+          "v",
+          "type",
+          "mime",
+          "name",
+          "data"
+        ],
+        "mime": "image/png",
+        "name": "red-dot",
+        "viewer_img_src_prefix": "data:image/png;base64,",
+        "viewer_save_filename": "decrypted_image.png",
+        "expansion_ratio": 10.543
+      }
+    },
+    {
+      "id": "czd-2-checker",
+      "produced_via": "tauri: pickImage() -> encryptImage() -> invoke(\"save_czd_file\")",
+      "pin": "correct horse battery staple",
+      "input": {
+        "picked_path": "C:\\Users\\bob\\Pictures\\Checker Board.PNG",
+        "file_bytes_b64": "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR42mP4//8/AwQAWQAp5AX7tiFYxAAAAABJRU5ErkJggg==",
+        "file_size": 73,
+        "img_name_field": "Checker Board"
+      },
+      "expected": {
+        "js_filename_arg": "Checker_Board.czd",
+        "saved_filename": "Checker_Board.czd",
+        "file_text": "{\"v\":1,\"type\":\"image\",\"cipher\":\"ფჭინРЪМფБЙФЦშЬМდვტЪგЪგკფზფქწქგჩყკЦღჯКЧСХსჭЙЛაЩДИძრქЙХЦზЧЕХЦექუჭცძЖიИაუЗЭყШЖЕბЕრИდსმСჟРДმწЫცღЫაОუМЭუზჩБЮლტЙეღტცჭСНИძПМდЬგРჯЮТЧХქყЧაპჩТЗთКДБგЬტЭЙТცკჭიСЮოЛЦყЛХЬШЬИОУვჟКჯუШბШНნФЪВЩვЭარАЧЗНЬცИთЙღაჭკპНКСКეჰОხЧХლჰЫქფჩКცДშРქВცვქНჭЩფЩБრЗЕДГქჟКТАОმვოჭლჭძწკოПЮზЕВОტმМРვჭამХუგЩАЙდИАТზღიჟფЛყВЮლАცბრЛჯჩფღЛ\"}",
+        "file_utf8_bytes": 766,
+        "file_sha256": "fe979bdd3ac08b2194fb350f2d891f0ec946a717a4cb3721d2a7ea2a714c32e2",
+        "outer_keys": [
+          "v",
+          "type",
+          "cipher"
+        ],
+        "cipher_codepoints": 291,
+        "blob_len": 218,
+        "blob_b64": "UdIMx7tUiq13Y9tDFS7C7CJUGUVcVCZXJ3Wfr4y2RdqsA6lpbQVq23G4m23EVTdabnIpATo+X5nmBmQpDRLyPxlLc8aW8AvTt+TGZi/KSqEWSadyupbwtD9Cxf/z42VX4AOZzoHrliC9S+qzaJdIy/Ns3Xs2959pv0FPrfT5B5uM17j6F+AQh4ou9apHqWAdJOuryrEgve42Kg8VUZralYxVjaFVud6U6iQomlkVPrzhvLFNdKdbcJNw/GmjvSLtxFdAL2TC6hqDphzGWIPUsXj/KhaBQsfZUWs=",
+        "salt_hex": "51d20cc7bb548aad7763db43152ec2ec",
+        "iv_hex": "225419455c54265727759faf",
+        "ct_len": 174,
+        "tag_hex": "1cc65883d4b178ff2a168142c7d9516b",
+        "inner_plaintext": "{\"v\":1,\"type\":\"image\",\"mime\":\"image/png\",\"name\":\"Checker Board\",\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR42mP4//8/AwQAWQAp5AX7tiFYxAAAAABJRU5ErkJggg==\"}",
+        "inner_keys": [
+          "v",
+          "type",
+          "mime",
+          "name",
+          "data"
+        ],
+        "mime": "image/png",
+        "name": "Checker Board",
+        "viewer_img_src_prefix": "data:image/png;base64,",
+        "viewer_save_filename": "decrypted_image.png",
+        "expansion_ratio": 10.493
+      }
+    },
+    {
+      "id": "czd-3-gradient-renamed",
+      "produced_via": "tauri: pickImage() -> encryptImage() -> invoke(\"save_czd_file\")",
+      "pin": "пароль🔑ქ",
+      "input": {
+        "picked_path": "/home/bob/Pictures/grad.8x8.png",
+        "file_bytes_b64": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAApUlEQVR42gXBoaGEQAxF0VdKSkkpKeV28OVK4pBI5MSNHIkkDolcuf8cSfxMfF28IR7EneIqsVpMyfia8brxhHFjXGmsMmYbQ3Jecx537nAunJXOLGe0c0rBY8HtwRXBIpgZjArODg4JboPLYQVMYCScBUfDLiWXJcuTGckgOTM5Ktk72aRiWTG9GFGcFEcWexVbFx+pmdYMb85oDpo9m62aTzd//1vGicGvxwrKAAAAAElFTkSuQmCC",
+        "file_size": 222,
+        "img_name_field": "my secret pic ☃"
+      },
+      "expected": {
+        "js_filename_arg": "my_secret_pic__.czd",
+        "saved_filename": "my_secret_pic__.czd",
+        "file_text": "{\"v\":1,\"type\":\"image\",\"cipher\":\"ფღЦწАრწძЖЧЛЭНЧკУКრЭЧСРРსურПВშღЩნУЗმЮЮხკზИიმუНБითჩАჯჭЛძБმპШცთჭოეტიჯФტძჩვАრყДЕჯვВЩრჯБვქЩЬლჩტМდწჩХГკლტЦჩჭთლჭЗზცНЩუთნСხკГედГЬძაПჩკЖვვლЦიЙДГკСШШЗАТХВპФАცИკШღЧБტულთთცНძწИТНБЛჩგЦვЧპტЙБცძუვძЖშთИფვვЫДВტძКრХХЭშЙПცეГЦუЛЛლЪეГღГბГლЦУПგზგმЛშРგАძСჰВЩოСზММТცნბტაМЩოГღЮჯВტლЩლЧЛЕტСმღШАუЮКХТЭეყЬჰЪИრნИЕძФჟლუШწიНჯЮრУНШტხЬЙჯЕმПჰУЦУФზპКხЩФბღЬნЕЗეРრУЖოცეОЫШქЖИგЭშЮЧЪЫЛФჰეძჰგЪГგღცДДნჰყმСყკშტვეФЗЙРქХუთГВძძЬშფНУყЛТЦШქОТჯხЦკЛНჯჟМЕტვდГЖЩჟპСბხХЬჯАეძმტხმგლწЖფШКАЩფФხУФДგჰტЗხჰВმჩჟკЙვჭჭწვБГЦЬПგФზცМრღГКЕЮსმზჩვფКჭЭჰКБძთЧსოМცЮЬაОვБЦდРთფშოНდტМЗთМაუდОფჭЛЛნცЩჭყГიИЦოთჯПРОЗწვЙАБЕჩცЭა\"}",
+        "file_utf8_bytes": 1415,
+        "file_sha256": "afb200e253a1a877c201b895804bb737e8bb0f0a68ca3b2f3d18f25cf6788683",
+        "outer_keys": [
+          "v",
+          "type",
+          "cipher"
+        ],
+        "cipher_codepoints": 546,
+        "blob_len": 409,
+        "blob_b64": "UW3chQcbn4s+u4J0rQ+4yxxRTQwjYW6M0oL//eJGpILTuiIHZhfdsbiLO5aHdNESIf1SbZFhQXlmfFj6QfiFV69KZStDcZ2kJKS3ZdHKdoGau6THMyeJkEDk9bAwZJnFFK3IqlkJy55ohz2jO1hapJ5W4iSTKHHaubcpzuisZC3F4OSqiabTFbnYHpUFF8ljSbrQ22+YqwaEk3TssK7EkWkBkK30wCGCLsYxChbygj6NyGttzaMBSAt6NkW/fjSK6K4smSyLW5hT/r2z+EX9g7pQMpmb1PKT5cIuf/Q0u5Se9qfmLwg0301GOre61BW9MmoExQ0nNaEv85VnpC+Y/478s1gEbgC7kCWallMgXLyXJYSFE1oqxV2THkjbb9YUu0Xsz35Vvzfe3JsufPtmSFDkn6POyBe29fhEbLSeLCKcnU5rh6U1e01lCgSoegjLZPJqFddcFik39wC1GatQWkrm/RLGZFUrd+gribH4RNta/9AvFi3DxHUYNuDStoHtATDvUdssMa6dXkIp3NHfwxvocFqhimZa+A==",
+        "salt_hex": "516ddc85071b9f8b3ebb8274ad0fb8cb",
+        "iv_hex": "1c514d0c23616e8cd282fffd",
+        "ct_len": 365,
+        "tag_hex": "5e4229dcd1dfc31be8705aa18a665af8",
+        "inner_plaintext": "{\"v\":1,\"type\":\"image\",\"mime\":\"image/png\",\"name\":\"grad.8x8\",\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAApUlEQVR42gXBoaGEQAxF0VdKSkkpKeV28OVK4pBI5MSNHIkkDolcuf8cSfxMfF28IR7EneIqsVpMyfia8brxhHFjXGmsMmYbQ3Jecx537nAunJXOLGe0c0rBY8HtwRXBIpgZjArODg4JboPLYQVMYCScBUfDLiWXJcuTGckgOTM5Ktk72aRiWTG9GFGcFEcWexVbFx+pmdYMb85oDpo9m62aTzd//1vGicGvxwrKAAAAAElFTkSuQmCC\"}",
+        "inner_keys": [
+          "v",
+          "type",
+          "mime",
+          "name",
+          "data"
+        ],
+        "mime": "image/png",
+        "name": "grad.8x8",
+        "viewer_img_src_prefix": "data:image/png;base64,",
+        "viewer_save_filename": "decrypted_image.png",
+        "expansion_ratio": 6.374
+      }
+    },
+    {
+      "id": "czd-4-gif",
+      "produced_via": "tauri: pickImage() -> encryptImage() -> invoke(\"save_czd_file\")",
+      "pin": "hunter2",
+      "input": {
+        "picked_path": "/Users/bob/Desktop/pixel.gif",
+        "file_bytes_b64": "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        "file_size": 42,
+        "img_name_field": "pixel"
+      },
+      "expected": {
+        "js_filename_arg": "pixel.czd",
+        "saved_filename": "pixel.czd",
+        "file_text": "{\"v\":1,\"type\":\"image\",\"cipher\":\"УВტЗვЮქРЩРМეФშზФЪთПჰვყГЦთძПЩნЖხВШХЗკЙУФდწცძКთზოЧФЖშЪლИФჰნწრთიЭЙЫნБЬჯХბЕეЙარКბყЫბვბШХღღЭПდТОЗОЛრძЕЗТხПოჟЬწСგЛჯОჟიКეჩГШНბБწЛЗჟდრХКРცЕЭНფШСიЛГИГბზХШЙუღჭჯЖწУКЧუГოვКყБვცთჩРЫЭგზყЩЪИსაზოლრქთКტЛУბДЪЩოВЗხლЧООМეРАВქХЩეაეМიЫრРცУსИАწა\"}",
+        "file_utf8_bytes": 584,
+        "file_sha256": "fbe4f9a498a3b7e3dcbab1951eff72d488b14a3fbafef60132c711ad65052371",
+        "outer_keys": [
+          "v",
+          "type",
+          "cipher"
+        ],
+        "cipher_codepoints": 222,
+        "blob_len": 166,
+        "blob_b64": "0jSoF/Vx6xtE1YG17HwgFXk3Hbw6Mnej52oJq01DcabrHGN41nY7Kp1gMcQHI+q8Mi9f2BmEqAQrBX8BFB52WW+wDzvovsQbmozewNP9cyCsfvPIrEZk5uBicsoPDQ2rxam+uU5yIskpkBG25qTWdfnc0r4TkNFrXiFaHZx8+CGX67pRAGNKQVHrSs0Bl76NjoeK4vvtExhjV26EAEtI8Qxa0RphcA==",
+        "salt_hex": "d234a817f571eb1b44d581b5ec7c2015",
+        "iv_hex": "79371dbc3a3277a3e76a09ab",
+        "ct_len": 122,
+        "tag_hex": "131863576e84004b48f10c5ad11a6170",
+        "inner_plaintext": "{\"v\":1,\"type\":\"image\",\"mime\":\"image/gif\",\"name\":\"pixel\",\"data\":\"R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\"}",
+        "inner_keys": [
+          "v",
+          "type",
+          "mime",
+          "name",
+          "data"
+        ],
+        "mime": "image/gif",
+        "name": "pixel",
+        "viewer_img_src_prefix": "data:image/gif;base64,",
+        "viewer_save_filename": "decrypted_image.gif",
+        "expansion_ratio": 13.905
+      }
+    },
+    {
+      "id": "czd-5-browser-fallback",
+      "produced_via": "browser fallback (no __TAURI__): <input type=file> -> FileReader data URL -> encryptImage() -> <a download>",
+      "pin": "pin with trailing space ",
+      "input": {
+        "file_name": "browser pixel.png",
+        "file_type": "image/png",
+        "file_bytes_b64": "iVBORw0KGgoAAAANSUhEUgAAAAMAAAABCAIAAACUgoPjAAAAEklEQVR42mNgMDqRYnTihNEJABEIBBv0tWvcAAAAAElFTkSuQmCC",
+        "file_size": 75,
+        "img_name_field": "browser pixel"
+      },
+      "expected": {
+        "js_filename_arg": "browser_pixel.czd",
+        "saved_filename": "browser_pixel.czd",
+        "blob_type": "text/plain",
+        "file_text": "{\"v\":1,\"type\":\"image\",\"cipher\":\"АცლტЙვზМჰვБქჩსБჰგЗხЭუუწკფДЭტВФОხХКИრნОЙტИშБЗრТჯФЛყПЩმრცЛИძХაЫჯწჰღჯИფუЧЫფДჰГხПოგოЬХგХოძУИფყოЬИემФჟზЧСლПნჰნУღჩЛგჯროჭТდОЧჩМსЦუГწРოლოЗМჯНЗჯღნПტჩკММФКПხРხВУდხჯЫმთჟАყგყოეВЦНებეНВРЧАФИფМЧЙГყქკიეГსსДაЪვЬფბცყბფფჰИთТУШДიკდГრხღРКწზВჯცФТФგЧზФЮТოИЮკДწხМვეჩტზჯრცოОაЫუГЫФდჰთЗოპპპვძМДყუЗწЦЩЕიხЬფЗგლტცКფЮЛЦВნ\"}",
+        "file_utf8_bytes": 780,
+        "file_sha256": "cfa3a8dab7ff474aa880696218f57aa9390daaeda7d8ecd7f1ac490afd5b4d0c",
+        "outer_keys": [
+          "v",
+          "type",
+          "cipher"
+        ],
+        "cipher_codepoints": 291,
+        "blob_len": 218,
+        "blob_b64": "haKSqFGtgFiVZRigCoe+TTcJUl+Sj1ve2rpQMvqSpYioQzf1sXw6LQaspb2A8fcgWfpUT48UlgkewNCN92C2Nb0pUXN9pEL1PG4yKwMgM0WZsCfQNdzDv4ZtR3TkcxNKNotfuofWMwSZJtt1rwexej0Def8LHPhXCXNEj3uEBEujx4h1pUt4qkXVJIEkRRlA7F9UBaXBUUgpHz05lIJDkQeWxrcGjfa1z1C4G1/zNp/JlcetFEZSGfQaNvA8Tk81DgHoNOOOFbtlXToc36mIe9UoCKSarU/s3jM=",
+        "salt_hex": "85a292a851ad8058956518a00a87be4d",
+        "iv_hex": "3709525f928f5bdedaba5032",
+        "ct_len": 174,
+        "tag_hex": "3a1cdfa9887bd52808a49aad4fecde33",
+        "inner_plaintext": "{\"v\":1,\"type\":\"image\",\"mime\":\"image/png\",\"name\":\"browser pixel\",\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAAMAAAABCAIAAACUgoPjAAAAEklEQVR42mNgMDqRYnTihNEJABEIBBv0tWvcAAAAAElFTkSuQmCC\"}",
+        "inner_keys": [
+          "v",
+          "type",
+          "mime",
+          "name",
+          "data"
+        ],
+        "mime": "image/png",
+        "name": "browser pixel",
+        "expansion_ratio": 10.4
+      }
+    },
+    {
+      "id": "czd-6-fixed-salt-iv",
+      "produced_via": "tauri: pickImage() -> encryptImage() -> invoke(\"save_czd_file\")",
+      "pin": "fixed",
+      "input": {
+        "picked_path": "C:\\fixed\\blue.png",
+        "file_bytes_b64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR42mNgaPgPAAIDAYAanCY7AAAAAElFTkSuQmCC",
+        "file_size": 69,
+        "img_name_field": "blue"
+      },
+      "expected": {
+        "js_filename_arg": "blue.czd",
+        "saved_filename": "blue.czd",
+        "file_text": "{\"v\":1,\"type\":\"image\",\"cipher\":\"ააეგაПრვბჰწიგრЗმდაУპდЩგАЗЙპГИცცЖЙლЕЙЙЭთНეჩГბონЛდУЩТНგუფЮЬЬУლლცДШქЮЪყჩЛცБლНХმУИШღШЭნМგСЩქდკლძСფЛჩქპТНექოВცЙმЭЙომЭვოОქНღБЬЛМЖНცპЩЭწОფწჭნლხПКЗИЭნხჯნПКზყყპЭწქყუმПთТლხცХТБСЮგЖЕჩЧიბШФОკЖუწРЙგОЗკМგЬВАჟУЩჟНხღაСჭბЖВТВჟდპБЖЦШЖტოუОჟფЩყСГჩЗТХЧКЛრშტრЩბОЮВКჩГЙწხОХდსЬზსЛჰისБЪრდРКტრЧ\"}",
+        "file_utf8_bytes": 707,
+        "file_sha256": "0c969d8c53013c7392f36b612364fc2480f45cb3dba91c301ec8b7d356f1b3c6",
+        "outer_keys": [
+          "v",
+          "type",
+          "cipher"
+        ],
+        "cipher_codepoints": 268,
+        "blob_len": 201,
+        "blob_b64": "AAECAwQFBgcICQoLDA0OD6ChoqOkpaanqKmqq+HuEZkBNMsD06zuCTU/990KKal5V/7XZsaiKu2L0p5W5+MtCy6VDJKbyUsZVOzuEVNjaqL+qNL+FNvVuWi9stnuaO6+cvUcdMKewrop+MefMwrGXXO+cVXTLwHzKea2ziy/CnmZ4IB51vJnTcxqCvoJtC9jhP06PueWAydBnjzjPDOin35nSNTvPU6XykZoz24rsQYSQ6Bv/jrZkqcev2DR9GRsgIRi7QDxrSQ4",
+        "salt_hex": "000102030405060708090a0b0c0d0e0f",
+        "iv_hex": "a0a1a2a3a4a5a6a7a8a9aaab",
+        "ct_len": 157,
+        "tag_hex": "1ebf60d1f4646c808462ed00f1ad2438",
+        "inner_plaintext": "{\"v\":1,\"type\":\"image\",\"mime\":\"image/png\",\"name\":\"blue\",\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR42mNgaPgPAAIDAYAanCY7AAAAAElFTkSuQmCC\"}",
+        "inner_keys": [
+          "v",
+          "type",
+          "mime",
+          "name",
+          "data"
+        ],
+        "mime": "image/png",
+        "name": "blue",
+        "viewer_img_src_prefix": "data:image/png;base64,",
+        "viewer_save_filename": "decrypted_image.png",
+        "expansion_ratio": 10.246
+      },
+      "deterministic": {
+        "salt_hex": "000102030405060708090a0b0c0d0e0f",
+        "iv_hex": "a0a1a2a3a4a5a6a7a8a9aaab",
+        "note": "crypto.getRandomValues stubbed; everything else original"
+      }
+    },
+    {
+      "id": "czd-7-crafted-nonimage",
+      "crafted": true,
+      "produced_via": "hand-wrapped original aesEncrypt output (NOT producible by the app UI)",
+      "pin": "textpin",
+      "input": {
+        "plaintext": "just some text"
+      },
+      "expected": {
+        "file_text": "{\"v\":1,\"type\":\"text\",\"cipher\":\"გმТОХЧЖფХЫდИЪШКЧძАყЗქღРჩეშეФРЙДТЕხШЗფლЕჭФაზЖგРაЙГვГვჯХЫღЩოТიДჭძძЪРНСუგიАЭМფЩქა\"}",
+        "cipher_codepoints": 78,
+        "blob_len": 58,
+        "blob_b64": "CLzv24nU28Dp75r4bhXoVWxZEYE1xqlzme5oUKmd1AGnCxAqkFkFf28W6NzIldbb7xuyTCIh+tU6VA==",
+        "salt_hex": "08bcefdb89d4dbc0e9ef9af86e15e855",
+        "iv_hex": "6c59118135c6a97399ee6850",
+        "ct_len": 14,
+        "tag_hex": "e8dcc895d6dbef1bb24c2221fad53a54",
+        "inner_plaintext": "just some text",
+        "viewer_text_out": "just some text",
+        "viewer_img_shown": false
+      }
+    }
+  ],
+  "v4_text": [
+    {
+      "id": "v4-1-hello",
+      "produced_by": "desktop aesEncrypt (original)",
+      "pin": "1234",
+      "plaintext": "hello world",
+      "plaintext_utf8_len": 11,
+      "ciphertext": "ГციეჰРშЭტПკნქჯიეყЮИУЖЫАთდმსკУყКУზჩდბКდГЬღოწკშНმპწСეჯწაЦЛტბЛШოჯНშფტჩქპЙЧОრჰ",
+      "cipher_codepoints": 74,
+      "blob_len": 55,
+      "blob_b64": "kaIEgxY+SwJMVfIEX/p0n8hHDLRJ0Xr0GZDBrDk9WNcJYuLOcyEfcA3sSBs5NfuYUSZVOq4vQg==",
+      "salt_hex": "91a20483163e4b024c55f2045ffa749f",
+      "iv_hex": "c8470cb449d17af41990c1ac",
+      "ct_len": 11,
+      "tag_hex": "700dec481b3935fb985126553aae2f42",
+      "decrypts_with": [
+        "desktop aesDecrypt",
+        "web aesDec"
+      ]
+    },
+    {
+      "id": "v4-2-unicode",
+      "produced_by": "desktop aesEncrypt (original)",
+      "pin": "correct horse battery staple",
+      "plaintext": "Мир ქართული 🔐 émoji\nline2\ttab",
+      "plaintext_utf8_len": 50,
+      "ciphertext": "თგЪჯЗზნГУЧОრВფწКრმსშჩზწგხფლძნაჩЭშზღСჩჟჰКЪОმბЙძКმციბწმჯХЩХЬНЛИЫЦჰХტЪჯღЮეЭГЖУКზჭХდგДმОჯЕКღჟტЪღБЙСФДНქჰდშზპЕАГღბკЖЙШჭНჯГრრთწЛУოПП",
+      "cipher_codepoints": 126,
+      "blob_len": 94,
+      "blob_b64": "HC7foGMk04vQjUcrQLRYZGcCeUKbMAZ+YGWyZPgr7vLBqbrLaIBcLf2629usp83g2S7fW/E+kn0rGd2DClLvfmrWPS7Wiqy1luVgDYGOmhkWBJnq5dufkQQHcs0Nww==",
+      "salt_hex": "1c2edfa06324d38bd08d472b40b45864",
+      "iv_hex": "670279429b30067e6065b264",
+      "ct_len": 50,
+      "tag_hex": "9a19160499eae5db9f91040772cd0dc3",
+      "decrypts_with": [
+        "desktop aesDecrypt",
+        "web aesDec"
+      ]
+    },
+    {
+      "id": "v4-3-min",
+      "produced_by": "desktop aesEncrypt (original)",
+      "pin": "x",
+      "plaintext": "a",
+      "plaintext_utf8_len": 1,
+      "ciphertext": "ზВოЪთНЪბკყქჭფწპИХЬწუЧЕღЛოВОფსЙЭაСПძაЙბФსЬღტძЗაზКჩდოგЙუაХყკხდ",
+      "cipher_codepoints": 60,
+      "blob_len": 45,
+      "blob_b64": "GjN7Hu7BJXVdUcOp29cT4mWsNjvURq+AywbAqB1R9WSboAGrZDNCqTA2XJeD",
+      "salt_hex": "1a337b1eeec125755d51c3a9dbd713e2",
+      "iv_hex": "65ac363bd446af80cb06c0a8",
+      "ct_len": 1,
+      "tag_hex": "51f5649ba001ab643342a930365c9783",
+      "decrypts_with": [
+        "desktop aesDecrypt",
+        "web aesDec"
+      ]
+    },
+    {
+      "id": "v4-4-long",
+      "produced_by": "desktop aesEncrypt (original)",
+      "pin": "P@ssw0rd!é",
+      "plaintext": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      "plaintext_utf8_len": 569,
+      "ciphertext": "ჰჰСქЭგგრЖЗპყЬთეЕУПჰОთკАПლОГპწზბТიზЕგОЬХჰОტЗОყУНშდЩПДЩჯАЕЪХჩგმმЦХცПლЦЩВБიНУლცჟИღОაШშБსკგშგჰჟЦტრპХდდПხНიЦЩОСხძЛМვმღდЦჯტУЙОНნგМნЦКთრპМთВჰЬოჭცყЛძРВИუკЛЙТწСДგხუНქუჭკСუვФЕვკპОЕЮЖФВეРВოРოЧЧУСჭტკცЮЩთЖჟრვწრშФეწზЫქშЭლძЕЧთЩСღკმჟჰЗტლАИიЮЮЧკЙЬУЗХПМИДყЬკჟЪЩფყოКფქქЫРПДИПЫМმაРცЪАЦНОანАГშლშКЭБჰВზАЗМვАЪეეДწთЛЗАზХВКЙЬШტპოქЪვЫხოАვЫОჰდჰКკЭФყექვლთРПწჰპჩРპЮАმЛნჭფჭწФთСხჩმЫქЦცცჭჯЙთუშრწШСУЩЬМღТЙგცფКჟПჟთРბიაЩМვსჭЫЗЗЫჰვЮЧОБკლЕთЧვТБცყШМЭШАჯТЩПЛჯოჯЬზეუШТჭკწЩკНМЙზЮრზაКოЬИნხСპკღპძჟЙნკჭЩფბღЪქაЗდაОუШФЦცЛკფკЛშФვუიЕიВნЗკЮლრგძЙОვჯЭЪММვЛხჯკФძცგქДბპЩЭზძჟЕФЦბძხЭЮნЙკძუЦЖМუЬАიСЗФЦНვყოКАლქვЛმსЗИНმძდხლცАფყИლЛУФЫპЩРТЕТიУДЕდЙЕრДჟНРЗШტბНნფხჯФტМოთЗქЪНРკЕУАღБКილЬКФჯЛტЫუЮვУМФДამიგШწბნУЭБბУჯბЩკЕძЕЛმოЭძАუВЖჰВЬთЕჭუГშЬТიНЬТტპწოჟИЬღშГДЖДჭТФЮქЬСУЬჟოГჩშНრჯოჭБХაИХბსЪჰСფვსДАწДჩძწქხШჯХЮზТЙაПКთთძМОდМჩღБГდИЧЧЖფКჰБნწУდნუШჟПЭХფხოУვСლჟЗБაჰЧკწЙსУБსმЬИჭОБეЕЖქБღჰლЦРპУქდЧПВჰ",
+      "cipher_codepoints": 818,
+      "blob_len": 613,
+      "blob_b64": "ggyV+CCQnoOX9HEm0wgvHJhwKvkOcGBzIGmCv92gvSovX0uYD6wl6fhm72ZCLL32awK36jiIu0KaPpWvA5YiRJCYCgP3SQO2DDweuI36vyebstFLWD3fS0qvuMCtM3rHQOtHjg9NdaXsbxjpTJsqzcylCeTuVTdJyTF1mFJOvm/n1jExjNxN440ydSJa/6HnPQFcQY1EcG8VY+Kbm4H6yWJLPgoSKhpI//4Jq90o2wtplX9JP76UXNrUVV8xwlpw8tLAxa7h3uvAMhkYKYr+igjGhotFh7EElcHsohG2jrq95SONV7F8eNhF8vgDgrJ+1XEVFKHxwcgOZxO/hLsMdUdc1HyeZL8V3aadfqHTYQc5y069tWzqCaUrPwPHxBIA6tFRd8oo8gF/4viJKmH4FziaX5t+5hfz6wsfNf9GET5zdJc6JutqG/QGArN9pMeyOJWObPqMJd6UBW7VAoDAvT513asJUJsY1FTImIjMoJ/KQCbqvFf+7ttFsefJ1baCVlBO6+GbPm13Bbe+/MqJbT3ntT9hIyo13uFXNrhKVFsLRopuLbDeKahUXpKs018O6xzmzI0lmDqmQlPuxo5SBuMUef1StNHoV7uxJm0hWirIK9r1fsS8T/F0t1lALIC5cBM0+iB0fB6JmbmsLN+bhTjngj9HmdTkY9zIu9zSOcNPp9WYklnldz1/V9y09PNkZYuQfNdi2Ap2BR7gyUFRlhclZbcVe5f2/GzqAwrHHbtvDtZWikDp44nUrgiMc0DMT5Pw+2UeN0FyKPoiAg4JcqR0iRL9pdviEmnViWgK3xO0VD4wjg==",
+      "salt_hex": "820c95f820909e8397f47126d3082f1c",
+      "iv_hex": "98702af90e706073206982bf",
+      "ct_len": 569,
+      "tag_hex": "a5dbe21269d589680adf13b4543e308e",
+      "decrypts_with": [
+        "desktop aesDecrypt",
+        "web aesDec"
+      ]
+    },
+    {
+      "id": "v4-5-ui-czsup",
+      "produced_by": "desktop Stealth tab UI (czsup/_czRun)",
+      "pin": "ui-pin",
+      "plaintext": "typed in the stealth box  ",
+      "plaintext_utf8_len": 26,
+      "ciphertext": "ЬკДШПЗლКიაყნიჭЮისურჭУЫЗქფრზЛУЕეჭშОკრЗАРლСყХვჟკРЩДЬუЕБტჟЖჭДესТИКგНფАУფჩლЕЬШშჟЕЙკქЗЭჟცჩზნМზФГЙჩП",
+      "cipher_codepoints": 94,
+      "blob_len": 70,
+      "blob_b64": "9Jl5woKrIAXMId/IRTQd08oVUQGs0mEdYvJQohxKyX2FPJx6l9TmiSPndlERzprCuUh0UZKm95YPmqJVo+PaZGMtG1kqZw==",
+      "salt_hex": "f49979c282ab2005cc21dfc845341dd3",
+      "iv_hex": "ca155101acd2611d62f250a2",
+      "ct_len": 26,
+      "tag_hex": "f7960f9aa255a3e3da64632d1b592a67",
+      "decrypts_with": [
+        "desktop aesDecrypt",
+        "web aesDec"
+      ],
+      "ui_method_label": "AES-256-GCM · PBKDF2"
+    },
+    {
+      "id": "v4-6-from-web",
+      "produced_by": "web v1.1 aesEnc (original)",
+      "pin": "shared-pin",
+      "plaintext": "sent from the web edition",
+      "plaintext_utf8_len": 25,
+      "ciphertext": "წЖმძცჭЖНშეМФნხЕაКლШЧკროКხФთСКТძЮДЦЦდთდრლЫჟზბოემხЙЦЪძჯეНხდЩШЪქЧწЧЙЪЬაЫეГსდჩაЙСЦПშღЖზმБЫЪЮგЖმჭ",
+      "cipher_codepoints": 92,
+      "blob_len": 69,
+      "blob_b64": "cnLbadnuYEt1MemArK54JQNre1Hyrzb/l33DHDQK8PGBNELeq37bfEueD657V4c4q79A8EkRDZAqy3wYWnGLi87/CnLd",
+      "salt_hex": "7272db69d9ee604b7531e980acae7825",
+      "iv_hex": "036b7b51f2af36ff977dc31c",
+      "ct_len": 25,
+      "tag_hex": "110d902acb7c185a718b8bceff0a72dd",
+      "decrypts_with": [
+        "desktop aesDecrypt",
+        "web aesDec"
+      ]
+    },
+    {
+      "id": "v4-7-fixed-salt-iv",
+      "produced_by": "desktop aesEncrypt with stubbed getRandomValues",
+      "pin": "fixed",
+      "plaintext": "deterministic vector",
+      "plaintext_utf8_len": 20,
+      "ciphertext": "ააეგაПრვბჰწიგრЗმდაУპდЩგАЗЙპГИცცЖЙლЕЙЙЮЩИეЬШკციШჟТЙძЙბყრДЗЬეეჟლვНჩЕფმПЫХМОტჭჟუეИЙЫЙყЩЛა",
+      "cipher_codepoints": 86,
+      "blob_len": 64,
+      "blob_b64": "AAECAwQFBgcICQoLDA0OD6ChoqOkpaanqKmqq/6pE95JaI5PzqbqBXQlo9EEPKFuZmULw82tvSdPTEpq8qX6sA==",
+      "salt_hex": "000102030405060708090a0b0c0d0e0f",
+      "iv_hex": "a0a1a2a3a4a5a6a7a8a9aaab",
+      "ct_len": 20,
+      "tag_hex": "66650bc3cdadbd274f4c4a6af2a5fab0",
+      "decrypts_with": [
+        "desktop aesDecrypt",
+        "web aesDec"
+      ],
+      "deterministic": {
+        "salt_hex": "000102030405060708090a0b0c0d0e0f",
+        "iv_hex": "a0a1a2a3a4a5a6a7a8a9aaab"
+      }
+    }
+  ],
+  "v4_text_edge": [
+    {
+      "id": "edge-trailing-newline-L%4=2",
+      "base": "v4-1-hello",
+      "pin": "1234",
+      "ciphertext": "ГციეჰРშЭტПკნქჯიეყЮИУЖЫАთდმსკУყКУზჩდბКდГЬღოწკშНმპწСეჯწაЦЛტბЛШოჯНშფტჩქპЙЧОრჰ\n",
+      "codepoints": 75,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "Invalid character"
+      },
+      "why": "script2buf computes padding from length INCLUDING whitespace; atob then rejects/accepts depending on L%4"
+    },
+    {
+      "id": "edge-trailing-newline-L%4=0",
+      "base": "v4-3-min",
+      "pin": "x",
+      "ciphertext": "ზВოЪთНЪბკყქჭფწპИХЬწუЧЕღЛოВОფსЙЭაСПძაЙბФსЬღტძЗაზКჩდოგЙუაХყკხდ\n",
+      "codepoints": 61,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "Invalid character"
+      },
+      "why": "same, other residue"
+    },
+    {
+      "id": "edge-trailing-space-L%4=2",
+      "base": "v4-2-unicode",
+      "pin": "correct horse battery staple",
+      "ciphertext": "თგЪჯЗზნГУЧОრВფწКრმსშჩზწგხფლძნაჩЭშზღСჩჟჰКЪОმბЙძКმციბწმჯХЩХЬНЛИЫЦჰХტЪჯღЮეЭГЖУКზჭХდგДმОჯЕКღჟტЪღБЙСФДНქჰდშზპЕАГღბკЖЙШჭНჯГრრთწЛУოПП ",
+      "codepoints": 127,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "Invalid character"
+      },
+      "why": "same, other residue"
+    },
+    {
+      "id": "edge-leading-newline-L%4=2",
+      "base": "v4-4-long",
+      "pin": "P@ssw0rd!é",
+      "ciphertext": "\nჰჰСქЭგგრЖЗპყЬთეЕУПჰОთკАПლОГპწზბТიზЕგОЬХჰОტЗОყУНშდЩПДЩჯАЕЪХჩგმმЦХცПლЦЩВБიНУლცჟИღОაШშБსკგშგჰჟЦტრპХდდПხНიЦЩОСხძЛМვმღდЦჯტУЙОНნგМნЦКთრპМთВჰЬოჭცყЛძРВИუკЛЙТწСДგხუНქუჭკСუვФЕვკპОЕЮЖФВეРВოРოЧЧУСჭტკცЮЩთЖჟრვწრშФეწზЫქშЭლძЕЧთЩСღკმჟჰЗტლАИიЮЮЧკЙЬУЗХПМИДყЬკჟЪЩფყოКფქქЫРПДИПЫМმაРცЪАЦНОანАГშლშКЭБჰВზАЗМვАЪეეДწთЛЗАზХВКЙЬШტპოქЪვЫხოАვЫОჰდჰКკЭФყექვლთРПწჰპჩРპЮАმЛნჭფჭწФთСხჩმЫქЦცცჭჯЙთუშრწШСУЩЬМღТЙგცფКჟПჟთРბიაЩМვსჭЫЗЗЫჰვЮЧОБკლЕთЧვТБცყШМЭШАჯТЩПЛჯოჯЬზეუШТჭკწЩკНМЙზЮრზაКოЬИნხСპკღპძჟЙნკჭЩფბღЪქაЗდაОუШФЦცЛკფკЛშФვუიЕიВნЗკЮლრგძЙОვჯЭЪММვЛხჯკФძცგქДბპЩЭზძჟЕФЦბძხЭЮნЙკძუЦЖМუЬАიСЗФЦНვყოКАლქვЛმსЗИНმძდხლცАფყИლЛУФЫპЩРТЕТიУДЕდЙЕრДჟНРЗШტბНნფხჯФტМოთЗქЪНРკЕУАღБКილЬКФჯЛტЫუЮვУМФДამიგШწბნУЭБბУჯბЩკЕძЕЛმოЭძАუВЖჰВЬთЕჭუГშЬТიНЬТტპწოჟИЬღშГДЖДჭТФЮქЬСУЬჟოГჩშНრჯოჭБХაИХბსЪჰСფვსДАწДჩძწქხШჯХЮზТЙაПКთთძМОდМჩღБГდИЧЧЖფКჰБნწУდნუШჟПЭХფხოУვСლჟЗБაჰЧკწЙსУБსმЬИჭОБეЕЖქБღჰლЦРპУქდЧПВჰ",
+      "codepoints": 819,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "Invalid character"
+      },
+      "why": "same, other residue"
+    },
+    {
+      "id": "edge-plain-base64-accepted",
+      "base": "v4-1-hello",
+      "pin": "1234",
+      "ciphertext": "kaIEgxY+SwJMVfIEX/p0n8hHDLRJ0Xr0GZDBrDk9WNcJYuLOcyEfcA3sSBs5NfuYUSZVOq4vQg",
+      "codepoints": 74,
+      "original_aesDecrypt": {
+        "ok": true,
+        "result": "hello world"
+      },
+      "why": "chars not in SA pass through script2buf unchanged, so raw base64 of the blob also decrypts"
+    },
+    {
+      "id": "edge-truncated",
+      "base": "v4-1-hello",
+      "pin": "1234",
+      "ciphertext": "ГციეჰРშЭტПკნქჯიეყЮИУЖЫАთდმსკУყКУზჩდბКდГЬ",
+      "codepoints": 40,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "too short"
+      },
+      "why": "blob < 45 bytes -> \"too short\""
+    },
+    {
+      "id": "edge-wrong-pin",
+      "base": "v4-1-hello",
+      "pin": "12345",
+      "ciphertext": "ГციეჰРშЭტПკნქჯიეყЮИУЖЫАთდმსკУყКУზჩდბКდГЬღოწკშНმპწСეჯწაЦЛტბЛШოჯНშფტჩქპЙЧОრჰ",
+      "codepoints": 74,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "The operation failed for an operation-specific reason"
+      },
+      "why": "GCM tag mismatch"
+    },
+    {
+      "id": "edge-crlf-L%4=2",
+      "base": "v4-1-hello",
+      "pin": "1234",
+      "ciphertext": "ГციეჰРშЭტПკნქჯიეყЮИУЖЫАთდმსკУყКУზჩდბКდГЬღოწკშНმპწСეჯწაЦЛტბЛШოჯНშფტჩქპЙЧОრჰ\r\n",
+      "codepoints": 76,
+      "original_aesDecrypt": {
+        "ok": true,
+        "result": "hello world"
+      },
+      "why": "k=2 whitespace, (L+k)%4==0 -> accepted by accident"
+    },
+    {
+      "id": "edge-L%4=3-clean",
+      "pin": "p3",
+      "plaintext": "abc",
+      "ciphertext": "ჰЩЧЧФხПლქЧცЧჯეიაქТზპპФЙხპშდБქСЖსШჭბФტქმБНსЮიჰЫბАფЪЭХბЩРგСგპჯАЛЗ",
+      "codepoints": 63,
+      "original_aesDecrypt": {
+        "ok": true,
+        "result": "abc"
+      },
+      "why": "whitespace tolerance depends on L%4 and on how many whitespace chars are present"
+    },
+    {
+      "id": "edge-L%4=3-trailing-newline",
+      "pin": "p3",
+      "plaintext": "abc",
+      "ciphertext": "ჰЩЧЧФხПლქЧცЧჯეიაქТზპპФЙხპშდБქСЖსШჭბФტქმБНსЮიჰЫბАფЪЭХბЩРგСგპჯАЛЗ\n",
+      "codepoints": 64,
+      "original_aesDecrypt": {
+        "ok": true,
+        "result": "abc"
+      },
+      "why": "whitespace tolerance depends on L%4 and on how many whitespace chars are present"
+    },
+    {
+      "id": "edge-L%4=3-trailing-crlf",
+      "pin": "p3",
+      "plaintext": "abc",
+      "ciphertext": "ჰЩЧЧФხПლქЧცЧჯეიაქТზპპФЙხპშდБქСЖსШჭბФტქმБНსЮიჰЫბАფЪЭХბЩРგСგპჯАЛЗ\r\n",
+      "codepoints": 65,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "Invalid character"
+      },
+      "why": "whitespace tolerance depends on L%4 and on how many whitespace chars are present"
+    },
+    {
+      "id": "edge-empty-plaintext-undecryptable",
+      "pin": "p",
+      "ciphertext": "ЭНწЩძეАПჭОბდЧЙჩЗЮფსვДჭყТСБББЙაИЭХშДჭცФЕწჟკБუЛШФИЭСჟЖЙპიЩШქწ",
+      "codepoints": 59,
+      "original_aesDecrypt": {
+        "ok": false,
+        "error": "too short"
+      },
+      "why": "aesEncrypt(\"\") yields a 44-byte blob but aesDecrypt requires >=45 bytes"
+    }
+  ],
+  "legacy_text": {
+    "v1": [
+      {
+        "plaintext": "Hello World",
+        "caps": "cyrillic",
+        "encoded": "Нელლო Шორლდ",
+        "original_decT": "nello world"
+      },
+      {
+        "plaintext": "Hello World",
+        "caps": "georgian",
+        "encoded": "ჰელლო წორლდ",
+        "original_decT": "hello world"
+      },
+      {
+        "plaintext": "Good morning, Bob!",
+        "caps": "cyrillic",
+        "encoded": "Гოოდ მორნინგ, Вობ!",
+        "original_decT": "good morning, vob!"
+      },
+      {
+        "plaintext": "Good morning, Bob!",
+        "caps": "georgian",
+        "encoded": "გოოდ მორნინგ, ბობ!",
+        "original_decT": "good morning, bob!"
+      },
+      {
+        "plaintext": "quiz: xyz 123",
+        "caps": "cyrillic",
+        "encoded": "ყუიზ: ხყზ 123",
+        "original_decT": "yuiz: xyz 123"
+      },
+      {
+        "plaintext": "quiz: xyz 123",
+        "caps": "georgian",
+        "encoded": "ყუიზ: ხყზ 123",
+        "original_decT": "yuiz: xyz 123"
+      }
+    ],
+    "v2": [
+      {
+        "plaintext": "Hello World",
+        "ciphertext": "╼⎌⁂ლდ◊Шორლო Нელ※✩§※",
+        "method": 3,
+        "marker": "╼",
+        "original_v2sdec": "elo norlldw",
+        "corrected_decode": "nello world"
+      },
+      {
+        "plaintext": "secret meeting at noon",
+        "ciphertext": "╿※§ტ⁕ერცეს ⏣გ✪ნიტე⌀ე⁂მ ტა ნო⎌ონ◦※⎌✪✩",
+        "method": 2,
+        "marker": "╿",
+        "original_v2sdec": "secret meeting at noon",
+        "corrected_decode": "secret meeting at noon"
+      },
+      {
+        "plaintext": "abcdefgh",
+        "ciphertext": "╿⏣⌬⌘§ჰგფედც⍟ბა✧•⍟†",
+        "method": 2,
+        "marker": "╿",
+        "original_v2sdec": "abcdefgh",
+        "corrected_decode": "abcdefgh"
+      },
+      {
+        "plaintext": "the quick brown fox",
+        "ciphertext": "╿⌬¶•✪ეჰ⌘ტ ✩კც✦იუყ✩ ნწ⌘ორბ ხ⏣ოფ⏣⌀◊†",
+        "method": 2,
+        "marker": "╿",
+        "original_v2sdec": "the yuick brown fox",
+        "corrected_decode": "the yuick brown fox"
+      }
+    ],
+    "v3": [
+      {
+        "plaintext": "Hello World",
+        "pin": "secret",
+        "ciphertext": "უნიხყ პყხხს",
+        "original_v3sdec": "hellf wfrld",
+        "ambiguous_U10E7_count": 2
+      },
+      {
+        "plaintext": "the quick brown fox",
+        "pin": "Zebra99",
+        "ciphertext": "ყკფ ხგზბდ ონდწნ უდზ",
+        "original_v3sdec": "jhe quick brown fox",
+        "ambiguous_U10E7_count": 1
+      },
+      {
+        "plaintext": "meet at 9pm",
+        "pin": "1234",
+        "ciphertext": "ვმმო წო 9ლვ",
+        "original_v3sdec": "meet at 9pm",
+        "ambiguous_U10E7_count": 0
+      },
+      {
+        "plaintext": "attack at dawn",
+        "pin": "correct horse",
+        "ciphertext": "ხსვმუო ცს სზაყ",
+        "original_v3sdec": "attack at daws",
+        "ambiguous_U10E7_count": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "czeroode",
+  "version": "2.0.0",
+  "private": true,
+  "description": "cZEROde - private encrypted file vault (web + desktop from one static frontend)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "node --test \"tests/unit/**/*.test.js\"",
+    "test:browser": "playwright test tests/e2e/browser-units.spec.js",
+    "test:e2e": "playwright test",
+    "serve": "node scripts/serve.mjs",
+    "stage": "node scripts/stage-web.mjs",
+    "stage:watch": "node scripts/stage-web.mjs --watch",
+    "precache": "node scripts/precache.mjs",
+    "precache:check": "node scripts/precache.mjs --check",
+    "fixtures": "node scripts/gen-fixtures.mjs",
+    "vectors": "node scripts/gen-vectors.mjs",
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "icons": "tauri icon src-tauri/icons/source.png"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@tauri-apps/cli": "^2.12.1",
+    "fake-indexeddb": "^6.2.5"
+  }
+}

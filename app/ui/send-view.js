@@ -1,0 +1,9 @@
+// Send · Open screen (routes 'send', 'open', 'incoming').
+// Owner: V2a (phase 3). Phase-0 stub: exports match DESIGN §10; bodies throw CzdError('not-implemented').
+
+import { CzdError } from '../errors.js';
+
+/** ViewModule.mount. */
+export function mount(root, route, ctx) {
+  throw new CzdError('not-implemented');
+}

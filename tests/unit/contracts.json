@@ -1,0 +1,2271 @@
+{
+  "$comment": "Phase-0 module contracts derived from DESIGN §10 (+ setVault). arity = [min, max] bounds for Function.length: max = number of documented non-rest parameters; min = leading plain required parameters (stops at the first destructured, defaulted or opts-like parameter). null arity = unchecked. kind (DESIGN §10 declaration) = sync: plain function, neither async nor a generator | async: async function | asyncgen: async function* | promise: plain function documented to return a Promise (sync or async implementation). Class methods: {arity, kind}. value = exact expected value (deep equal). instanceProps are checked on new Vault({db: {}, openStore: async () => null}) and new MemoryStore().",
+  "modules": {
+    "app/errors.js": {
+      "CzdError": {
+        "type": "class"
+      },
+      "CODES": {
+        "type": "array"
+      },
+      "userMessage": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "isCancel": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "toCzdError": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/config.js": {
+      "VERSION": {
+        "type": "string",
+        "value": "2.0.0"
+      },
+      "APP_URL": {
+        "type": "string",
+        "value": "https://yuniorrguez13-a11y.github.io/cZEROdeWEB/"
+      },
+      "RELEASES_URL": {
+        "type": "string",
+        "value": "https://github.com/yuniorrguez13-a11y/cZEROdeWEB/releases"
+      },
+      "CHUNK_EXP": {
+        "type": "number",
+        "value": 18
+      },
+      "CAPS": {
+        "type": "object",
+        "value": {
+          "image": 67108864,
+          "text": 2097152,
+          "blobDesktop": 536870912,
+          "blobMobile": 209715200,
+          "thumbEdge": 320,
+          "thumbBytes": 32768,
+          "bundleEntries": 2000,
+          "folderFiles": 10000,
+          "folderDepth": 8
+        }
+      },
+      "TIMES": {
+        "type": "object",
+        "value": {
+          "undoMs": 8000,
+          "kdfCacheMs": 300000,
+          "swNeedMs": 2000,
+          "mediaFallbackMs": 5000,
+          "pickerSuspendMs": 600000,
+          "easterDebounceMs": 400
+        }
+      }
+    },
+    "app/types.js": {},
+    "app/util/bytes.js": {
+      "concat": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "utf8": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "fromUtf8": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "ascii": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "toHex": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "fromHex": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "toB64": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "fromB64": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "toB64url": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "toBase32": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "fromBase32": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "randomBytes": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "ctEqual": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "zeroize": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "u16": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "u32": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "u64": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "readU16": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "readU32": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "readU64": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "be88": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/util/stream.js": {
+      "blobSource": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "bytesSource": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "rechunk": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "fileChunks": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "collect": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "take": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "withProgress": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          3,
+          3
+        ]
+      },
+      "abortable": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/util/format.js": {
+      "fmtSize": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "fmtDate": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "fmtDuration": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "kindOf": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "viewerMode": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      },
+      "safeMediaType": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "safeFilename": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "extOf": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "mimeFromExt": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "randomExportName": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "contentDisposition": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "dedupeName": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      }
+    },
+    "app/util/dom.js": {
+      "h": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "svg": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "clear": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "icon": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "toast": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "modal": {
+        "type": "function",
+        "kind": "promise",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "sheet": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "confirmDialog": {
+        "type": "function",
+        "kind": "promise",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "promptDialog": {
+        "type": "function",
+        "kind": "promise",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "trapFocus": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "onOutside": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "announce": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/state.js": {
+      "get": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "set": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "on": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "onPurge": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "purge": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "busy": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/settings.js": {
+      "DEFAULTS": {
+        "type": "object",
+        "value": {
+          "theme": "gothic",
+          "idleLockMin": 5,
+          "hiddenLock": "3m",
+          "keepAudioWhenHidden": true,
+          "privacyCover": true,
+          "clipboardClearSec": 30,
+          "vaultView": "grid",
+          "vaultSort": "new",
+          "sendHideName": true,
+          "sendOnePerFile": false,
+          "sendKeepDates": false,
+          "tutorialDone": false,
+          "dismissed": {}
+        }
+      },
+      "get": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "set": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "all": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "migrateLegacy": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/router.js": {
+      "start": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          3
+        ]
+      },
+      "navigate": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "current": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "pushOverlay": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/platform.js": {
+      "isTauri": {
+        "type": "boolean"
+      },
+      "caps": {
+        "type": "object",
+        "members": {
+          "savePicker": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          },
+          "dirPicker": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          },
+          "sw": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          },
+          "mobile": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          },
+          "share": {
+            "type": "function",
+            "arity": [
+              1,
+              1
+            ]
+          }
+        }
+      },
+      "storage": {
+        "type": "object",
+        "members": {
+          "estimate": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          },
+          "persisted": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          },
+          "persist": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "pickFiles": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "chooseSaveTarget": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "setStager": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "shareFiles": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "shareText": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "suspendHiddenLock": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "listLegacyDesktopCzd": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "readLegacyDesktopCzd": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "onOpenFiles": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "openExternal": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "tauriFs": {
+        "type": "object",
+        "members": {
+          "readAt": {
+            "type": "function",
+            "arity": [
+              3,
+              3
+            ]
+          },
+          "writeStream": {
+            "type": "function",
+            "arity": [
+              2,
+              3
+            ]
+          },
+          "remove": {
+            "type": "function",
+            "arity": [
+              1,
+              1
+            ]
+          },
+          "list": {
+            "type": "function",
+            "arity": [
+              1,
+              1
+            ]
+          },
+          "mkdir": {
+            "type": "function",
+            "arity": null
+          },
+          "exists": {
+            "type": "function",
+            "arity": null
+          },
+          "rename": {
+            "type": "function",
+            "arity": null
+          },
+          "appDataDir": {
+            "type": "function",
+            "arity": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "tauriStreamRegister": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "tauriStreamUnregister": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "tauriStreamClear": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/pwa.js": {
+      "registerServiceWorker": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "applyUpdate": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "takeSharedFiles": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "isStandalone": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "isIOS": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "promptInstall": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/crypto/kdf.js": {
+      "KDF_ARGON2ID": {
+        "type": "number",
+        "value": 1
+      },
+      "POLICY": {
+        "type": "object",
+        "value": {
+          "m": 65536,
+          "t": 3,
+          "p": 1
+        }
+      },
+      "FLOOR": {
+        "type": "object",
+        "value": {
+          "m": 19456,
+          "t": 2,
+          "p": 1
+        }
+      },
+      "passphraseBytes": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "checkParams": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "argon2id": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          3,
+          4
+        ]
+      },
+      "derive": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          3,
+          4
+        ]
+      },
+      "deriveKek": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          3,
+          4
+        ]
+      },
+      "clearKdfCache": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "bootProbe": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "lastMs": {
+        "type": "any",
+        "binding": "let"
+      },
+      "__setArgon2ForTests": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/crypto/stealth.js": {
+      "SA": {
+        "type": "array"
+      },
+      "SSET": {
+        "type": "set"
+      },
+      "bytesToScript": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "scriptToBytes": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "stripWs": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "stealthRatio": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/crypto/container.js": {
+      "MAGIC": {
+        "type": "uint8array",
+        "value": [
+          137,
+          67,
+          90,
+          68,
+          13,
+          10,
+          26,
+          10
+        ]
+      },
+      "VERSION": {
+        "type": "number",
+        "value": 2
+      },
+      "ST_PASS": {
+        "type": "number",
+        "value": 1
+      },
+      "ST_VAULT": {
+        "type": "number",
+        "value": 2
+      },
+      "LIMITS": {
+        "type": "object"
+      },
+      "BUNDLE_TYPE": {
+        "type": "string",
+        "value": "application/x-czd-bundle"
+      },
+      "isCzd2": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "padme": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "containerSize": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      },
+      "parseHeader": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "readHeaderBytes": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "makePassKek": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          3
+        ]
+      },
+      "passStanza": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "vaultStanza": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          4,
+          4
+        ]
+      },
+      "openHeader": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "openSource": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "encryptStream": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "decryptStream": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          2,
+          3
+        ]
+      },
+      "decryptSource": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          2,
+          3
+        ]
+      },
+      "decryptRange": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          4,
+          4
+        ]
+      },
+      "verifySource": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          3
+        ]
+      },
+      "bundleMeta": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "release": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/crypto/textfmt.js": {
+      "TEXT_MARKER": {
+        "type": "string",
+        "value": "ჶ"
+      },
+      "encryptText": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          3
+        ]
+      },
+      "decryptText": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          3
+        ]
+      },
+      "detectText": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/crypto/passphrase.js": {
+      "generatePassphrase": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "estimateBits": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "strength": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "crackTime": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "meetsVaultMinimum": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "WEAK": {
+        "type": "set"
+      },
+      "isWeak": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "isEasterEggPin": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/crypto/wordlist.js": {
+      "WORDS": {
+        "type": "array"
+      }
+    },
+    "app/legacy/v4.js": {
+      "pbkdf2Legacy": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "decryptV4Bytes": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "decryptV4Text": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "pinMatchesV4": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "looksLikeV4": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/legacy/mixed.js": {
+      "detectLegacyText": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "decodeV1": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "decodeV2": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "decodeV3": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "LEGEND": {
+        "type": "array"
+      }
+    },
+    "app/legacy/oldvault.js": {
+      "setIdb": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "probeOldVault": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "listOldItems": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "tryPin": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "forgetPins": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "decodeOldItem": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "listOldPlaylists": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "deleteOldDb": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/legacy/oldczd.js": {
+      "isOldCzd": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "openOldCzd": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          2
+        ]
+      }
+    },
+    "app/vault/db.js": {
+      "openVaultDb": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          1
+        ]
+      }
+    },
+    "app/vault/store.js": {
+      "probeBestKind": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "openStore": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "MemoryStore": {
+        "type": "class",
+        "methods": {
+          "init": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "async"
+          },
+          "write": {
+            "arity": [
+              2,
+              3
+            ],
+            "kind": "async"
+          },
+          "source": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "delete": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "list": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "async"
+          },
+          "stage": {
+            "arity": [
+              2,
+              3
+            ],
+            "kind": "async"
+          },
+          "sweep": {
+            "arity": [
+              0,
+              1
+            ],
+            "kind": "async"
+          },
+          "estimate": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "async"
+          }
+        },
+        "instanceProps": [
+          "kind"
+        ]
+      }
+    },
+    "app/vault/vault.js": {
+      "vault": {
+        "type": "any",
+        "binding": "let"
+      },
+      "setVault": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "Vault": {
+        "type": "class",
+        "extends": "EventTarget",
+        "methods": {
+          "init": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "async"
+          },
+          "create": {
+            "arity": [
+              1,
+              2
+            ],
+            "kind": "async"
+          },
+          "unlock": {
+            "arity": [
+              1,
+              2
+            ],
+            "kind": "async"
+          },
+          "unlockWithRecovery": {
+            "arity": [
+              2,
+              2
+            ],
+            "kind": "async"
+          },
+          "lock": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "sync"
+          },
+          "changePassphrase": {
+            "arity": [
+              2,
+              2
+            ],
+            "kind": "async"
+          },
+          "setRecovery": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "removeRecovery": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "destroy": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "async"
+          },
+          "items": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "sync"
+          },
+          "item": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "sync"
+          },
+          "lists": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "sync"
+          },
+          "list": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "sync"
+          },
+          "thumbUrl": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "addFile": {
+            "arity": [
+              1,
+              2
+            ],
+            "kind": "async"
+          },
+          "addStream": {
+            "arity": [
+              0,
+              3
+            ],
+            "kind": "async"
+          },
+          "addNote": {
+            "arity": [
+              0,
+              1
+            ],
+            "kind": "async"
+          },
+          "saveNote": {
+            "arity": [
+              1,
+              2
+            ],
+            "kind": "async"
+          },
+          "readNote": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "rename": {
+            "arity": [
+              2,
+              2
+            ],
+            "kind": "async"
+          },
+          "setFavorite": {
+            "arity": [
+              2,
+              2
+            ],
+            "kind": "async"
+          },
+          "remove": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "open": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "sourceFor": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "exportCzd": {
+            "arity": [
+              2,
+              3
+            ],
+            "kind": "async"
+          },
+          "createList": {
+            "arity": [
+              0,
+              1
+            ],
+            "kind": "async"
+          },
+          "updateList": {
+            "arity": [
+              1,
+              2
+            ],
+            "kind": "async"
+          },
+          "removeList": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "exportBackup": {
+            "arity": [
+              0,
+              1
+            ],
+            "kind": "async"
+          },
+          "inspectBackup": {
+            "arity": [
+              1,
+              1
+            ],
+            "kind": "async"
+          },
+          "restoreBackup": {
+            "arity": [
+              2,
+              3
+            ],
+            "kind": "async"
+          },
+          "storage": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "async"
+          },
+          "useHere": {
+            "arity": [
+              0,
+              0
+            ],
+            "kind": "async"
+          }
+        },
+        "instanceProps": [
+          "status",
+          "kdfParams",
+          "lastUnlockMs",
+          "lastBackupAt",
+          "hasRecovery",
+          "storeKind",
+          "floor"
+        ]
+      }
+    },
+    "app/vault/thumbs.js": {
+      "makeThumb": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          2
+        ]
+      }
+    },
+    "app/vault/autolock.js": {
+      "startAutolock": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      }
+    },
+    "app/vault/backup.js": {
+      "writeBackup": {
+        "type": "function",
+        "kind": "asyncgen",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "readBackupHeader": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "restore": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          3,
+          4
+        ]
+      }
+    },
+    "app/vault/boot.js": {
+      "boot": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          1
+        ]
+      }
+    },
+    "app/media/media.js": {
+      "playableUrl": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "readText": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "decryptToBlob": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "prepareShare": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "saveDecrypted": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          2,
+          3
+        ]
+      },
+      "prefetch": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "releaseAll": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/ui/shell.js": {
+      "mountShell": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/ui/components.js": {
+      "passphraseField": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "dropZone": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "progressRow": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "kindIcon": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "emptyState": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "storageBar": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "segmented": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "menu": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "banner": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "strengthMeter": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "copyButton": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "stealthText": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      }
+    },
+    "app/ui/easter.js": {
+      "maybeEasterEgg": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      },
+      "showSkull": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/ui/codzilla.js": {
+      "mount": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      }
+    },
+    "app/ui/tutorial.js": {
+      "openTutorial": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/ui/vault-view.js": {
+      "mount": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      }
+    },
+    "app/ui/vault-grid.js": {
+      "grid": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      }
+    },
+    "app/ui/upload.js": {
+      "startImport": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "sniffFile": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "routeSpecialFile": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          2,
+          2
+        ]
+      }
+    },
+    "app/ui/albums.js": {
+      "albumStrip": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "albumEditor": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "addToAlbumDialog": {
+        "type": "function",
+        "kind": "async",
+        "arity": [
+          0,
+          1
+        ]
+      }
+    },
+    "app/ui/viewer.js": {
+      "openViewer": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          1
+        ]
+      },
+      "closeViewer": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/ui/player.js": {
+      "mountPlayer": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          1
+        ]
+      },
+      "playQueue": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          1,
+          2
+        ]
+      },
+      "stop": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      },
+      "isPlaying": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          0,
+          0
+        ]
+      }
+    },
+    "app/ui/send-view.js": {
+      "mount": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      }
+    },
+    "app/ui/text-view.js": {
+      "mount": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      }
+    },
+    "app/ui/legacy-view.js": {
+      "mount": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      }
+    },
+    "app/ui/more-view.js": {
+      "mount": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      }
+    },
+    "app/ui/settings-view.js": {
+      "mount": {
+        "type": "function",
+        "kind": "sync",
+        "arity": [
+          3,
+          3
+        ]
+      }
+    }
+  }
+}
