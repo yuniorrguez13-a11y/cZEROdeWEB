@@ -1,7 +1,9 @@
 // Send · Open review e2e (DESIGN §1.6, §1.7, §5.1, §7): no decrypted object URL survives a lock (bundle thumbnails
 // re-rendered while decrypting), keyboard focus stays in the card while locking, double clicks start one save, a lock
 // or a route change in the middle of "Lock & save" leaves nothing behind, a .czd dropped on the Lock card is offered
-// to the Open card, bundle row buttons name their file, and the "unlock your vault" hint reads as one sentence.
+// to the Open card, bundle row buttons name their file, the "create a vault" hint reads as one sentence, a locked
+// vault is unlocked right in the Open card (the file stays open), no decrypted name survives a lock anywhere in the
+// page, and incoming plain files ask to create a vault first when there is none.
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -217,7 +219,7 @@ test('a locked .czd added to the Lock card is offered to the Open card instead',
   await chooser.setFiles([{ name: 'from-chat.czd', mimeType: 'application/octet-stream', buffer: Buffer.from(bytes) }]);
   const t = page.locator('.toast', { hasText: 'already locked' });
   await expect(t).toBeVisible();
-  await t.getByRole('button', { name: 'Open it' }).click();
+  await t.getByRole('button', { name: 'Open' }).click();
   await expect(page.locator('.sd-card-open .sd-chip-name')).toHaveText('from-chat.czd');
   await expect(page.locator('.sd-card-lock')).toHaveAttribute('data-phase', 'empty');
   await check();
@@ -236,5 +238,71 @@ test('bundle rows: icon buttons name their file; the vault hint is one sentence'
   await createVault(page);
   await expect(page.getByRole('button', { name: 'Add a.txt to my vault' })).toBeVisible();
   await expect(page.locator('.sd-vault-hint')).toHaveCount(0);
+  await check();
+});
+
+test('the vault is unlocked from the Open card: the file stays open and Add all fills the album', async ({ page }) => {
+  const check = await watch(page);
+  await page.goto('/#/open');
+  await createVault(page);
+  await page.evaluate(async () => (await import('/app/vault/vault.js')).vault.lock('user'));
+  await expect.poll(() => page.evaluate(async () => (await import('/app/state.js')).get('vault.status'))).toBe('locked');
+  await makeCzd(page, [{ name: 'a.txt', type: 'text/plain', text: 'aaa' }, { name: 'b.txt', type: 'text/plain', text: 'bbb' }], { name: 'trip.czd' });
+  await openCzdInCard(page);
+  await expect(page.locator('.sd-add-all')).toHaveCount(0);
+  await page.locator('.sd-vault-open').click();
+  const field = page.locator('input[name="czd-vault-unlock"]');
+  await expect(field).toBeFocused();
+  await field.fill('not the vault pass');
+  await field.press('Enter');
+  await expect(page.locator('.sd-vault-form .pass-err')).toHaveText('Wrong passphrase. Capital letters matter; spaces at the ends are ignored.', { timeout: 30_000 });
+  await field.fill('vault pass for e2e');
+  await page.locator('.sd-vault-go').click();
+  await expect(page.locator('.sd-add-all')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.sd-add-all')).toBeFocused();
+  await expect(page.locator('.sd-vault-form')).toHaveCount(0);
+  await expect(page.locator('.sd-card-open')).toHaveAttribute('data-phase', 'opened');
+  await page.locator('.sd-add-all').click();
+  await expect(page.locator('.toast', { hasText: 'album “trip”' })).toBeVisible({ timeout: 30_000 });
+  const album = await page.evaluate(async () => {
+    const { vault } = await import('/app/vault/vault.js');
+    const l = vault.lists().find((x) => x.name === 'trip');
+    return l ? l.itemIds.map((id) => vault.item(id).name).sort() : null;
+  });
+  expect(album).toEqual(['a.txt', 'b.txt']);
+  await check();
+});
+
+test('after a lock no decrypted file name is left anywhere in the page', async ({ page }) => {
+  const check = await watch(page);
+  await page.goto('/#/open');
+  await makeCzd(page, [{ name: 'zebra-secret-name.txt', type: 'text/plain', text: 'top secret body' }]);
+  await openCzdInCard(page);
+  await expect(page.locator('.sd-entry-name')).toHaveText('zebra-secret-name.txt');
+  await page.locator('.sd-act-preview').click();
+  await expect(page.locator('.vw-root')).toBeVisible();
+  await page.waitForTimeout(300);
+  await page.evaluate(async () => (await import('/app/state.js')).purge('user'));
+  await expect(page.locator('.sd-card-open')).toHaveAttribute('data-phase', 'empty');
+  await page.waitForTimeout(400);
+  const html = await page.evaluate(() => document.documentElement.outerHTML);
+  expect(html).not.toContain('zebra-secret-name');
+  expect(html).not.toContain('top secret body');
+  await check();
+});
+
+test('incoming plain files offer "Add to vault"; without a vault it asks to create one first', async ({ page }) => {
+  const check = await watch(page);
+  await page.goto('/#/send');
+  await expect(page.locator('.sd-card-lock')).toBeVisible();
+  await page.evaluate(async () => {
+    const state = await import('/app/state.js');
+    state.set('incoming.files', [new File(['hello'], 'holiday.jpg', { type: 'image/jpeg' })]);
+  });
+  const row = page.locator('.sd-in-row');
+  await expect(row).toHaveCount(1);
+  await row.getByRole('button', { name: 'Add to vault' }).click();
+  await expect(page.locator('.toast', { hasText: 'Create your vault first' })).toBeVisible();
+  await expect(page).toHaveURL(/#\/vault$/);
   await check();
 });

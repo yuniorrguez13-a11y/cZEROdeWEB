@@ -335,3 +335,83 @@ test('old desktop .czd handed over through state legacy.files', async ({ page })
   expect(await page.evaluate(async () => (await import('/app/state.js')).get('legacy.files'))).toBeNull();
   await check();
 });
+
+test('double clicks import once, keyboard focus stays in the row, a lock mid-open keeps nothing', async ({ page }) => {
+  const check = await watch(page);
+  await seedOldVault(page);
+  await openLegacy(page);
+  await tryPin(page, 'vault-pin');
+  await expect(row(page, 'snack plan')).toHaveAttribute('data-state', 'open');
+  await createVault(page);
+  const vaultNames = () => page.evaluate(async () => (await import('/app/vault/vault.js')).vault.items().map((i) => i.name).sort());
+  // Old web vault: a double click imports one copy.
+  await row(page, 'snack plan').locator('.lg-act-import').dblclick();
+  await expect(row(page, 'snack plan')).toHaveAttribute('data-state', 'imported');
+  await page.waitForTimeout(300);
+  expect(await vaultNames(page)).toEqual(['snack plan']);
+  // Keyboard: Enter on Import; when it turns into "Imported", focus stays in that row.
+  const v2 = row(page, 'v2 thing');
+  await v2.locator('.lg-act-import').focus();
+  await page.keyboard.press('Enter');
+  await expect(v2).toHaveAttribute('data-state', 'imported');
+  await expect.poll(() => page.evaluate(() => document.activeElement?.closest('.lg-item')?.dataset.key ?? null))
+    .toBe(await v2.getAttribute('data-key'));
+
+  // Old desktop .czd: a double click imports one copy.
+  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), page.click('.lg-czd-pick')]);
+  await chooser.setFiles(RED_DOT);
+  const item = page.locator('.lg-desktop .lg-item');
+  await page.fill('input[name="czd-legacy-czd-pin"]', DESK.czd_files[0].pin);
+  await page.click('.lg-czd-open');
+  await expect(item).toHaveAttribute('data-state', 'open');
+  await item.locator('.lg-act-import').dblclick();
+  await expect(item.locator('.lg-act-import')).toHaveText('Imported');
+  await page.waitForTimeout(300);
+  expect(await vaultNames(page)).toEqual(['red-dot.png', 'snack plan', 'v2 thing']);
+
+  // Save to vault as note: one note per decoded message, the button keeps focus and says so.
+  await page.fill('#lg-msg', 'ყუიზ');
+  const save = page.locator('.lg-save-note');
+  await save.dblclick();
+  await expect(save).toHaveText('Saved to vault');
+  await expect(save).toBeFocused();
+  await page.waitForTimeout(300);
+  expect((await vaultNames(page)).filter((n) => n.startsWith('Old message'))).toHaveLength(1);
+
+  // A lock while the PIN is opening a .czd: nothing decrypted shows up afterwards.
+  await item.locator('.lg-act-remove').click();
+  const [chooser2] = await Promise.all([page.waitForEvent('filechooser'), page.click('.lg-czd-pick')]);
+  await chooser2.setFiles(RED_DOT);
+  await expect(item).toHaveAttribute('data-state', 'locked');
+  await page.fill('input[name="czd-legacy-czd-pin"]', DESK.czd_files[0].pin);
+  await page.evaluate(async () => {
+    const { vault } = await import('/app/vault/vault.js');
+    document.querySelector('.lg-czd-open').click();
+    vault.lock('user');
+  });
+  await page.waitForTimeout(800);
+  await expect(item).toHaveAttribute('data-state', 'locked');
+  await expect(item.locator('.lg-item-text')).toHaveText('red-dot.czd');
+  await check();
+});
+
+test('a double click on "Delete old data" leaves its question open; huge pastes are refused', async ({ page }) => {
+  const check = await watch(page);
+  await seedOldVault(page);
+  await openLegacy(page);
+  await page.locator('.lg-delete-old').dblclick();
+  await page.waitForTimeout(600);
+  await expect(page.locator('.modal')).toContainText('Delete old cZEROde 1 data?');
+  await page.locator('.modal').getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.locator('.modal')).toHaveCount(0);
+  const prevented = await page.evaluate(() => {
+    const dt = new DataTransfer();
+    dt.setData('text/plain', 'ა'.repeat(1_200_000));
+    const ev = new ClipboardEvent('paste', { clipboardData: dt, cancelable: true, bubbles: true });
+    document.querySelector('#lg-msg').dispatchEvent(ev);
+    return ev.defaultPrevented;
+  });
+  expect(prevented).toBe(true);
+  await expect(page.locator('.lg-msgs .lg-error')).toContainText('too long for an old cZEROde message');
+  await check();
+});

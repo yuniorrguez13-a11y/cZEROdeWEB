@@ -47,6 +47,7 @@ const JUNK = new Set(['thumbs.db', 'desktop.ini', '__macosx', '.ds_store']);
 const TOO_BIG = 'Stored, but too big to play or save on this device. Send it as .czd or open it on a computer.';
 const HINT = "Your originals are still in your Photos/Downloads. Delete them there if you only want them in the vault — after you've backed up.";
 const UNREADABLE = "Couldn't read this file — it may have been moved or deleted.";
+const NOTHING = 'Nothing to add: hidden and system files (like .DS_Store) are skipped.';
 const UNREADABLE_NAMES = new Set(['NotReadableError', 'NotFoundError', 'NotAllowedError']);
 
 const num = (n) => n.toLocaleString('en-US');
@@ -232,6 +233,10 @@ export async function pickAndImport({ vault, folder = false, album } = {}) {
   if (!picked?.length) return undefined;
   if (!dir) return importFiles({ vault, files: picked, album });
   const { files, folders } = groupByFolder(picked);
+  if (!files.length && !folders.length) {
+    toast(NOTHING, { kind: 'warn' });
+    return undefined;
+  }
   return importFiles({ vault, files, folders, album });
 }
 
@@ -306,7 +311,11 @@ function entriesOf(files, folders) {
 async function runImport({ vault, files, folders, album }) {
   const result = { added: [], failed: 0, cancelled: 0, interrupted: 0, routed: 0, skipped: 0 };
   const entries = entriesOf(files, folders);
-  if (!entries.length) return result;
+  if (!entries.length) {
+    // A folder of nothing but hidden/system files (.DS_Store, Thumbs.db…): say so instead of doing nothing.
+    if (Array.isArray(folders) && folders.some((g) => g?.files?.length)) toast(NOTHING, { kind: 'warn' });
+    return result;
+  }
   let prepTimer = null;
   if (dock && entries.length > 1) prepTimer = setTimeout(() => dock?.setPreparing(entries.length), PREPARE_SHOW_MS);
   let kinds;
@@ -323,7 +332,7 @@ async function runImport({ vault, files, folders, album }) {
   let batches = [];
   if (plain.length) {
     if (!vault || vault.status !== 'unlocked') {
-      toast(userMessage('vault-locked'), { kind: 'warn' });
+      toast(notReady(vault), { kind: 'warn' });
       result.skipped = plain.length;
       plain = [];
     } else {
@@ -343,6 +352,20 @@ async function runImport({ vault, files, folders, album }) {
     }
   }
   return result;
+}
+
+/** Why files can't be added right now. */
+function notReady(vault) {
+  switch (vault?.status) {
+    case 'none':
+      return 'Create your vault first — then add your files.';
+    case 'other-tab':
+      return userMessage('other-tab');
+    case 'unavailable':
+      return userMessage('store-unavailable');
+    default:
+      return userMessage('vault-locked');
+  }
 }
 
 // ───────── pre-flight space check
@@ -540,9 +563,32 @@ function hookVault(vault) {
   if (!vault || typeof vault.addEventListener !== 'function' || hookedVaults.has(vault)) return;
   hookedVaults.add(vault);
   vault.addEventListener('status', () => {
+    // The vault was deleted: what is left of the queue belongs to it (a later Retry must not fill a new vault).
+    if (vault.status === 'none') forgetQueue(vault);
     dock?.repaint();
     if (vault.status === 'unlocked') dock?.unlocked();
   });
+}
+
+/** Drops the vault's unfinished imports (nothing of them runs: a lock came first) and closes the panel when empty. */
+function forgetQueue(vault) {
+  if (jobs.some((j) => j.vault === vault && (j.state === 'waiting' || j.state === 'running'))) return;
+  for (const j of jobs) {
+    if (j.vault !== vault) continue;
+    j.gone = true;
+    j.info = null;
+    j.row = null;
+  }
+  jobs = jobs.filter((j) => j.vault !== vault);
+  for (const b of batches) {
+    if (b.vault !== vault) continue;
+    b.albumId = null;
+    b.resolve();
+  }
+  batches = batches.filter((b) => b.vault !== vault);
+  if (!dock) return;
+  if (!jobs.length) dock.close();
+  else dock.rebuild();
 }
 
 const isLocked = () => {
@@ -601,20 +647,27 @@ function ensureAlbum(b) {
   return b.albumPending;
 }
 
+/**
+ * The album a file is added to: the album the import was started in (its view is open), else the batch's folder
+ * album. A file that should be in both is added to the first and joins the folder album afterwards (joinAlbum).
+ */
 async function albumFor(job) {
   const b = job.batch;
+  let own = null;
   if (b.folder && b.createAlbum) {
     try {
-      return (await ensureAlbum(b)) ?? b.album;
+      own = await ensureAlbum(b);
     } catch (e) {
       globalThis.console?.warn?.('[upload] album not created', e);
-      return b.album;
     }
   }
-  return b.album;
+  return b.album ?? own;
 }
 
-/** The file landed outside its folder album (the option was ticked while it was being added): put it in now. */
+/**
+ * The file landed outside its folder album (the option was ticked while it was being added, or the import was
+ * started inside another album): put it in now.
+ */
 async function joinAlbum(b, id) {
   if (!b.folder || !b.createAlbum || !b.albumId || b.vault.status !== 'unlocked') return;
   try {
@@ -716,13 +769,26 @@ function settleBatches() {
   for (const b of batches) {
     if (b.settled || b.jobs.some((j) => j.state === 'waiting' || j.state === 'running')) continue;
     b.settled = true;
-    if (b.albumId && b.addedIds.length === 0 && b.vault.status === 'unlocked') {
-      const id = b.albumId;
-      b.albumId = null;
-      b.vault.removeList(id).catch(() => {});
-    }
+    dropEmptyAlbum(b);
     b.resolve();
   }
+}
+
+/**
+ * Removes the batch's folder album when none of its files landed (it is made when the first file starts) and nothing
+ * else was put in it meanwhile. Locked: kept (a retry after unlock fills it; clearing the queue then drops it).
+ */
+function dropEmptyAlbum(b) {
+  if (!b.albumId || b.addedIds.length || b.vault.status !== 'unlocked') return;
+  let l = null;
+  try {
+    l = b.vault.list(b.albumId);
+  } catch {
+    l = null; // gone already
+  }
+  const id = b.albumId;
+  b.albumId = null;
+  if (l && !l.itemIds.length) b.vault.removeList(id).catch(() => {});
 }
 
 function cancelJob(job) {
@@ -954,7 +1020,7 @@ function buildDock() {
   };
   let liftRaf = 0;
   const liftSoon = () => {
-    if (liftRaf) return;
+    if (liftRaf || el.hidden) return; // a hidden panel (nothing queued yet) skips the work; show() lifts it
     const raf = globalThis.requestAnimationFrame ?? ((f) => setTimeout(f, 16));
     liftRaf = raf(() => {
       liftRaf = 0;
@@ -1137,7 +1203,10 @@ function buildDock() {
   const api = {
     el,
     show() {
-      el.hidden = false;
+      if (el.hidden) {
+        el.hidden = false;
+        lift();
+      }
       clearTimeout(closeTimer);
     },
     setPreparing(n) {
@@ -1396,7 +1465,10 @@ function buildDock() {
         j.row = null;
       }
       jobs = [];
-      for (const b of batches) b.resolve();
+      for (const b of batches) {
+        dropEmptyAlbum(b);
+        b.resolve();
+      }
       batches = [];
       if (dock === api) dock = null;
       if (hadFocus) {

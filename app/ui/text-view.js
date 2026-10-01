@@ -4,7 +4,8 @@
 // button (Enter in the passphrase field, or Ctrl/⌘+Enter in the message) encrypts into the camouflage script
 // (text v2: Argon2id + AES-GCM + key commitment) or decrypts v2 / old v4 messages. Old Mixed Script (v1–v3) is
 // pointed to Legacy. The weak-PIN skull and strength meter only show while encrypting. "codzilla" + Encrypt opens
-// the Codzilla page. Locking clears the message, the output and the passphrase.
+// the Codzilla page. An output belongs to the message and passphrase it came from (editing either drops it).
+// Locking clears the message, the output and the passphrase.
 // Node-importable: the DOM is only touched inside functions.
 
 import { isCancel, toCzdError, userMessage } from '../errors.js';
@@ -29,6 +30,12 @@ const NOTE_TITLE_MAX = 60;
 const MODE_LABEL = { encrypt: '▶ Encrypting', decrypt: '◀ Decrypting' };
 const DETECT_LABEL = { v2: 'cZEROde message', v4: 'Old v4 message', mixed: 'Old Mixed Script' };
 
+// 'legacy.text' hands an old Mixed Script message to the Legacy screen; it is plaintext in all but name, so a lock
+// drops it when Legacy hasn't taken it yet.
+state.onPurge(() => {
+  if (state.get('legacy.text') != null) state.set('legacy.text', null);
+});
+
 function utf8Length(s) {
   if (s.length * 3 <= MAX_PLAIN) return s.length * 3; // cheap upper bound: certainly fits
   return new TextEncoder().encode(s).length;
@@ -39,6 +46,11 @@ const confirmKdf = (p) => confirmDialog({
   message: `This message needs ~${p.mib} MiB and ~${p.seconds} s to unlock. Continue?`,
   confirmLabel: 'Continue',
 });
+
+function withFk(el, key) {
+  el.dataset.fk = key;
+  return el;
+}
 
 function noteTitle(text) {
   const first = String(text).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? '';
@@ -58,9 +70,10 @@ function unsupportedView(host) {
 function textPage(host, { getVault }) {
   let override = 'auto';
   let detected = null;
-  let running = null; // {ctl, mode}
+  let running = null; // {ctl, mode, stale}: stale = the input changed meanwhile, the result is not shown
   let output = null; // {kind: 'cipher'|'plain', text, version?}
   let noteSaved = false;
+  let noteSaving = false;
   let detectTimer = null;
   let seq = 0;
 
@@ -87,7 +100,7 @@ function textPage(host, { getVault }) {
   });
   const count = h('p', { class: 'tx-count', id: 'tx-count' });
   const mixedSlot = h('div', { class: 'tx-mixed' });
-  const pf = passphraseField({ label: 'Passphrase', mode: 'new', purpose: 'text', generateWords: 6, autocomplete: 'off', onSubmit: () => run() });
+  const pf = passphraseField({ label: 'Passphrase', mode: 'new', purpose: 'text', generateWords: 6, autocomplete: 'off', onSubmit: () => run(), onChange: () => dropStale() });
   const goLabel = h('span');
   const goIcon = h('span', { class: 'tx-go-icon' });
   const go = h('button', { type: 'button', class: 'btn btn-primary tx-go', on: { click: () => run() } }, goIcon, goLabel);
@@ -171,7 +184,7 @@ function textPage(host, { getVault }) {
     count.textContent = problem ?? (s ? `${s.length.toLocaleString()} ${s.length === 1 ? 'character' : 'characters'}` : '');
     count.classList.toggle('tx-count-err', Boolean(problem));
     clearBtn.hidden = !s && !output;
-    const showMixed = detected === 'mixed' && m === 'encrypt';
+    const showMixed = detected === 'mixed';
     if (painted.mixed === showMixed) return;
     painted.mixed = showMixed;
     mixedSlot.replaceChildren(...(showMixed ? [banner({
@@ -200,8 +213,23 @@ function textPage(host, { getVault }) {
     paint();
   }
 
+  /**
+   * An output belongs to the message and passphrase it was made from: editing either drops it (no stale
+   * ciphertext to copy by mistake, no decrypted text left next to a different message).
+   */
+  function dropStale() {
+    if (running) running.stale = true; // its result is for the old message: not shown
+    if (!output) return;
+    output = null;
+    noteSaved = false;
+    noteSaving = false;
+    showOutput();
+    paint();
+  }
+
   ta.addEventListener('input', () => {
     setError(null);
+    dropStale();
     clearTimeout(detectTimer);
     detectTimer = setTimeout(detectNow, DETECT_MS);
     paint();
@@ -215,7 +243,18 @@ function textPage(host, { getVault }) {
 
   // ── output
 
+  /** Rebuilds the output card; keyboard focus inside it stays on the same control. */
   function showOutput() {
+    const d = globalThis.document;
+    const prev = d?.activeElement && outSlot.contains(d.activeElement) ? d.activeElement : null;
+    const key = prev?.closest?.('[data-fk]')?.dataset.fk ?? null;
+    buildOutput();
+    if (!prev || outSlot.contains(d.activeElement)) return;
+    const t = (key && outSlot.querySelector(`[data-fk="${key}"]:not([disabled])`)) || outSlot.querySelector('.tx-cipher, .tx-plain');
+    t?.focus({ preventScroll: true });
+  }
+
+  function buildOutput() {
     if (!output) {
       outSlot.replaceChildren();
       return;
@@ -226,6 +265,7 @@ function textPage(host, { getVault }) {
       const share = typeof globalThis.navigator?.share === 'function' ? h('button', {
         type: 'button',
         class: 'btn btn-sm tx-share',
+        dataset: { fk: 'share' },
         on: {
           click: async () => {
             try {
@@ -243,7 +283,7 @@ function textPage(host, { getVault }) {
           h('span', { class: 'tx-out-meta', text: `${output.text.length.toLocaleString()} characters` })),
         h('div', { class: 'tx-cipher', tabIndex: 0, aria: { label: 'Ciphertext' } }, stealthText(output.text)),
         h('div', { class: 'tx-out-tools' },
-          copyButton(() => output?.text ?? '', { label: 'Copy' }),
+          withFk(copyButton(() => output?.text ?? '', { label: 'Copy' }), 'copy'),
           share,
           h('span', { class: 'tx-out-tip', text: 'Send the passphrase some other way.' }))));
       return;
@@ -251,9 +291,10 @@ function textPage(host, { getVault }) {
     const noteBtn = unlocked ? h('button', {
       type: 'button',
       class: 'btn btn-sm tx-note',
-      disabled: noteSaved,
-      on: { click: (e) => saveNote(e.currentTarget) },
-    }, icon(noteSaved ? 'check' : 'note'), h('span', { text: noteSaved ? 'Saved to your vault' : 'Save to vault as note' })) : null;
+      dataset: { fk: 'note' },
+      disabled: noteSaved || noteSaving,
+      on: { click: () => saveNote() },
+    }, icon(noteSaved ? 'check' : 'note'), h('span', { text: noteSaved ? 'Saved to your vault' : noteSaving ? 'Saving…' : 'Save to vault as note' })) : null;
     outSlot.replaceChildren(h('section', { class: 'card tx-out tx-out-plain', aria: { label: 'Decrypted message' } },
       h('div', { class: 'tx-out-head' },
         h('span', { class: 'tx-out-icon', aria: { hidden: 'true' } }, icon('unlock')),
@@ -262,21 +303,27 @@ function textPage(host, { getVault }) {
       h('pre', { class: 'tx-plain', tabIndex: 0, text: output.text }),
       output.version === 'v4' ? h('p', { class: 'hint' }, icon('info'), h('span', { text: 'v4 used a weak PIN key. Re-encrypt anything important here.' })) : null,
       h('div', { class: 'tx-out-tools' },
-        copyButton(() => output?.text ?? '', { secret: true, label: 'Copy' }),
+        withFk(copyButton(() => output?.text ?? '', { secret: true, label: 'Copy' }), 'copy'),
         noteBtn)));
   }
 
-  async function saveNote(btn) {
+  async function saveNote() {
     const v = getVault();
-    if (!output || output.kind !== 'plain' || !v || v.status !== 'unlocked') return;
-    btn.disabled = true;
+    const out = output;
+    if (!out || out.kind !== 'plain' || !v || v.status !== 'unlocked' || noteSaving || noteSaved) return;
+    noteSaving = true;
+    showOutput();
     try {
-      await v.addNote({ title: noteTitle(output.text), body: output.text });
+      await v.addNote({ title: noteTitle(out.text), body: out.text });
+      if (output !== out) return; // cleared or locked meanwhile
+      noteSaving = false;
       noteSaved = true;
       showOutput();
       toast('Saved to your vault as a note', { kind: 'ok', action: { label: 'Open vault', onClick: () => router.navigate('#/vault') } });
     } catch (e) {
-      btn.disabled = false;
+      if (output !== out) return;
+      noteSaving = false;
+      showOutput();
       if (!isCancel(e)) toast(userMessage(e), { kind: 'err' });
     }
   }
@@ -310,7 +357,8 @@ function textPage(host, { getVault }) {
     }
     const my = ++seq;
     const ctl = new AbortController();
-    running = { ctl, mode: m };
+    const job = { ctl, mode: m, stale: false };
+    running = job;
     paint();
     try {
       let result;
@@ -330,14 +378,15 @@ function textPage(host, { getVault }) {
       } else {
         result = { kind: 'plain', text: await decryptV4Text(msg, pass), version: 'v4' };
       }
-      if (my !== seq) return;
+      if (my !== seq || job.stale) return;
       output = result;
       noteSaved = false;
+      noteSaving = false;
       showOutput();
       announce(result.kind === 'cipher' ? 'Message encrypted' : 'Message decrypted');
       outSlot.firstElementChild?.scrollIntoView?.({ block: 'nearest' });
     } catch (e) {
-      if (my !== seq || isCancel(e)) return;
+      if (my !== seq || job.stale || isCancel(e)) return;
       const code = toCzdError(e).code;
       if (code === 'wrong-passphrase') pf.setError(userMessage(code));
       else if (code === 'legacy-wrong-pin') pf.setError('Wrong passphrase or PIN. Old v4 messages use the PIN they were made with.');
@@ -365,6 +414,7 @@ function textPage(host, { getVault }) {
     detected = null;
     output = null;
     noteSaved = false;
+    noteSaving = false;
     setError(null);
     showOutput();
     paint();
@@ -379,7 +429,10 @@ function textPage(host, { getVault }) {
       seg.set('auto');
       paint();
     }),
-    state.on('vault.status', () => showOutput()),
+    // Only the decrypted output has a vault action ("Save to vault as note").
+    state.on('vault.status', () => {
+      if (output?.kind === 'plain') showOutput();
+    }),
   ];
   paint();
 

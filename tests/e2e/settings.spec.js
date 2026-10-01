@@ -280,12 +280,18 @@ test('restore with the recovery code sets a new passphrase', async ({ page }) =>
   await expect(rdlg).toContainText('Restore backup');
   await rdlg.locator('.seg-btn', { hasText: 'Recovery code' }).click();
   await page.fill('input[name="czd-restore-code"]', 'AAAA-BBBB-CCCC-DDDD-EEEE-FFFF-GGGG-HHHH');
+  // Generated words need the "I saved it" tick (as when creating a vault).
+  await rdlg.locator('.pass-gen').click();
+  await expect(rdlg.locator('.st-check')).toBeVisible();
+  await rdlg.locator('.st-restore-go').click();
+  await expect(rdlg.locator('.st-error')).toContainText('I saved it');
   await page.fill('input[name="czd-restore-new"]', 'short');
+  await expect(rdlg.locator('.st-check')).toBeHidden();
   await rdlg.locator('.st-restore-go').click();
   await expect(rdlg.locator('.st-error')).toContainText('at least 10 characters');
   await page.fill('input[name="czd-restore-new"]', NEW_PASS);
   await rdlg.locator('.st-restore-go').click();
-  await expect(rdlg.locator('.pass-err:visible')).toContainText("doesn't open this vault");
+  await expect(rdlg.locator('.pass-err:visible')).toContainText("doesn't open this backup");
   await page.fill('input[name="czd-restore-code"]', BACKUP_INFO.recoveryCode);
   await rdlg.locator('.st-restore-go').click();
   await expect(toast(page, `Restored ${BACKUP_INFO.items.length} items`)).toBeVisible({ timeout: 60_000 });
@@ -368,5 +374,95 @@ test('More menu: every card goes where it says', async ({ page }) => {
   await install.click();
   await expect(page.locator('.st-install-modal')).toContainText('Install cZEROde');
   await page.locator('.st-install-modal').getByRole('button', { name: 'Got it' }).click();
+  await check();
+});
+
+test('backup dialog: a double click keeps it, an unsaved staged backup asks first, focus comes back', async ({ page }) => {
+  test.setTimeout(90_000);
+  const check = await watch(page);
+  await noPickers(page);
+  await openSettings(page);
+  await createVault(page, { notes: ['one'] });
+  const exportBtn = page.locator('.st-export');
+  await expect(exportBtn).toBeEnabled();
+  await exportBtn.dblclick();
+  const dlg = page.locator('.st-backup-modal');
+  await expect(dlg.locator('.st-job[data-state="done"]')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.st-backup-modal')).toHaveCount(1);
+  // Done (or Esc) without saving: a warning first, then "Discard" really closes.
+  await dlg.locator('.st-backup-done').click();
+  await expect(dlg.locator('.st-unsaved')).toBeVisible();
+  await expect(dlg.locator('.st-backup-done')).toHaveText('Discard');
+  await expect(dlg.locator('.st-save-backup')).toBeFocused();
+  const [download] = await Promise.all([page.waitForEvent('download'), dlg.locator('.st-save-backup').click()]);
+  expect(download.suggestedFilename()).toMatch(/^czerode-backup-\d{8}\.czb$/);
+  await expect(dlg.locator('.st-unsaved')).toBeHidden();
+  await expect(dlg.locator('.st-backup-done')).toHaveText('Done');
+  await page.keyboard.press('Escape');
+  await expect(dlg).toHaveCount(0);
+  await expect(page.locator('.st-export')).toBeFocused();
+
+  // Esc while it runs = Cancel; a second export can start afterwards.
+  await page.locator('.st-export').click();
+  await expect(page.locator('.st-backup-modal')).toHaveCount(1);
+  await page.keyboard.press('Escape');
+  // Either it was still running (Esc cancelled it) or it had finished (Esc asks about the unsaved file first).
+  await expect.poll(async () => (await page.locator('.st-backup-modal').count()) === 0
+    || page.locator('.st-backup-modal .st-unsaved').isVisible()).toBe(true);
+  if (await page.locator('.st-backup-modal').count()) await page.keyboard.press('Escape');
+  await expect(page.locator('.st-backup-modal')).toHaveCount(0);
+  await check();
+});
+
+test('keyboard: focus survives the recovery code and passphrase dialogs; double clicks keep dialogs open', async ({ page }) => {
+  const check = await watch(page);
+  await openSettings(page);
+  await createVault(page);
+  await page.locator('.st-rec-create').focus();
+  await page.keyboard.press('Enter');
+  await page.fill('input[name="czd-confirm-pass"]', PASS);
+  await page.keyboard.press('Enter');
+  const rec = page.locator('.st-recovery-modal');
+  await expect(rec.getByRole('button', { name: 'I saved it' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(rec).toHaveCount(0);
+  await expect(page.locator('.st-rec-create')).toBeFocused();
+  await expect(page.locator('.st-rec-create')).toHaveText('Replace code');
+  // Remove: its button goes away, focus lands on "Create code".
+  await page.locator('.st-rec-remove').focus();
+  await page.keyboard.press('Enter');
+  await page.fill('input[name="czd-confirm-pass"]', PASS);
+  await page.keyboard.press('Enter');
+  await expect(toast(page, 'Recovery code removed')).toBeVisible();
+  await expect(page.locator('.st-rec-create')).toBeFocused();
+  // A double click opens the dialog and leaves it open.
+  await page.locator('.st-change').dblclick();
+  await page.waitForTimeout(600);
+  await expect(page.locator('.st-change-modal')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.st-change')).toBeFocused();
+  await page.locator('.st-delete').dblclick();
+  await page.waitForTimeout(600);
+  await expect(page.locator('.modal')).toContainText('Delete vault?');
+  await page.keyboard.press('Escape');
+  await check();
+});
+
+test('the section index follows the scroll; an update waiting for a lock says so', async ({ page }) => {
+  const check = await watch(page);
+  await openSettings(page);
+  await createVault(page);
+  await expect(page.locator('.st-toc-link.active')).toHaveAttribute('data-target', 'appearance');
+  await page.locator('.st-toc-link[data-target="app"]').click();
+  await expect(page.locator('.st-toc-link.active')).toHaveAttribute('data-target', 'app');
+  await expect(page.locator('#st-app-title')).toBeFocused();
+  await page.locator('#st-vault').scrollIntoViewIfNeeded();
+  await page.evaluate(() => document.getElementById('st-vault').scrollIntoView({ block: 'start' }));
+  await expect(page.locator('.st-toc-link.active')).toHaveAttribute('data-target', 'vault');
+  await page.evaluate(async () => (await import('/app/state.js')).set('sw.updateReady', true));
+  const upd = page.locator('.st-update');
+  await expect(upd).toHaveText('Update after lock');
+  await upd.click();
+  await expect(toast(page, 'installs as soon as you lock')).toBeVisible();
   await check();
 });

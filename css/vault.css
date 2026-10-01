@@ -274,7 +274,7 @@
 .vv-items[data-view="list"] .vv-more { top: 50%; bottom: auto; right: 8px; margin-top: -19px; }
 
 /* Empty states */
-.vv-empty .empty { padding: 64px 20px; border: 1px dashed var(--brd); border-radius: var(--r); background: var(--bg2); }
+.vv-empty .empty { padding: 64px 20px; border: 1px dashed var(--brd); border-radius: var(--r); background: var(--bg2); overflow-wrap: anywhere; }
 
 /* Storage */
 .vv-storage { margin-top: 12px; padding: 14px 16px; border: 1px solid var(--bdim); border-radius: var(--r); background: var(--bg2); }
@@ -293,10 +293,16 @@
 .vv-album-new { width: 42px; padding: 0; justify-content: center; }
 
 /* Drop anywhere */
+/* The dimmed, dashed frame; the label sits on its own solid pill so it reads in every theme (Minimal White's overlay is light). */
+.vv.dragover::before {
+  content: ''; position: fixed; inset: 12px; z-index: 150;
+  border: 2px dashed var(--acc); border-radius: var(--r); background: var(--overlay); pointer-events: none;
+}
 .vv.dragover::after {
-  content: 'Drop to encrypt into your vault'; position: fixed; inset: 12px; z-index: 150; display: flex; align-items: center; justify-content: center;
-  border: 2px dashed var(--acc); border-radius: var(--r); background: var(--overlay); color: #f2f2f2;
-  font-size: 18px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; pointer-events: none;
+  content: 'Drop to encrypt into your vault'; position: fixed; left: 50%; top: 50%; z-index: 151; transform: translate(-50%, -50%);
+  width: max-content; max-width: calc(100vw - 64px); padding: 14px 24px;
+  border: 1px solid var(--acc); border-radius: var(--pill); background: var(--surf); box-shadow: var(--sh-pop); color: var(--txt);
+  font-size: 16px; font-weight: 700; letter-spacing: .16em; line-height: 1.4; text-align: center; text-transform: uppercase; pointer-events: none;
 }
 
 /* ───────── Recovery code sheet */
@@ -379,14 +385,12 @@
   .vv-meta { font-size: 12px; }
   .vv-more { right: 2px; bottom: 4px; }
   .vv-items[data-view="list"] .vv-open { padding-right: 52px; }
-  .vv-selbar {
-    position: fixed; left: 8px; right: 8px; top: auto; bottom: calc(72px + env(safe-area-inset-bottom)); z-index: 95;
-  }
+  /* Sticky under the (54px) header, as on desktop: the bottom of the screen belongs to toasts (Undo) and the player dock. */
+  .vv-selbar { top: 62px; gap: 6px; padding: 6px 8px; }
   .vv-selact { width: 42px; padding: 0; }
   .vv-selact-label { display: none; }
   .vv-selacts { gap: 4px; }
   .vv-selall { display: none; }
-  .vv-unlocked.is-selecting { padding-bottom: 96px; }
   .vv-album-actions { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {

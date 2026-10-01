@@ -171,6 +171,22 @@ const btn = (label, iconId, { kind, small = true, onClick, disabled, className, 
   on: { click: onClick },
 }, iconId ? icon(iconId) : null, h('span', { text: label }));
 
+/**
+ * A double click on the button that opened a modal must not dismiss it with its second click (the backdrop is
+ * under the pointer by then): backdrop presses are ignored during the first moments, and while `hold()` is true
+ * (a job runs). Without `dlg`, the newest modal is meant (confirmDialog hides its handle).
+ */
+function holdBackdrop(dlg, { ms = 500, hold } = {}) {
+  const panel = dlg?.el ?? globalThis.document?.querySelector('#modals > .modal-backdrop:last-child > .modal');
+  const backdrop = panel?.parentElement;
+  if (!backdrop) return;
+  const t0 = Date.now();
+  // Capture at the target runs before modal()'s own (bubble) listener.
+  backdrop.addEventListener('pointerdown', (e) => {
+    if (e.target === backdrop && (Date.now() - t0 < ms || hold?.())) e.stopImmediatePropagation();
+  }, true);
+}
+
 const confirmKdf = (p) => confirmDialog({
   title: 'Heavy backup',
   message: `This backup needs ~${p.mib} MiB and ~${p.seconds} s to unlock. Continue?`,
@@ -179,9 +195,13 @@ const confirmKdf = (p) => confirmDialog({
 
 // ───────── backup export (§3.7, §12)
 
+let exporting = false;
+let restoring = false;
+
 /**
  * Exports the unlocked vault to a .czb: FIRST await is the save picker (call it from a click), then the export
- * streams into the chosen target with progress, size and free space shown. Never rejects (errors are shown).
+ * streams into the chosen target with progress, size and free space shown. Resolves when its dialog closes; never
+ * rejects (errors are shown). A second call while one runs does nothing.
  * @returns {Promise<void>}
  */
 export async function openBackupExport() {
@@ -190,16 +210,22 @@ export async function openBackupExport() {
     toast(userMessage('vault-locked'), { kind: 'warn', action: { label: 'Open vault', onClick: () => router.navigate('#/vault') } });
     return;
   }
-  const name = backupFileName();
-  let target;
+  if (exporting) return;
+  exporting = true;
   try {
-    target = await platform.chooseSaveTarget({ name, mime: CZB_MIME, count: 1 });
-  } catch (e) {
-    report(e);
-    return;
+    const name = backupFileName();
+    let target;
+    try {
+      target = await platform.chooseSaveTarget({ name, mime: CZB_MIME, count: 1 });
+    } catch (e) {
+      report(e);
+      return;
+    }
+    if (!target) return;
+    await runExport(v, target, name);
+  } finally {
+    exporting = false;
   }
-  if (!target) return;
-  await runExport(v, target, name);
 }
 
 async function runExport(v, target, name) {
@@ -209,13 +235,21 @@ async function runExport(v, target, name) {
   const sub = h('p', { class: 'st-job-sub', text: 'Checking every item first. Nothing is decrypted.' });
   const slot = h('div', { class: 'st-job-slot' }, h('div', { class: 'progress st-indet' }, h('div', { class: 'progress-fill' })));
   const errLine = h('p', { class: 'hint hint-err st-error', role: 'alert', hidden: true });
-  const cancel = btn('Cancel', 'close', { kind: 'ghost', small: false, onClick: () => ctl.abort(new CzdError('aborted')) });
+  const cancel = btn('Cancel', 'close', { kind: 'ghost', small: false, className: 'st-backup-cancel', onClick: () => ctl.abort(new CzdError('aborted')) });
   const foot = h('div', { class: 'st-job-foot' }, cancel);
   const body = h('div', { class: 'st-job', dataset: { state: 'running' } },
     h('div', { class: 'st-job-head' }, h('span', { class: 'st-job-icon' }, icon('download')), h('div', { class: 'st-job-titles' }, title, sub)),
     slot, errLine, foot);
-  const dlg = modal({ title: 'Back up vault', body, className: 'st-modal st-backup-modal' });
+  // Not dismissible by a stray click or Esc: Cancel stops the job, and a staged backup must not be thrown away
+  // by accident (Esc = Cancel / Done below). A lock or a route change still closes it.
+  const dlg = modal({ title: 'Back up vault', body, className: 'st-modal st-backup-modal', dismissible: false });
   let closed = false;
+  let onEsc = () => ctl.abort(new CzdError('aborted'));
+  dlg.el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    e.preventDefault();
+    onEsc();
+  });
   dlg.then(() => {
     closed = true;
     if (running) ctl.abort(new CzdError('aborted'));
@@ -228,6 +262,7 @@ async function runExport(v, target, name) {
     running = false;
     await target.abort().catch(() => {});
     fail(e);
+    await dlg;
     return;
   }
   const est = await platform.storage.estimate().catch(() => null);
@@ -243,6 +278,7 @@ async function runExport(v, target, name) {
     running = false;
     await target.abort().catch(() => {});
     fail(e);
+    await dlg;
     return;
   }
   running = false;
@@ -254,23 +290,49 @@ async function runExport(v, target, name) {
   sub.textContent = lines.join(' · ');
   const tips = h('p', { class: 'st-job-tip', text: 'It opens with your passphrase or your recovery code. Keep it somewhere other than this device.' });
   const warn = plan.skipped > 0 ? banner({ kind: 'warn', text: `${plural(plan.skipped, 'damaged item')} could not be included.` }) : null;
-  const done = btn('Done', 'check', { kind: res?.staged ? 'ghost' : 'primary', small: false, onClick: () => dlg.close(true) });
+  // A staged backup only exists in this tab until "Save backup" hands it to the browser's downloads.
+  let saved = !res?.staged;
+  let warned = false;
+  const unsaved = h('p', { class: 'hint st-unsaved', role: 'alert', hidden: true }, icon('warning'),
+    h('span', { text: 'Not saved yet — it disappears when this closes. Tap “Save backup”, or “Discard” to throw it away.' }));
+  const finish = () => {
+    if (saved || warned) {
+      dlg.close(true);
+      return;
+    }
+    warned = true;
+    unsaved.hidden = false;
+    done.querySelector('.icon')?.replaceWith(icon('trash'));
+    done.querySelector('span').textContent = 'Discard';
+    done.classList.add('st-discard');
+    save?.focus();
+  };
+  onEsc = finish;
+  const done = btn('Done', 'check', { kind: res?.staged ? 'ghost' : 'primary', small: false, className: 'st-backup-done', onClick: finish });
   const save = res?.staged ? btn('Save backup', 'download', {
     kind: 'primary',
     small: false,
     className: 'st-save-backup',
     onClick: () => {
       downloadFile(res.staged);
+      saved = true;
+      unsaved.hidden = true;
       save.disabled = true;
       save.lastChild.textContent = 'Saved';
-      done.classList.replace('btn-ghost', 'btn-primary');
+      done.querySelector('.icon')?.replaceWith(icon('check'));
+      done.querySelector('span').textContent = 'Done';
+      done.classList.remove('btn-ghost', 'st-discard');
+      done.classList.add('btn-primary');
+      done.focus();
     },
   }) : null;
   slot.after(tips);
   if (warn) tips.after(warn);
+  foot.before(unsaved);
   foot.replaceChildren(done, save ?? '');
   (save ?? done).focus();
   announce('Backup ready');
+  await dlg;
 
   function fail(e) {
     body.dataset.state = 'failed';
@@ -288,7 +350,10 @@ async function runExport(v, target, name) {
     slot.replaceChildren();
     errLine.replaceChildren(icon('warning'), h('span', { text: errorText(e) }));
     errLine.hidden = false;
-    foot.replaceChildren(btn('Close', null, { kind: 'primary', small: false, onClick: () => dlg.close(null) }));
+    const close = btn('Close', null, { kind: 'primary', small: false, onClick: () => dlg.close(null) });
+    foot.replaceChildren(close);
+    close.focus();
+    onEsc = () => dlg.close(null);
   }
 }
 
@@ -313,13 +378,16 @@ async function isCzbFile(file) {
 
 /**
  * Restore (no vault yet → the backup becomes this device's vault) or merge (unlocked → its items are added,
- * duplicates skipped). Without `file` the FIRST await is the file picker (call it from a click). Never rejects.
+ * duplicates skipped). Without `file` the FIRST await is the file picker (call it from a click). Resolves when its
+ * dialog closes; never rejects. A second call while one is open does nothing.
  * @param {File} [file]
  * @returns {Promise<void>}
  */
 export async function openRestoreDialog(file) {
   let f = file;
   if (!f) {
+    // The picker itself isn't guarded: a pick the browser never reports as cancelled is only settled by the next
+    // pickFiles() call, which a guard here would block forever.
     let picked;
     try {
       picked = await platform.pickFiles({ multiple: false });
@@ -330,6 +398,16 @@ export async function openRestoreDialog(file) {
     f = picked?.[0];
     if (!f) return;
   }
+  if (restoring) return;
+  restoring = true;
+  try {
+    await restoreFrom(f);
+  } finally {
+    restoring = false;
+  }
+}
+
+async function restoreFrom(f) {
   const v = getVault();
   if (!v) {
     report(new CzdError('store-unavailable'));
@@ -348,6 +426,12 @@ export async function openRestoreDialog(file) {
     return;
   }
   await restoreFlow(v, f, src, info);
+}
+
+/** holdBackdrop(dlg), then the dialog's promise. */
+function held(dlg) {
+  holdBackdrop(dlg);
+  return dlg;
 }
 
 function backupSummary(f, info) {
@@ -373,14 +457,14 @@ async function restoreFlow(v, f, src, info) {
     const msg = status === 'locked'
       ? 'Unlock your vault first to merge this backup into it. To replace your vault with it instead, delete this vault in Settings → Vault, then restore.'
       : userMessage(status === 'other-tab' ? 'other-tab' : 'store-unavailable');
-    const go = await modal({
+    const go = await held(modal({
       title: 'Restore backup',
       className: 'st-modal',
       body: h('div', { class: 'stack' }, backupSummary(f, info), banner({ kind: 'info', text: msg })),
       actions: status === 'locked'
         ? [{ label: 'Close', kind: 'ghost', value: false }, { label: 'Unlock vault', kind: 'primary', value: true, autofocus: true }]
         : [{ label: 'Close', kind: 'primary', value: false }],
-    });
+    }));
     if (go === true) router.navigate('#/vault');
     return;
   }
@@ -389,16 +473,20 @@ async function restoreFlow(v, f, src, info) {
   let secretKind = 'pass';
   let running = null;
 
+  const orCode = info.hasRecovery ? ' — or its recovery code' : '';
   const lead = mode === 'replace'
-    ? "This device has no vault yet: the backup becomes your vault. Unlock it with the backup's passphrase — or its recovery code."
+    ? `This device has no vault yet: the backup becomes your vault. Unlock it with the backup's passphrase${orCode}.`
     : info.sameVault
       ? 'This backup comes from the vault you have open. Items you already have are skipped — nothing is overwritten.'
-      : "This backup comes from another vault. Its items are copied into yours with fresh keys, and its albums come along. Enter that backup's passphrase or recovery code.";
+      : `This backup comes from another vault. Its items are copied into yours with fresh keys, and its albums come along. Enter that backup's passphrase${orCode}.`;
 
   const passF = passphraseField({ label: mode === 'replace' ? 'Backup passphrase' : "That backup's passphrase", mode: 'enter', purpose: 'unlock', autocomplete: 'off', name: 'czd-restore-pass', onSubmit: () => go() });
   const codeF = passphraseField({ label: 'Recovery code', mode: 'enter', purpose: 'open', autocomplete: 'off', name: 'czd-restore-code', placeholder: '8 groups of 4', onSubmit: () => go() });
   // Replace with the recovery code: the vault gets a new passphrase (the old one is the one that was forgotten).
   const newF = passphraseField({ label: 'New passphrase for this vault', mode: 'new', purpose: 'vault', generateWords: 5, name: 'czd-restore-new', onChange: () => paint() });
+  // Generated words: like creating a vault (§1.4), a tick that they are stored somewhere.
+  const savedBox = h('input', { type: 'checkbox', on: { change: () => paint() } });
+  const saved = h('label', { class: 'check st-check', hidden: true }, savedBox, h('span', { text: 'I saved it (password manager, paper or screenshot)' }));
   const reason = h('p', { class: 'hint st-reason', aria: { live: 'polite' } });
   const seg = info.hasRecovery ? segmented({
     label: 'Unlock with',
@@ -414,7 +502,7 @@ async function restoreFlow(v, f, src, info) {
   const progressSlot = h('div', { class: 'st-job-slot' });
   const goBtn = btn(mode === 'replace' ? 'Restore' : 'Merge', mode === 'replace' ? 'refresh' : 'plus', { kind: 'primary', small: false, className: 'st-restore-go', onClick: () => go() });
   const cancelBtn = btn('Cancel', null, { kind: 'ghost', small: false, onClick: () => (running ? running.abort(new CzdError('aborted')) : dlg.close(null)) });
-  const secretBox = h('div', { class: 'st-secret' }, seg?.el ?? null, passF.el, codeF.el, newF.el, reason);
+  const secretBox = h('div', { class: 'st-secret' }, seg?.el ?? null, passF.el, codeF.el, newF.el, saved, reason);
   const body = h('div', { class: 'st-restore stack' },
     backupSummary(f, info),
     h('p', { class: 'st-lead-sm', text: lead }),
@@ -423,6 +511,7 @@ async function restoreFlow(v, f, src, info) {
     errLine,
     h('div', { class: 'st-job-foot' }, cancelBtn, goBtn));
   const dlg = modal({ title: mode === 'replace' ? 'Restore backup' : 'Merge backup', body, className: 'st-modal st-restore-modal' });
+  holdBackdrop(dlg, { hold: () => Boolean(running) });
   let closed = false;
   dlg.then(() => {
     closed = true;
@@ -431,6 +520,7 @@ async function restoreFlow(v, f, src, info) {
   paint();
   if (needSecret) passF.focus();
   else goBtn.focus();
+  await dlg;
 
   function problem() {
     if (!needSecret) return null;
@@ -440,6 +530,7 @@ async function restoreFlow(v, f, src, info) {
       if (!newF.value) return 'Pick a new passphrase for the restored vault — or tap Generate.';
       const min = meetsVaultMinimum(newF.value, { generated: newF.generated });
       if (!min.ok) return min.reason === 'too-short' ? 'Use at least 10 characters — or tap Generate.' : 'Too easy to guess. Add a few more words, or tap Generate.';
+      if (newF.generated && !savedBox.checked) return 'Tick “I saved it” once the words are stored somewhere safe.';
     }
     return null;
   }
@@ -448,6 +539,8 @@ async function restoreFlow(v, f, src, info) {
     passF.el.hidden = secretKind !== 'pass';
     codeF.el.hidden = secretKind !== 'code';
     newF.el.hidden = !(secretKind === 'code' && mode === 'replace');
+    saved.hidden = newF.el.hidden || !newF.generated;
+    if (saved.hidden) savedBox.checked = false;
     const p = problem();
     reason.textContent = p ?? '';
     reason.hidden = !p || !(secretKind === 'code' && mode === 'replace');
@@ -477,6 +570,7 @@ async function restoreFlow(v, f, src, info) {
     progressSlot.replaceChildren(row.el);
     goBtn.disabled = true;
     for (const fld of [passF, codeF, newF]) fld.setDisabled(true);
+    savedBox.disabled = true;
     if (seg) seg.el.inert = true;
     body.dataset.state = 'running';
     try {
@@ -497,6 +591,7 @@ async function restoreFlow(v, f, src, info) {
       progressSlot.replaceChildren();
       goBtn.disabled = false;
       for (const fld of [passF, codeF, newF]) fld.setDisabled(false);
+      savedBox.disabled = false;
       if (seg) seg.el.inert = false;
       body.dataset.state = 'idle';
       if (isCancel(e)) return;
@@ -505,8 +600,10 @@ async function restoreFlow(v, f, src, info) {
         return;
       }
       if (e?.code === 'wrong-passphrase' && secretKind === 'pass') passF.setError(userMessage(e));
-      else if (e?.code === 'recovery-wrong') codeF.setError(userMessage(e));
+      else if (e?.code === 'recovery-wrong') codeF.setError("That recovery code doesn't open this backup.");
+      else if (e?.code === 'vault-exists') setError('This device has a vault now (made in another tab?). Close this and merge the backup into it instead.');
       else setError(errorText(e));
+      if (!body.contains(globalThis.document?.activeElement)) goBtn.focus(); // it was disabled while running
     }
   }
 }
@@ -540,6 +637,7 @@ function changePassphraseDialog(v) {
     go();
   });
   const dlg = modal({ title: 'Change passphrase', body: form, className: 'st-modal st-change-modal' });
+  holdBackdrop(dlg, { hold: () => busy });
   paint();
   oldF.focus();
 
@@ -584,9 +682,11 @@ function changePassphraseDialog(v) {
       else {
         errLine.replaceChildren(icon('warning'), h('span', { text: errorText(e) }));
         errLine.hidden = false;
+        goBtn.focus(); // it was disabled while working
       }
     }
   }
+  return dlg;
 }
 
 /** Asks for the vault passphrase, then runs `run(pass)`; wrong passphrases stay in the dialog. */
@@ -599,6 +699,7 @@ function passphraseDialog({ title, text, confirmLabel, danger = false, run }) {
     h('div', { class: 'st-job-foot' }, btn('Cancel', null, { kind: 'ghost', small: false, onClick: () => dlg.close(null) }), goBtn));
   const dlg = modal({ title, body, className: 'st-modal' });
   let busy = false;
+  holdBackdrop(dlg, { hold: () => busy });
   f.focus();
   async function go() {
     if (busy) return;
@@ -623,6 +724,7 @@ function passphraseDialog({ title, text, confirmLabel, danger = false, run }) {
       else {
         errLine.replaceChildren(icon('warning'), h('span', { text: errorText(e) }));
         errLine.hidden = false;
+        goBtn.focus(); // it was disabled while working
       }
     }
     return undefined;
@@ -770,12 +872,37 @@ function settingsPage(host, ctx, route) {
     h('div', { class: 'st-layout' }, toc, sections));
   host.append(el);
 
+  function markToc(id) {
+    for (const b of toc.querySelectorAll('[data-target]')) {
+      const on = b.dataset.target === id;
+      b.classList.toggle('active', on);
+      if (on) b.setAttribute('aria-current', 'true');
+      else b.removeAttribute('aria-current');
+      // Horizontal chips (tablet/phone): keep the current one in view without scrolling the page.
+      if (on && toc.scrollWidth > toc.clientWidth) toc.scrollLeft = Math.max(0, b.offsetLeft - toc.offsetLeft - 16);
+    }
+  }
+
   function jump(id, smooth) {
     const target = el.querySelector(`#st-${id}`);
     if (!target) return;
     const reduce = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     target.scrollIntoView({ behavior: smooth && !reduce ? 'smooth' : 'auto', block: 'start' });
-    for (const b of toc.querySelectorAll('[data-target]')) b.classList.toggle('active', b.dataset.target === id);
+    markToc(id);
+    target.querySelector('.st-sec-title')?.setAttribute('tabindex', '-1');
+    if (smooth) target.querySelector('.st-sec-title')?.focus({ preventScroll: true });
+  }
+
+  // The index follows the scroll: the first section whose top part is on screen is "current".
+  let spy = null;
+  if (typeof globalThis.IntersectionObserver === 'function') {
+    const seen = new Map();
+    spy = new IntersectionObserver((entries) => {
+      for (const e of entries) seen.set(e.target.dataset.section, e.isIntersecting);
+      const first = SECTIONS.find((sec) => seen.get(sec.id));
+      if (first) markToc(first.id);
+    }, { rootMargin: '-90px 0px -45% 0px' });
+    for (const sec of sections.querySelectorAll('.st-sec')) spy.observe(sec);
   }
 
   // ───── security: unlock time
@@ -789,8 +916,40 @@ function settingsPage(host, ctx, route) {
     const params = p ? `Argon2id · ${Math.round(p.m / 1024)} MiB · ${plural(p.t, 'pass', 'passes')}${v.floor ? ' (lighter protection for low memory)' : ''}` : 'Argon2id';
     unlockHint.textContent = ms
       ? `Unlock takes ~${Math.round(ms).toLocaleString()} ms on this device. ${params}. Every guess costs an attacker the same.`
-      : `Unlock once to measure it on this device. ${params}.`;
+      : v?.status === 'locked' || v?.status === 'unlocked' ? `Unlock once to measure it on this device. ${params}.` : `Measured when you create or unlock a vault on this device. ${params}.`;
   }
+
+  // ───── keyboard focus across repaints of the vault section (its rows are rebuilt on every vault change)
+  const FOCUS_ALT = Object.freeze({ 'st-rec-remove': 'st-rec-create', 'st-delete': 'st-restore', 'st-keep': 'st-export' });
+  let pendingFocus = null;
+  const stClass = (el) => [...(el?.classList ?? [])].find((c) => c.startsWith('st-') && c !== 'st-row');
+  /** After a dialog opened from `cls` closes (or a repaint dropped the focused button), focus its successor. */
+  function wantFocus(cls) {
+    if (!alive || !cls) return;
+    pendingFocus = cls;
+    tryFocus();
+  }
+  function tryFocus() {
+    if (!pendingFocus) return;
+    const d = globalThis.document;
+    const a = d?.activeElement;
+    if (a && d.getElementById('modals')?.contains(a)) return; // a dialog is up: when it closes
+    if (a && a !== d.body && a.isConnected) {
+      // Focus is somewhere real (back on its button, or the user moved on): a repaint records it again if needed.
+      pendingFocus = null;
+      return;
+    }
+    const want = pendingFocus;
+    pendingFocus = null;
+    const pick = (c) => (c ? vaultBody.querySelector(`.${c}:not([disabled])`) : null);
+    const target = pick(want) ?? pick(FOCUS_ALT[want]) ?? d.getElementById('st-vault-title');
+    if (target) {
+      if (target.id === 'st-vault-title') target.tabIndex = -1;
+      target.focus({ preventScroll: true });
+    }
+  }
+  /** Runs a dialog flow opened by the `cls` button; focus comes back to that button (or its successor). */
+  const track = (p, cls) => Promise.resolve(p).finally(() => wantFocus(cls));
 
   // ───── vault section
   let paintSeq = 0;
@@ -866,7 +1025,7 @@ function settingsPage(host, ctx, route) {
         count: info?.count ?? 0, itemBytes: info?.itemBytes ?? 0, usage: info?.usage ?? est?.usage ?? null, quota: info?.quota ?? est?.quota ?? null, persisted: info?.persisted ?? persisted,
       });
       bar.classList.add('st-storage');
-      const keep = !platform.isTauri && persisted !== true ? btn('Keep my data', 'check', { kind: 'primary', className: 'st-keep', onClick: () => keepData() }) : null;
+      const keep = !platform.isTauri && persisted !== true ? btn('Keep my data', 'check', { kind: 'primary', className: 'st-keep', onClick: () => track(keepData(), 'st-keep') }) : null;
       const storageHint = platform.isTauri
         ? 'Your vault lives in this app’s data folder. Uninstalling may delete it — keep a backup.'
         : persisted === true
@@ -877,7 +1036,7 @@ function settingsPage(host, ctx, route) {
       rows.push(row({
         label: 'Keep my data',
         hint: 'The browser may clear storage when space runs low. This asks it not to; installing the app helps too.',
-        control: btn('Keep my data', 'check', { className: 'st-keep', onClick: () => keepData() }),
+        control: btn('Keep my data', 'check', { className: 'st-keep', onClick: () => track(keepData(), 'st-keep') }),
       }));
     }
 
@@ -890,13 +1049,13 @@ function settingsPage(host, ctx, route) {
         rows.push(row({
           label: 'Back up',
           hint: [`One .czb file with everything — still encrypted, opens with your passphrase or recovery code.`, sizeLine, last].filter(Boolean).join(' '),
-          control: btn('Export backup', 'download', { kind: unlocked ? 'primary' : undefined, disabled: !unlocked, className: 'st-export', onClick: () => openBackupExport() }),
+          control: btn('Export backup', 'download', { kind: unlocked ? 'primary' : undefined, disabled: !unlocked, className: 'st-export', onClick: () => track(openBackupExport(), 'st-export') }),
         }));
       }
       rows.push(row({
         label: status === 'none' ? 'Restore a backup' : 'Restore or merge a backup',
         hint: status === 'none' ? 'A .czb backup becomes this device’s vault.' : 'Adds the items of a .czb to this vault. Items you already have are skipped.',
-        control: btn(status === 'none' ? 'Restore backup' : 'Merge backup', 'upload', { className: 'st-restore', disabled: status === 'other-tab', onClick: () => openRestoreDialog() }),
+        control: btn(status === 'none' ? 'Restore backup' : 'Merge backup', 'upload', { className: 'st-restore', disabled: status === 'other-tab', onClick: () => track(openRestoreDialog(), 'st-restore') }),
       }));
     }
 
@@ -904,7 +1063,7 @@ function settingsPage(host, ctx, route) {
       rows.push(row({
         label: 'Passphrase',
         hint: unlocked ? 'Changes what unlocks the vault on this device. Old backups still open with the old one.' : 'Unlock first to change it.',
-        control: btn('Change passphrase', 'key', { className: 'st-change', disabled: !unlocked, onClick: () => changePassphraseDialog(v) }),
+        control: btn('Change passphrase', 'key', { className: 'st-change', disabled: !unlocked, onClick: () => track(changePassphraseDialog(v), 'st-change') }),
       }));
       const rec = v.hasRecovery;
       rows.push(row({
@@ -912,17 +1071,20 @@ function settingsPage(host, ctx, route) {
         hint: rec ? 'On. The code opens the vault if you forget your passphrase — keep it away from this device.' : 'Off. Without a code, a forgotten passphrase means your files are gone.',
         control: h('div', { class: 'st-ctl-row' },
           h('span', { class: ['badge', rec ? 'badge-ok' : 'badge-warn', 'st-rec-badge'] }, icon(rec ? 'check' : 'warning'), h('span', { text: rec ? 'On' : 'Off' })),
-          btn(rec ? 'Replace code' : 'Create code', rec ? 'refresh' : 'plus', { className: 'st-rec-create', onClick: () => createRecovery(v) }),
-          rec ? btn('Remove', 'trash', { kind: 'ghost', className: 'st-rec-remove', onClick: () => removeRecovery(v) }) : ''),
+          btn(rec ? 'Replace code' : 'Create code', rec ? 'refresh' : 'plus', { className: 'st-rec-create', onClick: () => track(createRecovery(v), 'st-rec-create') }),
+          rec ? btn('Remove', 'trash', { kind: 'ghost', className: 'st-rec-remove', onClick: () => track(removeRecovery(v), 'st-rec-remove') }) : ''),
       }));
       rows.push(row({
         label: 'Delete vault',
         hint: 'Deletes every item in this vault on this device. There is no undo — only a .czb backup brings it back.',
-        control: btn('Delete vault', 'trash', { kind: 'danger', className: 'st-delete', onClick: () => deleteVault(v) }),
+        control: btn('Delete vault', 'trash', { kind: 'danger', className: 'st-delete', onClick: () => track(deleteVault(v), 'st-delete') }),
         className: 'st-row-danger',
       }));
     }
+    const a = globalThis.document?.activeElement;
+    if (a && vaultBody.contains(a)) pendingFocus = stClass(a) ?? null;
     vaultBody.replaceChildren(...rows);
+    tryFocus();
   }
 
   async function keepData() {
@@ -933,7 +1095,7 @@ function settingsPage(host, ctx, route) {
   }
 
   function createRecovery(v) {
-    passphraseDialog({
+    return passphraseDialog({
       title: v.hasRecovery ? 'Replace recovery code' : 'Create recovery code',
       text: v.hasRecovery ? 'A new code replaces the old one; the old code stops working. Enter your passphrase to continue.' : 'The code opens your vault if you ever forget your passphrase. Enter your passphrase to continue.',
       confirmLabel: v.hasRecovery ? 'Replace code' : 'Create code',
@@ -941,14 +1103,14 @@ function settingsPage(host, ctx, route) {
         const replaced = v.hasRecovery;
         const code = await v.setRecovery(pass);
         // Opened after the passphrase dialog has closed (same tick): one layer at a time.
-        Promise.resolve().then(() => showRecoveryCode(code, { replaced }));
+        Promise.resolve().then(() => track(showRecoveryCode(code, { replaced }), 'st-rec-create'));
         return code;
       },
     });
   }
 
   function removeRecovery(v) {
-    passphraseDialog({
+    return passphraseDialog({
       title: 'Remove recovery code',
       text: 'After this, only your passphrase opens the vault. Forget it and your files are gone. Enter your passphrase to continue.',
       confirmLabel: 'Remove code',
@@ -961,13 +1123,15 @@ function settingsPage(host, ctx, route) {
   }
 
   async function deleteVault(v) {
-    const ok = await confirmDialog({
+    const asked = confirmDialog({
       title: 'Delete vault?',
       message: `This deletes every item in the vault on this device. There is no undo.\n\nMake a backup first if you might want anything back.`,
       confirmLabel: 'Delete vault',
       danger: true,
       typed: 'DELETE',
     });
+    holdBackdrop(null);
+    const ok = await asked;
     if (!ok) return;
     try {
       await v.destroy();
@@ -994,7 +1158,9 @@ function settingsPage(host, ctx, route) {
         hint: ready
           ? (blocked ? 'Update ready — it installs after you lock the vault and running jobs finish.' : 'Update ready — reload to get it.')
           : 'Updates download in the background and wait for your OK. Never while your vault is open.',
-        control: ready ? btn(blocked ? 'Update after lock' : 'Reload to update', 'refresh', { kind: 'primary', className: 'st-update', onClick: () => applyUpdate() }) : h('span', { class: 'badge badge-ok' }, icon('check'), h('span', { text: 'Up to date' })),
+        control: ready
+          ? btn(updateQueued ? 'Waiting for lock' : blocked ? 'Update after lock' : 'Reload to update', 'refresh', { kind: 'primary', className: 'st-update', disabled: updateQueued, onClick: () => applyUpdate() })
+          : h('span', { class: 'badge' }, icon('check'), h('span', { text: 'No update waiting' })),
       }));
     } else {
       rows.push(row({
@@ -1012,12 +1178,24 @@ function settingsPage(host, ctx, route) {
     appBody.replaceChildren(...rows);
   }
 
+  let updateQueued = false;
   async function applyUpdate() {
+    if (updateQueued) return;
+    const blocked = state.get('vault.status') === 'unlocked' || (Number(state.get('busy')) || 0) > 0;
+    if (blocked) {
+      // pwa.applyUpdate waits for a lock (and for running jobs); say so instead of looking stuck.
+      updateQueued = true;
+      paintApp();
+      toast('The update installs as soon as you lock the vault (and running jobs finish).', { kind: 'info', timeout: 6000 });
+    }
     try {
       const ok = await pwa.applyUpdate();
       if (!ok) toast('No update is waiting right now.', { kind: 'info' });
     } catch (e) {
       report(e);
+    } finally {
+      updateQueued = false;
+      if (alive) paintApp();
     }
   }
 
@@ -1049,6 +1227,7 @@ function settingsPage(host, ctx, route) {
     },
     destroy() {
       alive = false;
+      spy?.disconnect();
       for (const off of offs.splice(0)) off();
       for (const off of vaultOffs.splice(0)) off();
       el.remove();
@@ -1058,7 +1237,15 @@ function settingsPage(host, ctx, route) {
 
 // ───────── about page (§6)
 
+/** The Linux build (the desktop media limit of DESIGN §12 applies only there). */
+function isLinuxDesktop() {
+  const nav = globalThis.navigator;
+  const s = `${nav?.userAgentData?.platform ?? ''} ${nav?.platform ?? ''} ${nav?.userAgent ?? ''}`;
+  return /linux/i.test(s) && !/android/i.test(s);
+}
+
 function aboutPage(host) {
+  const clipSec = Number(settings.get('clipboardClearSec')) || 0;
   const li = (iconId, title, text) => h('li', { class: 'st-point' },
     h('span', { class: 'st-point-icon', aria: { hidden: 'true' } }, icon(iconId)),
     h('div', null, h('p', { class: 'st-point-title', text: title }), h('p', { class: 'st-point-text', text })));
@@ -1083,7 +1270,9 @@ function aboutPage(host) {
       'Each browser and each app install has its own vault. Move with a backup (.czb) or Send it to yourself.',
       'Uninstalling or clearing site data deletes the vault. Only a .czb backup survives that.',
       LOCK_COPY,
-      'Copied secrets: cZEROde tries to clear the clipboard after 30 s (only while it’s in front). Clipboard history apps may keep a copy.',
+      clipSec
+        ? `Copied secrets: cZEROde tries to clear the clipboard after ${clipSec} s (only while it’s in front). Clipboard history apps may keep a copy.`
+        : 'Copied secrets: clearing the clipboard is off (Settings → Security). Clipboard history apps may keep a copy.',
     ].map((t) => h('li', { text: t })));
   const originCard = platform.isTauri ? null : h('section', { class: 'st-origin', aria: { labelledby: 'st-origin-title' } },
     h('div', { class: 'st-origin-head' },
@@ -1091,7 +1280,7 @@ function aboutPage(host) {
       h('h2', { class: 'st-origin-title', id: 'st-origin-title', text: 'The web version shares its address' })),
     h('p', { class: 'st-origin-text', text: WEB_ORIGIN_COPY }),
     h('p', { class: 'st-origin-road', text: 'Roadmap: move cZEROde web to its own domain. Moving then = export a .czb backup on the old site, restore it on the new one.' }));
-  const linuxCard = platform.isTauri ? h('section', { class: 'st-origin st-origin-info', aria: { labelledby: 'st-linux-title' } },
+  const linuxCard = platform.isTauri && isLinuxDesktop() ? h('section', { class: 'st-origin st-origin-info', aria: { labelledby: 'st-linux-title' } },
     h('div', { class: 'st-origin-head' },
       h('span', { class: 'st-origin-icon', aria: { hidden: 'true' } }, icon('video')),
       h('h2', { class: 'st-origin-title', id: 'st-linux-title', text: 'Desktop media on Linux' })),

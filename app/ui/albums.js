@@ -284,6 +284,8 @@ export function albumStrip({ vault, onOpen } = {}) {
   let mounted = false;
   let destroyed = false;
   let scheduled = false;
+  // Covers are decrypted when their card comes near the screen (the strip scrolls sideways; there may be many).
+  const io = lazyObserver();
 
   const open = (id) => {
     try {
@@ -315,8 +317,10 @@ export function albumStrip({ vault, onOpen } = {}) {
     if (sig === c.coverSig) return;
     c.coverSig = sig;
     releaseThumbs(vault, c.used);
+    const old = c.frame.firstElementChild;
+    if (old) io?.unobserve(old);
     let thumb;
-    if (cover) thumb = thumbBox(vault, cover, { className: 'al-card-cover', decorative: true, used: c.used });
+    if (cover) thumb = thumbBox(vault, cover, { className: 'al-card-cover', decorative: true, used: c.used, observer: io });
     else if (first) thumb = h('span', { class: 'al-thumb al-card-cover', dataset: { kind: first.kind } }, kindIcon(first.kind));
     else thumb = h('span', { class: 'al-thumb al-card-cover al-card-empty' }, icon('album'));
     c.frame.replaceChildren(thumb);
@@ -381,13 +385,25 @@ export function albumStrip({ vault, onOpen } = {}) {
     for (const [id, c] of [...cards]) {
       if (seen.has(id)) continue;
       releaseThumbs(vault, c.used);
+      const box = c.frame.firstElementChild;
+      if (box) io?.unobserve(box);
       cards.delete(id);
     }
     lis.push(addLi);
     const now = [...list.children];
     if (now.length !== lis.length || now.some((x, i) => x !== lis[i])) {
+      // Only the cards that changed place move: re-inserting all of them drops keyboard focus, and the scroll-snapped
+      // strip would jump sideways (it re-snaps to a moved card), hiding the first albums.
       const active = globalThis.document?.activeElement;
-      list.replaceChildren(...lis);
+      const x = list.scrollLeft;
+      const want = new Set(lis);
+      for (const c of now) if (!want.has(c)) c.remove();
+      let node = list.firstElementChild;
+      for (const li of lis) {
+        if (node === li) node = node.nextElementSibling;
+        else list.insertBefore(li, node);
+      }
+      if (list.scrollLeft !== x) list.scrollLeft = x;
       if (active && active !== globalThis.document.activeElement && list.contains(active)) active.focus({ preventScroll: true });
     }
     markActive();
@@ -401,6 +417,10 @@ export function albumStrip({ vault, onOpen } = {}) {
   const types = ['lists', 'items', 'status'];
   for (const t of types) vault?.addEventListener?.(t, schedule);
   const offPurge = state.onPurge(() => {
+    for (const c of cards.values()) {
+      const box = c.frame.firstElementChild;
+      if (box) io?.unobserve(box);
+    }
     cards.clear();
     list.replaceChildren();
     count.textContent = '';
@@ -416,6 +436,7 @@ export function albumStrip({ vault, onOpen } = {}) {
     for (const t of types) vault?.removeEventListener?.(t, schedule);
     offPurge();
     offRoute();
+    io?.disconnect();
     for (const c of cards.values()) releaseThumbs(vault, c.used);
     cards.clear();
   };
@@ -437,6 +458,8 @@ export function albumEditor({ vault, id } = {}) {
     return null;
   }
   let order = [...l0.itemIds];
+  /** The album's items as last seen: one in the album that isn't among them was put there elsewhere meanwhile. */
+  let known = new Set(l0.itemIds);
   let cover = l0.cover ?? null;
   let name = l0.name;
   let saveTimer = null;
@@ -524,12 +547,29 @@ export function albumEditor({ vault, id } = {}) {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(flushOrder, ORDER_SAVE_MS);
   }
+  /**
+   * The local order plus what was put in the album elsewhere since the editor last looked (an import into this album,
+   * "Add to album"): saving the local order alone would take those items out again.
+   */
+  function mergedOrder() {
+    const cur = listOr(vault, id);
+    if (!cur) return order;
+    const have = new Set(cur.itemIds);
+    const mine = new Set(order);
+    const extra = cur.itemIds.filter((x) => !mine.has(x) && !known.has(x));
+    for (const x of extra) known.add(x);
+    // ...and what was taken out elsewhere stays out
+    const kept = order.filter((x) => have.has(x));
+    return extra.length || kept.length !== order.length ? [...kept, ...extra] : order;
+  }
+
   /** Saves the local order when it changed. updateList is called synchronously (a 'locking' listener relies on it). */
   async function flushOrder() {
     clearTimeout(saveTimer);
     saveTimer = null;
     if (!orderDirty || deleting || vault.status !== 'unlocked') return;
     orderDirty = false;
+    order = mergedOrder();
     try {
       await vault.updateList(id, { itemIds: order });
     } catch (e) {
@@ -551,7 +591,8 @@ export function albumEditor({ vault, id } = {}) {
     if (info.duration) sub.push(fmtDuration(info.duration));
     const up = h('button', { type: 'button', class: 'btn-icon al-ed-btn al-ed-up', aria: { label: `Move ${info.name} up` }, on: { click: () => move(info.id, -1, 'up') } }, icon('back'));
     const down = h('button', { type: 'button', class: 'btn-icon al-ed-btn al-ed-down', aria: { label: `Move ${info.name} down` }, on: { click: () => move(info.id, 1, 'down') } }, icon('back'));
-    const coverBtn = h('button', { type: 'button', class: 'btn-icon al-ed-btn al-ed-cover', on: { click: () => setCover(info.id) } }, icon('image'));
+    // A toggle: the second click of a double click would clear the cover the first one set.
+    const coverBtn = h('button', { type: 'button', class: 'btn-icon al-ed-btn al-ed-cover', on: { click: (e) => e.detail > 1 || setCover(info.id) } }, icon('image'));
     // A double click must not also remove the next row, which moves under the pointer.
     const remove = h('button', { type: 'button', class: 'btn-icon al-ed-btn al-ed-remove', aria: { label: `Remove ${info.name} from the album` }, on: { click: (e) => e.detail > 1 || removeItem(info.id) } }, icon('close'));
     const badge = h('span', { class: 'badge badge-gold al-ed-badge', text: 'Cover', hidden: true });
@@ -663,6 +704,7 @@ export function albumEditor({ vault, id } = {}) {
     clearTimeout(saveTimer);
     saveTimer = null;
     orderDirty = false;
+    order = mergedOrder();
     try {
       await vault.updateList(id, { itemIds: order, cover });
     } catch (e) {
@@ -764,6 +806,8 @@ export function albumEditor({ vault, id } = {}) {
       paint();
       announce(`Moved to position ${to + 1} of ${order.length}`);
       scheduleOrder();
+    } else if (!orderDirty) {
+      onLists(); // changes that arrived during the drag
     }
   };
   listEl.addEventListener('pointerup', endDrag);
@@ -783,6 +827,7 @@ export function albumEditor({ vault, id } = {}) {
     if (globalThis.document?.activeElement !== nameInput) nameInput.value = name;
     if (titleEl) titleEl.textContent = name;
     order = [...l.itemIds];
+    known = new Set(l.itemIds);
     cover = l.cover ?? null;
     render();
   };
@@ -790,7 +835,10 @@ export function albumEditor({ vault, id } = {}) {
     const removed = e?.detail?.removed ?? [];
     const updated = e?.detail?.updated ?? [];
     for (const x of [...removed, ...updated]) rows.delete(x);
-    if (removed.length) order = order.filter((x) => !removed.includes(x));
+    if (removed.length) {
+      const dropped = new Set(removed); // deleting thousands of items fires one event
+      order = order.filter((x) => !dropped.has(x));
+    }
     if (!dragging) render();
   };
   vault.addEventListener('lists', onLists);
@@ -828,6 +876,7 @@ export async function addToAlbumDialog({ vault, itemIds } = {}) {
   if (!ids.length) return null;
   const lists = listsOr(vault);
   const used = new Set();
+  const io = lazyObserver(); // the list scrolls: covers load as they come into view
   let p = null;
   let focusSet = false;
   const choose = (value) => p?.close(value);
@@ -846,7 +895,7 @@ export async function addToAlbumDialog({ vault, itemIds } = {}) {
       disabled: all,
       on: { click: () => choose({ id: l.id }) },
     },
-    cover ? thumbBox(vault, cover, { className: 'al-pick-thumb', decorative: true, used })
+    cover ? thumbBox(vault, cover, { className: 'al-pick-thumb', decorative: true, used, observer: io })
       : lead ? h('span', { class: 'al-thumb al-pick-thumb', dataset: { kind: lead.kind } }, kindIcon(lead.kind))
         : h('span', { class: 'al-thumb al-pick-thumb' }, icon('album')),
     h('span', { class: 'al-pick-meta' },
@@ -877,6 +926,7 @@ export async function addToAlbumDialog({ vault, itemIds } = {}) {
 
   p = modal({ title: 'Add to album', body, className: 'al-add-modal', actions: [{ label: 'Cancel', kind: 'ghost', value: null }] });
   const picked = await p;
+  io?.disconnect();
   releaseThumbs(vault, used);
   if (!picked || typeof picked !== 'object') return null;
   try {

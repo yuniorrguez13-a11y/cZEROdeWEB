@@ -1,7 +1,9 @@
 // Send · Open screen (routes 'send', 'open', 'incoming'; DESIGN §1.7, §3.6, §5.1, §12). Owner: V2a.
 // Two big cards: "Lock files to send" (picked/dropped files, or vault items handed over through state
 // 'send.pending', locked into one passphrase .czd per batch — a bundle for ≥ 2 files unless "One .czd per file")
-// and "Open a .czd" (czd2 with a passphrase, a cZEROde 1 desktop .czd with its PIN; a .czb goes to Restore).
+// and "Open a .czd" (czd2 with a passphrase, a cZEROde 1 desktop .czd with its PIN; a .czb goes to Restore). A
+// locked vault can be unlocked right in the Open card to keep the files (leaving this screen would close the file);
+// a .czd dropped on the Lock card is offered to the Open card instead of being locked again.
 // '#/open' focuses the Open card; '#/incoming' (share target, file handlers, Tauri associations, files sniffed in
 // the vault via state 'incoming.files') lists what arrived with the fitting actions.
 // Activation rule (§1.7): every picker / save / share call is the FIRST await of its click handler.
@@ -62,7 +64,20 @@ function errorText(e) {
     return 'Too big to save in this browser — use the desktop app or Chrome.';
   }
   if (err.code === 'picker-needs-gesture') return 'Tap the button again to continue.';
+  // Only a bundle's list of names can outgrow the metadata limit (§3.3: ≤ 1 MiB).
+  if (err.code === 'bad-meta' && err.detail === 'too long') return 'Too many file names for one .czd — turn on “One .czd per file” or pick fewer files.';
   return userMessage(err);
+}
+
+/** Format errors of a .czd that is not openable get the plain "damaged" / "newer app" copy, not "Something went wrong". */
+const DAMAGED_CODES = new Set(['bad-meta', 'bad-stanza', 'bad-stanza-count', 'too-many-stanzas', 'bad-chunk-size', 'source-size-mismatch', 'source-larger-than-size']);
+
+function openErrorText(code, e) {
+  if (code === 'legacy-not-ciphertext' || code === 'legacy-bad-record') return "This old cZEROde file is damaged and can't be opened.";
+  if (DAMAGED_CODES.has(code)) return userMessage('truncated');
+  if (code === 'unsupported-kdf') return userMessage('unsupported-version');
+  if (code === 'no-usable-stanza') return "This .czd isn't locked with a passphrase — only the vault that made it can open it.";
+  return userMessage(e);
 }
 
 function report(e) {
@@ -84,6 +99,12 @@ async function asJob(fn) {
 const confirmKdf = (p) => confirmDialog({
   title: 'Heavy file',
   message: `This file needs ~${p.mib} MiB and ~${p.seconds} s to unlock. Continue?`,
+  confirmLabel: 'Continue',
+});
+
+const confirmVaultKdf = (p) => confirmDialog({
+  title: 'Heavy unlock',
+  message: `This vault needs ~${p.mib} MiB of memory to unlock. Continue?`,
   confirmLabel: 'Continue',
 });
 
@@ -137,7 +158,7 @@ function deliverStaged(files) {
   const p = modal({
     title: list.length === 1 ? 'Ready to save' : `${list.length} files ready`,
     className: 'sd-ready',
-    body: h('div', { class: 'stack' }, h('p', { text: list.length === 1 ? 'Your decrypted copy is ready. Tap Save.' : 'Your decrypted copies are ready. Tap Save for each one.' }), h('ul', { class: 'sd-ready-list' }, rows)),
+    body: h('div', { class: 'stack' }, h('p', { text: list.length === 1 ? 'Your decrypted copy is ready to save.' : 'Your decrypted copies are ready. Save each one.' }), h('ul', { class: 'sd-ready-list' }, rows)),
     actions: [{ label: 'Done', kind: 'ghost', value: null }],
   });
   p.then(() => list.splice(0));
@@ -190,6 +211,24 @@ async function sniff(file) {
     // unreadable: treated as an ordinary file
   }
   return null;
+}
+
+const SNIFF_PARALLEL = 8;
+/** A file the browser typed as media/text/PDF… is not a .czd (those come as '' or application/octet-stream). */
+const maybeLocked = (f) => f.size >= 8 && (!f.type || f.type === 'application/octet-stream' || /czd|json/i.test(f.type));
+
+/** sniff() for a list (a few files at a time) → kinds in the same order. */
+async function sniffAll(files) {
+  const out = new Array(files.length).fill(null);
+  let next = 0;
+  const worker = async () => {
+    while (next < files.length) {
+      const i = next++;
+      out[i] = await sniff(files[i]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(SNIFF_PARALLEL, files.length) }, worker));
+  return out;
 }
 
 /** The Restore/Merge flow of the settings view (DESIGN §12), or a pointer to it while it isn't available. */
@@ -298,7 +337,7 @@ function checkOption(label, key, hint, onChange) {
 
 // ───────── Lock card
 
-function lockPanel({ getVault }) {
+function lockPanel({ getVault, toOpen }) {
   let files = [];
   let itemIds = [];
   let phrase = '';
@@ -306,6 +345,10 @@ function lockPanel({ getVault }) {
   let job = null; // {ctl, target, row, phase}
   let result = null; // {outputs, pass, targetKind}
   let noteSaved = false;
+  let noteSaving = false;
+  let choosing = false; // the save picker of "Lock & save" is open
+  let checking = 0; // large batches being sniffed
+  let purgeGen = 0; // bumped by every lock: work started before it is dropped
   const own = passphraseField({ label: 'Type your own', mode: 'new', purpose: 'send', autocomplete: 'off', onChange: () => paintOwnHint(), onSubmit: () => lockAndSave() });
   own.el.dataset.fk = 'own';
   const ownHint = h('p', { class: 'hint hint-warn sd-weak', hidden: true }, icon('warning'),
@@ -350,12 +393,51 @@ function lockPanel({ getVault }) {
     return out;
   }
 
-  function addFiles(list) {
-    const add = [...(list ?? [])].filter((f) => typeof Blob !== 'undefined' && f instanceof Blob);
-    if (!add.length) return;
+  /**
+   * Adds picked/dropped files. Files that are already locked (.czd) are not locked again: they are offered to the
+   * Open card instead (a received .czd dropped on the wrong card).
+   */
+  async function addFiles(list, { sniffed = false } = {}) {
+    let add = [...(list ?? [])].filter((f) => typeof Blob !== 'undefined' && f instanceof Blob);
+    if (!add.length) return false;
     if (job) {
       toast('Wait until these files are locked.', { kind: 'warn' });
-      return;
+      return false;
+    }
+    if (!sniffed) {
+      const gen = purgeGen;
+      // Only files without a known type can be a .czd (photos, videos, PDFs… are not read here).
+      const unknown = add.filter(maybeLocked);
+      const big = unknown.length > 200;
+      if (big) {
+        checking++;
+        render();
+      }
+      let found;
+      try {
+        found = await sniffAll(unknown);
+      } finally {
+        if (big) checking--;
+      }
+      if (gen !== purgeGen) {
+        if (big) render(); // locked meanwhile: the card is empty again
+        return false;
+      }
+      const kindOfFile = new Map(unknown.map((f, i) => [f, found[i]]));
+      const kinds = add.map((f) => kindOfFile.get(f) ?? null);
+      const locked = add.map((f, i) => ({ file: f, kind: kinds[i] })).filter((x) => x.kind === 'czd2' || x.kind === 'oldczd');
+      if (locked.length) {
+        add = add.filter((f, i) => kinds[i] !== 'czd2' && kinds[i] !== 'oldczd');
+        offerOpen(locked);
+      }
+      if (!add.length) {
+        if (big) render();
+        return true;
+      }
+      if (job) {
+        toast('Wait until these files are locked.', { kind: 'warn' });
+        return false;
+      }
     }
     if (result) clearResult();
     if (fromVault()) {
@@ -371,6 +453,16 @@ function lockPanel({ getVault }) {
       }
     }
     render();
+    return true;
+  }
+
+  function offerOpen(locked) {
+    const one = locked.length === 1;
+    toast(one ? `“${shortName(locked[0].file.name, 26)}” is already locked.` : `${locked.length} files are already locked.`, {
+      kind: 'info',
+      timeout: 10_000,
+      action: { label: 'Open', onClick: () => toOpen?.(locked) },
+    });
   }
 
   function setVaultItems(ids) {
@@ -393,6 +485,7 @@ function lockPanel({ getVault }) {
   function clearResult() {
     result = null;
     noteSaved = false;
+    noteSaving = false;
     freshPhrase();
   }
 
@@ -408,6 +501,7 @@ function lockPanel({ getVault }) {
     itemIds = [];
     result = null;
     noteSaved = false;
+    noteSaving = false;
     useOwn = false;
     own.clear();
     freshPhrase();
@@ -527,8 +621,10 @@ function lockPanel({ getVault }) {
   }
 
   function jobView() {
+    // The phase line holds keyboard focus while the job runs (the Lock & save button is gone; Cancel must not
+    // take it: a second Enter would cancel).
     return h('div', { class: 'sd-job', role: 'status' },
-      h('p', { class: 'sd-phase' }, h('span', { class: 'sd-spin', aria: { hidden: 'true' } }), h('span', { text: job.phase })),
+      h('p', { class: 'sd-phase', tabIndex: -1, dataset: { fkFallback: '' } }, h('span', { class: 'sd-spin', aria: { hidden: 'true' } }), h('span', { text: job.phase })),
       job.kdf ? indeterminate('Argon2id · 64 MiB') : null,
       job.row.el,
       h('p', { class: 'sd-fine' }, icon('info'), h('span', { text: 'Keep this tab open until it finishes.' })));
@@ -572,10 +668,10 @@ function lockPanel({ getVault }) {
     const noteBtn = v ? h('button', {
       type: 'button',
       class: 'btn btn-sm sd-note',
-      disabled: noteSaved,
-      on: { click: (e) => savePassNote(e.currentTarget) },
+      disabled: noteSaved || noteSaving,
+      on: { click: () => savePassNote() },
       dataset: { fk: 'note' },
-    }, icon(noteSaved ? 'check' : 'note'), h('span', { text: noteSaved ? 'Saved to your vault' : 'Save passphrase to my vault as a note' })) : null;
+    }, icon(noteSaved ? 'check' : 'note'), h('span', { text: noteSaved ? 'Saved to your vault' : noteSaving ? 'Saving…' : 'Save passphrase to my vault as a note' })) : null;
     const sharePass = canShareText() ? h('button', {
       type: 'button',
       class: 'btn btn-sm sd-share-pass',
@@ -608,21 +704,27 @@ function lockPanel({ getVault }) {
       h('button', { type: 'button', class: 'btn btn-ghost sd-again', on: { click: () => reset() } }, icon('plus'), h('span', { text: 'Lock more files' })));
   }
 
-  async function savePassNote(btn) {
+  async function savePassNote() {
     const v = vaultOf();
-    if (!v || !result) return;
-    btn.disabled = true;
-    const names = result.outputs.map((o) => safeFilename(o.name));
+    if (!v || !result || noteSaving || noteSaved) return;
+    const r = result;
+    noteSaving = true;
+    render();
+    const names = r.outputs.map((o) => safeFilename(o.name));
     try {
       await v.addNote({
         title: `Passphrase · ${shortName(names[0], 60)}`,
-        body: `Passphrase: ${result.pass}\n\nFor: ${names.join(', ')}\nLocked: ${new Date().toLocaleString()}`,
+        body: `Passphrase: ${r.pass}\n\nFor: ${names.join(', ')}\nLocked: ${new Date().toLocaleString()}`,
       });
+      if (result !== r) return; // reset or locked meanwhile
+      noteSaving = false;
       noteSaved = true;
       toast('Passphrase saved to your vault as a note', { kind: 'ok' });
       render();
     } catch (e) {
-      btn.disabled = false;
+      if (result !== r) return;
+      noteSaving = false;
+      render();
       report(e);
     }
   }
@@ -631,6 +733,7 @@ function lockPanel({ getVault }) {
     let view;
     if (job) view = jobView();
     else if (result) view = resultView();
+    else if (!count() && checking) view = indeterminate('Checking the files…');
     else if (!count()) view = emptyView();
     else view = readyView();
     keepFocus(body, () => body.replaceChildren(view));
@@ -648,7 +751,7 @@ function lockPanel({ getVault }) {
   }
 
   async function lockAndSave() {
-    if (job) return;
+    if (job || choosing) return;
     const n = count();
     if (!n) return;
     const pass = currentPass();
@@ -669,16 +772,21 @@ function lockPanel({ getVault }) {
     const keepDates = settings.get('sendKeepDates') === true;
     const names = plannedNames(hide);
     const generated = !useOwn;
-    // FIRST await of the click: the save picker (§1.7). Cancel ends the flow before Argon2.
+    const gen = purgeGen;
+    // FIRST await of the click: the save picker (§1.7). Cancel ends the flow before Argon2. A second click while
+    // the picker is open (double click) is ignored: it would open a second picker, or stage the outputs instead.
+    choosing = true;
     let target;
     try {
       target = await platform.chooseSaveTarget({ name: names[0], count: names.length });
     } catch (e) {
       report(e);
       return;
+    } finally {
+      choosing = false;
     }
     if (!target) return;
-    if (job) {
+    if (job || gen !== purgeGen || !count()) {
       target.abort().catch(() => {});
       return;
     }
@@ -755,7 +863,11 @@ function lockPanel({ getVault }) {
     }
   }
 
-  const offPurge = state.onPurge(() => reset());
+  const offPurge = state.onPurge(() => {
+    purgeGen++;
+    noteSaving = false;
+    reset();
+  });
   render();
 
   return {
@@ -839,6 +951,9 @@ function openPanel({ getVault, toLock, onMany }) {
   let ctl = new AbortController();
   let activity = null; // {label, row}
   let viewer = null;
+  let choosing = false; // a save picker is open
+  const pending = new Set(); // 'save:<idx>' / 'share:<idx>' running for an entry
+  let vaultUnlock = null; // {field, busy} while the inline vault unlock form is open
   const thumbs = new Map(); // entry index → object URL
   const thumbQueue = [];
   let thumbsRunning = 0;
@@ -890,6 +1005,11 @@ function openPanel({ getVault, toLock, onMany }) {
     unlocking = false;
     errorMsg = null;
     activity = null;
+    pending.clear();
+    if (vaultUnlock) {
+      vaultUnlock.field.clear();
+      vaultUnlock = null;
+    }
     phase = 'empty';
   }
 
@@ -962,7 +1082,8 @@ function openPanel({ getVault, toLock, onMany }) {
       phase = 'opened';
       render();
       const n = entries().length;
-      announce(n > 1 ? `Unlocked: ${n} files` : `Unlocked: ${entries()[0]?.name ?? 'file'}`);
+      // No decrypted name here: the live region's text outlives a lock.
+      announce(n > 1 ? `Unlocked: ${n} files` : 'File unlocked');
       el.querySelector('.sd-entry .sd-act-preview')?.focus({ preventScroll: true });
     } catch (e) {
       if (my !== seq) return;
@@ -978,7 +1099,7 @@ function openPanel({ getVault, toLock, onMany }) {
         return;
       }
       if (code === 'internal') globalThis.console?.error?.('[send] open failed', e);
-      errorMsg = code === 'legacy-not-ciphertext' || code === 'legacy-bad-record' ? "This old cZEROde file is damaged and can't be opened." : userMessage(e);
+      errorMsg = openErrorText(code, e);
       render();
     }
   }
@@ -1045,42 +1166,58 @@ function openPanel({ getVault, toLock, onMany }) {
   }
 
   async function saveOne(en) {
+    // One save per entry at a time, and never while a save picker is open (a double click must not open two
+    // pickers or download twice).
+    const key = `save:${en.idx}`;
+    if (choosing || pending.has(key)) return;
     const my = seq;
     let target;
+    choosing = true;
+    pending.add(key);
     try {
-      target = await platform.chooseSaveTarget({ name: en.name, mime: en.type, count: 1 });
-    } catch (e) {
-      report(e);
-      return;
-    }
-    if (!target) return;
-    if (my !== seq) {
-      target.abort().catch(() => {});
-      return;
-    }
-    const t = toast(`Decrypting “${shortName(en.name, 30)}”…`, { timeout: 0 });
-    try {
-      const r = await asJob(() => saveDecrypted(target, sourceOf(en), { name: en.name, type: en.type, signal: ctl.signal }));
-      t.close();
-      if (my !== seq) return;
-      if (r?.staged) deliverStaged([r.staged]);
-      else if (r?.where === 'downloads') toast('Download started', { kind: 'ok' });
-      else toast(`Saved “${shortName(r?.name ?? en.name, 30)}”`, { kind: 'ok' });
-    } catch (e) {
-      t.close();
-      if (my === seq) report(e);
+      try {
+        target = await platform.chooseSaveTarget({ name: en.name, mime: en.type, count: 1 });
+      } catch (e) {
+        report(e);
+        return;
+      } finally {
+        choosing = false;
+      }
+      if (!target) return;
+      if (my !== seq) {
+        target.abort().catch(() => {});
+        return;
+      }
+      const t = toast(`Decrypting “${shortName(en.name, 30)}”…`, { timeout: 0 });
+      try {
+        const r = await asJob(() => saveDecrypted(target, sourceOf(en), { name: en.name, type: en.type, signal: ctl.signal }));
+        t.close();
+        if (my !== seq) return;
+        if (r?.staged) deliverStaged([r.staged]);
+        else if (r?.where === 'downloads') toast('Download started', { kind: 'ok' });
+        else toast(`Saved “${shortName(r?.name ?? en.name, 30)}”`, { kind: 'ok' });
+      } catch (e) {
+        t.close();
+        if (my === seq) report(e);
+      }
+    } finally {
+      if (my === seq) pending.delete(key);
     }
   }
 
   async function saveAll() {
+    if (choosing || activity) return;
     const list = entries();
     const my = seq;
     let target;
+    choosing = true;
     try {
       target = await platform.chooseSaveTarget({ name: list[0]?.name ?? 'files', count: list.length });
     } catch (e) {
       report(e);
       return;
+    } finally {
+      choosing = false;
     }
     if (!target) return;
     if (my !== seq || activity) {
@@ -1121,15 +1258,20 @@ function openPanel({ getVault, toLock, onMany }) {
   }
 
   async function shareOne(en) {
+    const key = `share:${en.idx}`;
+    if (pending.has(key)) return;
+    pending.add(key);
     const my = seq;
     const t = toast(`Preparing “${shortName(en.name, 30)}”…`, { timeout: 0 });
     try {
       const f = await prepareShare(sourceOf(en), { name: en.name, type: en.type });
       t.close();
-      if (my === seq) offerShare(f);
+      if (my === seq) await offerShare(f);
     } catch (e) {
       t.close();
       if (my === seq) report(e);
+    } finally {
+      if (my === seq) pending.delete(key);
     }
   }
 
@@ -1200,12 +1342,20 @@ function openPanel({ getVault, toLock, onMany }) {
     try {
       const album = await asJob(async () => {
         const l = await v.createList({ name });
-        let done = 0;
-        for (const en of list) {
-          const base = done;
-          await addEntry(v, en, { album: l.id, signal: ctl.signal, onProgress: (d) => row.update(base + d) });
-          done += en.size;
-          row.update(done);
+        let added = 0;
+        try {
+          let done = 0;
+          for (const en of list) {
+            const base = done;
+            await addEntry(v, en, { album: l.id, signal: ctl.signal, onProgress: (d) => row.update(base + d) });
+            added++;
+            done += en.size;
+            row.update(done);
+          }
+        } catch (e) {
+          // Cancelled or failed before anything was added: no empty album left behind.
+          if (!added && v.status === 'unlocked') await v.removeList(l.id).catch(() => {});
+          throw e;
         }
         return l;
       });
@@ -1348,19 +1498,22 @@ function openPanel({ getVault, toLock, onMany }) {
   }
 
   function entryActions(en, single) {
-    const btn = (cls, ic, label, fn, primary) => h('button', {
+    const name = safeFilename(en.name);
+    // Bundle rows show icon-only buttons: their accessible name (and tooltip) says which file they act on.
+    const btn = (cls, ic, label, fn, primary, full) => h('button', {
       type: 'button',
       class: ['btn', single ? null : 'btn-sm', primary ? 'btn-primary' : null, 'sd-act', cls],
       dataset: { fk: `${cls}-${en.idx}`, fkFallback: cls === 'sd-act-preview' && en.idx === 0 ? '' : undefined },
-      title: label,
+      title: single ? label : full,
+      aria: { label: single ? undefined : full },
       on: { click: () => fn(en) },
     }, icon(ic), h('span', { class: 'sd-act-label', text: label }));
     const v = vaultOf();
     return h('div', { class: 'sd-entry-actions' },
-      btn('sd-act-preview', 'eye', 'Preview', preview, single),
-      btn('sd-act-save', 'download', 'Save', saveOne),
-      canShareFiles() ? btn('sd-act-share', 'share', 'Share', shareOne) : null,
-      v ? btn('sd-act-add', 'lock', single ? 'Add to my vault' : 'Add', addOne) : null);
+      btn('sd-act-preview', 'eye', 'Preview', preview, single, `Preview ${name}`),
+      btn('sd-act-save', 'download', 'Save', saveOne, false, `Save ${name}`),
+      canShareFiles() ? btn('sd-act-share', 'share', 'Share', shareOne, false, `Share ${name}`) : null,
+      v ? btn('sd-act-add', 'lock', single ? 'Add to my vault' : 'Add', addOne, false, `Add ${name} to my vault`) : null);
   }
 
   function entryRow(en, single) {
@@ -1389,14 +1542,97 @@ function openPanel({ getVault, toLock, onMany }) {
         h('button', { type: 'button', class: 'btn btn-sm sd-save-all', dataset: { fk: 'save-all' }, disabled: Boolean(activity), on: { click: () => saveAll() } }, icon('download'), h('span', { text: 'Save all' })),
         v ? h('button', { type: 'button', class: 'btn btn-sm btn-primary sd-add-all', dataset: { fk: 'add-all' }, disabled: Boolean(activity), on: { click: () => addAll() } }, icon('lock'), h('span', { text: 'Add all to my vault' })) : null)) : null;
     const rows = list.slice(0, CAPS.bundleEntries).map((en) => entryRow(en, !bundle));
-    const hint = v ? null : h('p', { class: 'sd-fine sd-vault-hint' }, icon('info'),
-      h('span', { text: 'To keep these in your vault, unlock it in the ' }), h('a', { href: '#/vault', text: 'Vault tab' }), h('span', { text: ' first — leaving this screen closes the file.' }));
     return h('div', { class: 'sd-opened' },
       head,
       bar,
       h('ul', { class: ['sd-entries', bundle ? 'sd-entries-bundle' : null] }, rows),
       activity ? h('div', { class: 'sd-activity' }, activity.row.el) : null,
-      hint);
+      v ? null : vaultBox(list.length));
+  }
+
+  // ── keeping the files: the vault is unlocked right here (leaving this screen would close the file)
+
+  function vaultBox(n) {
+    const g = getVault();
+    const st = g?.status;
+    const these = n === 1 ? 'this file' : 'these files';
+    if (st === 'locked') {
+      if (!vaultUnlock) {
+        return h('div', { class: 'sd-vault-hint sd-vault-locked' },
+          icon('lock'),
+          h('span', { class: 'sd-vault-text', text: `Want to keep ${these}? Unlock your vault here — the file stays open.` }),
+          h('button', { type: 'button', class: 'btn btn-sm sd-vault-open', dataset: { fk: 'vault-open' }, on: { click: () => openVaultUnlock() } }, icon('unlock'), h('span', { text: 'Unlock vault' })));
+      }
+      const u = vaultUnlock;
+      u.field.setDisabled(u.busy);
+      u.field.el.dataset.fk = 'vault-pass';
+      return h('form', { class: 'sd-vault-form', noValidate: true, aria: { label: 'Unlock your vault' }, on: { submit: (e) => {
+        e.preventDefault();
+        unlockVault();
+      } } },
+        h('input', { type: 'text', class: 'visually-hidden', name: 'username', autocomplete: 'username', value: 'cZEROde vault', readOnly: true, tabIndex: -1, attrs: { 'aria-hidden': 'true' } }),
+        h('p', { class: 'sd-vault-text', text: `Unlock your vault to keep ${these}. The file stays open.` }),
+        u.field.el,
+        h('div', { class: 'sd-row' },
+          h('button', { type: 'submit', class: 'btn btn-sm btn-primary sd-vault-go', dataset: { fk: 'vault-go' }, disabled: u.busy }, icon('unlock'), h('span', { text: u.busy ? 'Unlocking…' : 'Unlock' })),
+          h('button', { type: 'button', class: 'btn btn-sm btn-ghost sd-vault-cancel', dataset: { fk: 'vault-cancel' }, disabled: u.busy, on: { click: () => closeVaultUnlock(true) } }, h('span', { text: 'Not now' }))));
+    }
+    if (st === 'none') {
+      return h('p', { class: 'sd-fine sd-vault-hint' }, icon('info'),
+        h('span', null, `To keep ${these}, create a vault in the `, h('a', { href: '#/vault', text: 'Vault tab' }), ' first — leaving this screen closes the file.'));
+    }
+    if (st === 'other-tab') {
+      return h('p', { class: 'sd-fine sd-vault-hint' }, icon('info'),
+        h('span', { text: `Your vault is open in another cZEROde tab — add ${these} there.` }));
+    }
+    return null;
+  }
+
+  function openVaultUnlock() {
+    if (vaultUnlock) return;
+    vaultUnlock = {
+      busy: false,
+      field: passphraseField({ label: 'Vault passphrase', mode: 'enter', purpose: 'unlock', name: 'czd-vault-unlock' }),
+    };
+    render();
+    vaultUnlock.field.focus();
+  }
+
+  function closeVaultUnlock(focus) {
+    const u = vaultUnlock;
+    if (!u) return;
+    vaultUnlock = null;
+    u.field.clear();
+    render();
+    if (focus) el.querySelector('.sd-vault-open')?.focus({ preventScroll: true });
+  }
+
+  async function unlockVault() {
+    const u = vaultUnlock;
+    const g = getVault();
+    if (!u || u.busy || !g) return;
+    const pass = u.field.value;
+    if (!pass.trim()) {
+      u.field.setError('Type your vault passphrase first.');
+      return;
+    }
+    u.busy = true;
+    render();
+    try {
+      await g.unlock(pass, { confirmKdf: confirmVaultKdf });
+      if (vaultUnlock !== u) return;
+      vaultUnlock = null;
+      u.field.clear();
+      render();
+      announce('Vault unlocked');
+      (el.querySelector('.sd-add-all') ?? el.querySelector('.sd-act-add'))?.focus({ preventScroll: true });
+    } catch (e) {
+      if (vaultUnlock !== u) return;
+      u.busy = false;
+      render();
+      if (isCancel(e)) u.field.focus();
+      else u.field.setError(userMessage(e));
+    }
   }
 
   function render() {
@@ -1504,7 +1740,9 @@ function incomingPanel({ getVault, open, lock }) {
   async function toVault(entries) {
     const v = vaultOf();
     if (!v) {
-      toast('Unlock your vault first, then come back to Send to add it.', { kind: 'warn', timeout: 6000 });
+      const st = getVault()?.status;
+      const what = entries.length === 1 ? 'it' : 'them';
+      toast(st === 'none' ? `Create your vault first, then come back to Send to add ${what}.` : `Unlock your vault first, then come back to Send to add ${what}.`, { kind: 'warn', timeout: 6000 });
       router.navigate('#/vault');
       return;
     }
@@ -1516,9 +1754,10 @@ function incomingPanel({ getVault, open, lock }) {
     }
   }
 
-  function toLock(entries) {
+  async function toLock(entries) {
+    // The files leave the list only when the Lock card took them (it refuses while it is locking).
+    if (!(await lock.addFiles(entries.map((e) => e.file), { sniffed: true }))) return;
     for (const e of entries) drop(e);
-    lock.addFiles(entries.map((e) => e.file));
     lock.el.scrollIntoView?.({ block: 'nearest' });
   }
 
@@ -1543,7 +1782,7 @@ function incomingPanel({ getVault, open, lock }) {
         openRestore(f);
       }, true)];
     } else {
-      actions = [btn('Lock to send', 'lock', () => toLock([entry]), true), btn(vaultOf() ? 'Add to vault' : 'Unlock to add', 'plus', () => toVault([entry]))];
+      actions = [btn('Lock to send', 'lock', () => toLock([entry]), true), btn('Add to vault', 'plus', () => toVault([entry]))];
     }
     return h('li', { class: 'sd-in-row', dataset: { kind: k ?? 'pending' } },
       k === 'czd2' || k === 'oldczd' || k === 'czb' ? h('span', { class: 'sd-in-icon', aria: { hidden: 'true' } }, icon(k === 'czb' ? 'refresh' : 'lock')) : kindIcon(kindOf(fileType(f.type, f.name), f.name)),
@@ -1601,9 +1840,24 @@ function unsupportedView(host) {
 }
 
 function sendPage(host, { getVault }) {
-  const lock = lockPanel({ getVault });
   let incoming = null;
-  const open = openPanel({ getVault, toLock: (files) => lock.addFiles(files), onMany: (files) => incoming.add(files, { autoOpen: false }) });
+  let open = null;
+  let alive = true;
+  const lock = lockPanel({
+    getVault,
+    // From a toast's button: the toast may outlive this screen.
+    toOpen: (locked) => {
+      if (!alive) return;
+      if (locked.length === 1) {
+        open.load(locked[0].file, locked[0].kind);
+        open.el.scrollIntoView?.({ block: 'nearest' });
+        open.focus();
+      } else {
+        incoming.add(locked.map((x) => x.file), { autoOpen: false });
+      }
+    },
+  });
+  open = openPanel({ getVault, toLock: (files) => lock.addFiles(files, { sniffed: true }), onMany: (files) => incoming.add(files, { autoOpen: false }) });
   incoming = incomingPanel({ getVault, open, lock });
   const grid = h('div', { class: 'sd-grid' }, lock.el, open.el);
   const step = (n, title, text) => h('li', { class: 'sd-step' }, h('span', { class: 'sd-step-n', text: n }), h('span', { class: 'sd-step-text' }, h('strong', { text: title }), h('span', { text })));
@@ -1677,6 +1931,7 @@ function sendPage(host, { getVault }) {
       lastTop = top;
     },
     destroy() {
+      alive = false;
       for (const off of offs.splice(0)) off();
       helpSheet?.close();
       lock.destroy();

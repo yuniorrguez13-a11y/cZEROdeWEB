@@ -233,9 +233,12 @@ test('a .czb dropped in the vault opens the restore dialog and is not stored', a
     for await (const p of b.stream) parts.push(p);
     window.__drop([new File(parts, 'my-backup.czb')]);
   });
+  // the settings view's Restore/Merge flow (§12 openRestoreDialog), with the dropped file already inspected
   const dlg = page.getByRole('dialog').last();
   await expect(dlg).toBeVisible();
-  await expect(dlg).toContainText(/backup|restore/i);
+  await expect(dlg).toContainText('my-backup.czb');
+  await expect(dlg).toContainText('This backup comes from the vault you have open');
+  await expect(dlg.getByRole('button', { name: 'Merge' })).toBeVisible();
   expect(await page.evaluate(async () => ({ n: window.__vault.items().length, stored: (await window.__vault._store.list()).length }))).toEqual({ n: 1, stored: 1 });
   await expect(page.locator('.up-dock .up-row')).toHaveCount(0);
   expect(await page.evaluate(() => window.__csp)).toEqual([]);
@@ -938,10 +941,15 @@ test('double clicks: cancelling a row is not undone by the second click; removin
   await expect(editor.locator('.al-ed-row')).toHaveCount(2);
   await page.waitForTimeout(300);
   await expect.poll(() => page.evaluate((id) => window.__vault.list(id).itemIds.map((x) => window.__vault.item(x).name), albumId)).toEqual(['b.png', 'c.png']);
+  // "Use as cover" is a toggle: a double click sets it (the second click doesn't clear it again)
+  await editor.getByRole('button', { name: 'Use c.png as the cover' }).dblclick();
+  await expect(editor.getByRole('button', { name: 'c.png is the cover' })).toHaveAttribute('aria-pressed', 'true');
+  await page.waitForTimeout(300);
+  await expect.poll(() => page.evaluate((id) => window.__vault.item(window.__vault.list(id).cover).name, albumId)).toBe('c.png');
   expect(errors).toEqual([]);
 });
 
-test('vault view (phone): while an import runs, the queue panel sits above the selection toolbar, not over it', async ({ page }) => {
+test('vault view (phone): while an import runs, the queue panel does not cover the selection toolbar', async ({ page }) => {
   const errors = await watch(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await openVaultView(page);
@@ -955,12 +963,143 @@ test('vault view (phone): while an import runs, the queue panel sits above the s
   await expect(bar).toBeVisible();
   for (const collapsed of [false, true]) {
     if (collapsed) await page.locator('.up-toggle').click();
+    // wherever the vault view puts the toolbar (fixed above the nav, or sticky under the header), they don't overlap
     await expect.poll(async () => {
       const [d, b] = await Promise.all([page.locator('.up-dock').boundingBox(), bar.boundingBox()]);
-      return d.y + d.height <= b.y;
+      return d.y + d.height <= b.y || b.y + b.height <= d.y;
     }).toBe(true);
     expect(await uncovered(page, '.vv-selbar .vv-selclose')).toBe(true);
   }
   await page.evaluate(() => window.__p);
+  expect(errors).toEqual([]);
+});
+
+// ───────── review round 2
+
+test('album editor: items that land in the album while a reorder waits to be saved are kept', async ({ page }) => {
+  const errors = await watch(page);
+  await openVault(page);
+  const [a, b, c, d, albumId] = await page.evaluate(async () => {
+    const f = window.__fx;
+    const res = await window.__U.importFiles({ vault: window.__vault, files: [await f('image.png', 'a.png'), await f('image.png', 'b.png'), await f('notes.txt', 'c.txt'), await f('notes.txt', 'd.txt')] });
+    const by = Object.fromEntries(res.added.map((i) => [i.name, i.id]));
+    const l = await window.__vault.createList({ name: 'Trip', itemIds: [by['a.png'], by['b.png']] });
+    window.__A.albumEditor({ vault: window.__vault, id: l.id });
+    return [by['a.png'], by['b.png'], by['c.txt'], by['d.txt'], l.id];
+  });
+  const ids = () => page.evaluate((id) => window.__vault.list(id).itemIds, albumId);
+  const addElsewhere = (add) => page.evaluate(({ id, x }) => window.__vault.updateList(id, { itemIds: [...window.__vault.list(id).itemIds, x] }), { id: albumId, x: add });
+  const editor = page.locator('.sheet.al-editor');
+  // a reorder is waiting for its debounced save when an import adds c to the album
+  await editor.getByRole('button', { name: 'Move a.png down' }).click();
+  await addElsewhere(c);
+  await expect.poll(ids).toEqual([b, a, c]);
+  await expect(editor.locator('.al-ed-row')).toHaveCount(3);
+  // same while a removal is saved right away
+  await editor.getByRole('button', { name: 'Move a.png up' }).click();
+  await addElsewhere(d);
+  await editor.getByRole('button', { name: 'Remove b.png from the album' }).click();
+  await expect.poll(ids).toEqual([a, c, d]);
+  await expect(editor.locator('.al-ed-row')).toHaveCount(3);
+  expect(errors).toEqual([]);
+});
+
+test('a folder dropped inside an album view: ticking "Create album" keeps every file in the open album too', async ({ page }) => {
+  const errors = await watch(page);
+  await openVault(page);
+  const tripId = await page.evaluate(async () => (await window.__vault.createList({ name: 'Trip' })).id);
+  await page.evaluate(async (album) => {
+    const f = window.__fx;
+    window.__p = window.__U.importFiles({ vault: window.__vault, files: [], album, folders: [{ name: 'Paris', files: [await f('image.png', 'a.png', 'image/png'), window.__big(12, 'b.bin'), await f('notes.txt', 'c.txt')] }] });
+    // inside an album the files go to that album; a folder album is opt-in: ticked while b.bin is being added
+    window.__ticked = await window.__whenRunning('b.bin', () => {
+      const box = document.querySelector('.up-group-opt input');
+      const was = box.checked;
+      box.click();
+      return [was, box.checked];
+    });
+    await window.__p;
+  }, tripId);
+  expect(await page.evaluate(() => window.__ticked)).toEqual([false, true]);
+  const lists = await page.evaluate(() => window.__vault.lists().map((l) => ({ name: l.name, items: l.itemIds.map((id) => window.__vault.item(id).name).sort() })));
+  expect(lists).toEqual([
+    { name: 'Trip', items: ['a.png', 'b.bin', 'c.txt'] },
+    { name: 'Paris', items: ['a.png', 'b.bin', 'c.txt'] },
+  ]);
+  expect(errors).toEqual([]);
+});
+
+test('a folder album made for a batch that was interrupted before any file landed goes away when the queue is cleared', async ({ page }) => {
+  const errors = await watch(page);
+  await openVault(page);
+  await page.evaluate(async () => {
+    window.__p = window.__U.importFiles({ vault: window.__vault, files: [], folders: [{ name: 'Empty trip', files: [window.__big(12, 'b.bin')] }] });
+    await window.__whenRunning('b.bin', () => true);
+    window.__vault.lock('user');
+    await window.__p;
+  });
+  await page.evaluate((pass) => window.__vault.unlock(pass), PASS);
+  // the album was made when the first file started; nothing landed in it
+  expect(await page.evaluate(() => window.__vault.lists().map((l) => [l.name, l.itemIds.length]))).toEqual([['Empty trip', 0]]);
+  const dock = page.locator('.up-dock');
+  await expect(dock).toHaveAttribute('data-state', 'interrupted');
+  await dock.getByRole('button', { name: 'Clear' }).click();
+  await expect(dock).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.__vault.lists().length)).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('deleting the vault drops interrupted imports; adding files without a vault says to create one', async ({ page }) => {
+  const errors = await watch(page);
+  await openVault(page);
+  await page.evaluate(async () => {
+    window.__p = window.__U.importFiles({ vault: window.__vault, files: [window.__big(12, 'b.bin'), await window.__fx('notes.txt')] });
+    await window.__whenRunning('b.bin', () => true);
+    window.__vault.lock('user');
+    await window.__p;
+  });
+  const dock = page.locator('.up-dock');
+  await expect(dock).toHaveAttribute('data-state', 'interrupted');
+  await page.evaluate(() => window.__vault.destroy());
+  // the queue belonged to the deleted vault: a later "Retry" must not put its files into a new one
+  await expect(dock).toHaveCount(0);
+  const r = await page.evaluate(async () => {
+    const res = await window.__U.importFiles({ vault: window.__vault, files: [await window.__fx('notes.txt')] });
+    return { added: res.added.length, skipped: res.skipped };
+  });
+  expect(r).toEqual({ added: 0, skipped: 1 });
+  await expect(page.locator('.toast').last()).toContainText('Create your vault first');
+  expect(errors).toEqual([]);
+});
+
+test('a folder with nothing but hidden/system files says so (picked or dropped)', async ({ page }) => {
+  const errors = await watch(page);
+  await openVault(page);
+  const r = await page.evaluate(async () => {
+    const res = await window.__U.importFiles({ vault: window.__vault, files: [], folders: [{ name: 'Mac stuff', files: [new File(['x'], '.DS_Store'), new File(['y'], 'Thumbs.db')] }] });
+    return { added: res.added.length, items: window.__vault.items().length };
+  });
+  expect(r).toEqual({ added: 0, items: 0 });
+  await expect(page.locator('.toast').last()).toContainText('Nothing to add');
+  await expect(page.locator('.up-dock .up-row')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('vault view (phone): new albums join the strip without scrolling it sideways (the first albums stay in view)', async ({ page }) => {
+  const errors = await watch(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openVaultView(page);
+  await page.evaluate(async () => {
+    const v = window.__vault;
+    for (const name of ['One', 'Two', 'Three', 'Four']) {
+      await v.createList({ name });
+      await new Promise((r) => setTimeout(r, 120)); // each one renders on its own
+    }
+  });
+  const strip = page.locator('.al-strip-list');
+  await expect(strip.locator('.al-card[data-id]')).toHaveCount(4);
+  await page.waitForTimeout(300);
+  expect(await strip.evaluate((el) => el.scrollLeft)).toBe(0);
+  await expect(strip.locator('.al-card[data-id]').first()).toBeInViewport();
   expect(errors).toEqual([]);
 });

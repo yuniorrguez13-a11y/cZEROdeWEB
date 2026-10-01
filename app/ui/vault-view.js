@@ -15,7 +15,7 @@ import * as router from '../router.js';
 import * as platform from '../platform.js';
 import * as pwa from '../pwa.js';
 import { isCancel, userMessage } from '../errors.js';
-import { TIMES } from '../config.js';
+import { CAPS, TIMES } from '../config.js';
 import { FLOOR, passphraseBytes } from '../crypto/kdf.js';
 import { meetsVaultMinimum } from '../crypto/passphrase.js';
 import { fmtSize, safeFilename } from '../util/format.js';
@@ -153,6 +153,8 @@ const PRIVATE_TEXT = 'Private window or limited storage: your vault may disappea
  * @param {{quota?: number}|null} est platform.storage.estimate()
  */
 async function limitedStorage(v, est) {
+  // Desktop app: the vault lives in files under the app's data folder, not in the webview's storage quota.
+  if (platform.isTauri) return false;
   if (Number.isFinite(est?.quota) && est.quota < GIB) return true;
   const getDir = globalThis.navigator?.storage?.getDirectory;
   if (typeof getDir !== 'function') return false;
@@ -294,32 +296,51 @@ export function showRecoveryCode(code) {
   recoverySheet = s;
   done.focus({ preventScroll: true });
 
+  // Set before the picker opens (a second click while it is open would fall back to a staged download).
+  let saving = false;
   async function saveCode() {
+    if (saving) return;
+    saving = true;
     const name = 'cZEROde-recovery-code.txt';
     let target;
     try {
       target = await platform.chooseSaveTarget({ name, mime: 'text/plain', count: 1 });
     } catch (e) {
+      saving = false;
       report(e);
       return;
     }
-    if (!target) return;
+    if (!target) {
+      saving = false;
+      return;
+    }
     const text = `cZEROde vault recovery code\n\n${code}\n\nAnyone with this code can open your vault.\nKeep it somewhere safe and private.\n`;
     const blob = new Blob([text], { type: 'text/plain' });
     try {
       const r = await target.write(name, blob, { size: blob.size, mime: 'text/plain' });
       saved = true;
+      // Locked meanwhile: the code is not handed out on a locked screen (Settings makes a new one).
+      if (state.get('vault.status') !== 'unlocked') return;
       if (r?.staged) deliverStaged([r.staged]);
       else toast('Recovery code saved', { kind: 'ok' });
     } catch (e) {
       await target.abort().catch(() => {});
       report(e);
+    } finally {
+      saving = false;
     }
   }
   return s;
 }
 
 // ───────── pending deletes (module level: they outlive a remount, commit on lock/purge/pagehide)
+
+/**
+ * The vault's (cleartext, device-local) kv key listing the ids of deletes still in their undo window. A commit started
+ * by pagehide (or by the lock that pagehide causes) rarely reaches IndexedDB before the page is gone; whatever is
+ * still listed here at the next unlock is deleted then. Item ids are the index's cleartext keys: nothing new leaks.
+ */
+const PENDING_KEY = 'pending-deletes';
 
 let deleter = null;
 
@@ -328,6 +349,14 @@ function deletes(vault) {
   const hidden = new Set();
   const batches = new Set();
   const subs = new Set();
+  // kv writes run one after another, so the last one written is the latest set.
+  let kvChain = Promise.resolve();
+  const remember = () => {
+    const ids = [...hidden];
+    kvChain = kvChain
+      .then(() => vault.kvSet?.(PENDING_KEY, ids.length ? ids : undefined))
+      .catch(() => {}); // no database (tests) or storage gone: best effort
+  };
   const notify = (info) => {
     for (const fn2 of [...subs]) {
       try {
@@ -343,6 +372,7 @@ function deletes(vault) {
     const b = { ids: fresh, timer: null, toast: null, done: false };
     for (const id of fresh) hidden.add(id);
     batches.add(b);
+    remember();
     notify();
     b.toast = toast(label, { timeout: TIMES.undoMs, action: { label: 'Undo', onClick: () => undo(b) } });
     b.timer = setTimeout(() => commit(b), TIMES.undoMs);
@@ -353,6 +383,7 @@ function deletes(vault) {
     clearTimeout(b.timer);
     batches.delete(b);
     for (const id of b.ids) hidden.delete(id);
+    remember();
     notify({ restored: b.ids });
     announce('Restored');
   }
@@ -374,12 +405,41 @@ function deletes(vault) {
       })
       .finally(() => {
         for (const id of b.ids) hidden.delete(id);
+        remember();
         notify();
       });
   }
   const commitAll = () => {
     for (const b of [...batches]) commit(b);
   };
+  /** After an unlock: deletes left over from a page that went away inside the undo window are committed now. */
+  async function resume() {
+    let ids;
+    try {
+      ids = await vault.kvGet?.(PENDING_KEY);
+    } catch {
+      return;
+    }
+    if (!Array.isArray(ids) || vault.status !== 'unlocked') return;
+    const left = [...new Set(ids)].filter((id) => {
+      if (typeof id !== 'string' || hidden.has(id)) return false;
+      try {
+        vault.item(id);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+    if (!left.length) {
+      remember(); // already gone: forget them
+      return;
+    }
+    const b = { ids: left, timer: null, toast: null, done: false };
+    for (const id of left) hidden.add(id);
+    batches.add(b);
+    notify();
+    commit(b);
+  }
   vault.addEventListener('locking', commitAll);
   state.onPurge(commitAll);
   globalThis.addEventListener?.('pagehide', commitAll);
@@ -388,6 +448,7 @@ function deletes(vault) {
     isHidden: (id) => hidden.has(id),
     schedule,
     commitAll,
+    resume,
     subscribe(f) {
       subs.add(f);
       return () => subs.delete(f);
@@ -1129,6 +1190,7 @@ function lockedScreen({ vault }) {
 
 function unlockedScreen({ vault: v, route, host }) {
   const del = deletes(v);
+  del.resume();
   load('upload');
   load('albums');
   load('settings');
@@ -1428,7 +1490,8 @@ function unlockedScreen({ vault: v, route, host }) {
       }
     }
     if (searchKey(s.query)) {
-      return emptyState({ icon: 'search', title: 'Nothing found', text: `No names match “${s.query.trim()}”.` });
+      const q = searchKey(s.query);
+      return emptyState({ icon: 'search', title: 'Nothing found', text: `No names match “${q.length > 60 ? `${q.slice(0, 59)}…` : q}”.` });
     }
     if (!s.albumId && total === 0) {
       return emptyState({
@@ -1493,8 +1556,17 @@ function unlockedScreen({ vault: v, route, host }) {
     banners.replaceChildren(...list);
   }
 
+  let persisting = false;
   async function keepData() {
-    const ok = await platform.storage.persist();
+    if (persisting) return;
+    persisting = true;
+    let ok = null;
+    try {
+      ok = await platform.storage.persist();
+    } finally {
+      persisting = false;
+    }
+    if (!alive) return;
     if (ok === true) toast("Protected — the browser won't clear your vault on its own.", { kind: 'ok' });
     else toast("The browser didn't allow it. Install the app or back up regularly.", { kind: 'warn', timeout: 6000 });
     paintBanners();
@@ -1548,9 +1620,12 @@ function unlockedScreen({ vault: v, route, host }) {
   }
 
   let storageTimer = null;
+  /** Throttled, not debounced: a long import repaints all the time, and the bar must still move along. */
   function scheduleStorage(ms = 400) {
+    if (storageTimer !== null && ms > 0) return; // a refresh is already on its way
     clearTimeout(storageTimer);
     storageTimer = setTimeout(async () => {
+      storageTimer = null;
       let info = null;
       try {
         info = await v.storage();
@@ -1768,8 +1843,8 @@ function unlockedScreen({ vault: v, route, host }) {
     if (name === null) return null;
     try {
       const l = await v.createList({ name: name.trim() || 'Album', itemIds });
-      toast(`Album “${shortName(labelText(l.name) || 'Album', 42, true)}” created`, { kind: 'ok' });
-      if (!itemIds.length) openAlbum(l.id);
+      if (alive) toast(`Album “${shortName(labelText(l.name) || 'Album', 42, true)}” created`, { kind: 'ok' });
+      if (!itemIds.length && alive) openAlbum(l.id);
       return l;
     } catch (e) {
       report(e);
@@ -1901,11 +1976,11 @@ function unlockedScreen({ vault: v, route, host }) {
     try {
       if (r === '__new__') {
         const l = await v.createList({ name: input.value.trim() || 'Album', itemIds: ids });
-        toast(`Added to “${shortName(labelText(l.name) || 'Album', 42, true)}”`, { kind: 'ok' });
+        if (alive) toast(`Added to “${shortName(labelText(l.name) || 'Album', 42, true)}”`, { kind: 'ok' });
       } else if (r) {
         const l = v.list(r);
         await v.updateList(r, { itemIds: [...l.itemIds, ...ids] });
-        toast(`Added to “${shortName(labelText(l.name) || 'Album', 42, true)}”`, { kind: 'ok' });
+        if (alive) toast(`Added to “${shortName(labelText(l.name) || 'Album', 42, true)}”`, { kind: 'ok' });
       } else {
         return;
       }
@@ -1974,7 +2049,7 @@ function unlockedScreen({ vault: v, route, host }) {
   function deleteItems(ids) {
     const infos = ids.map(safeItem).filter(Boolean);
     if (!infos.length) return;
-    del.schedule(infos.map((i) => i.id), infos.length === 1 ? `Deleted “${shortName(infos[0], 28)}”` : `Deleted ${infos.length} items`);
+    del.schedule(infos.map((i) => i.id), infos.length === 1 ? `Deleted “${shortName(infos[0], 22)}”` : `Deleted ${infos.length} items`);
   }
 
   function sendItems(ids) {
@@ -1984,37 +2059,68 @@ function unlockedScreen({ vault: v, route, host }) {
     router.navigate('#/send');
   }
 
-  /** Save decrypted copies. FIRST await: the save target (§1.7). */
-  let saveBusy = false;
+  /**
+   * Save decrypted copies. FIRST await: the save target (§1.7). 'picking' is set before the picker opens: a second
+   * click while it is open would be refused a picker and fall back to a staged copy (a second, unasked-for save).
+   * Staged copies are plaintext held in memory: together they stay within one Blob cap (more → "smaller groups").
+   */
+  let saveState = null; // null | 'picking' | 'saving'
   async function saveItems(ids) {
     const infos = ids.map(safeItem).filter(Boolean);
-    if (!infos.length) return;
-    if (saveBusy) {
+    if (!infos.length || saveState === 'picking') return;
+    if (saveState === 'saving') {
       toast('Still saving the last ones — one moment.', { kind: 'info' });
       return;
     }
+    saveState = 'picking';
     const one = infos.length === 1;
     const name = one ? (infos[0].kind === 'note' ? `${infos[0].name}.txt` : infos[0].name) : 'cZEROde files';
     let target;
     try {
       target = await platform.chooseSaveTarget({ name, mime: one ? infos[0].type : undefined, count: infos.length });
     } catch (e) {
+      saveState = null;
       report(e);
       return;
     }
-    if (!target) return;
-    saveBusy = true;
-    const progress = toast(one ? `Decrypting “${shortName(infos[0], 30)}”…` : `Decrypting ${infos.length} items…`, { timeout: 0 });
+    if (!target) {
+      saveState = null;
+      return;
+    }
+    saveState = 'saving';
+    const ctl = new AbortController();
+    const progress = toast(one ? `Decrypting “${shortName(infos[0], 30)}”…` : `Decrypting ${infos.length} items…`, {
+      timeout: 0,
+      action: { label: 'Cancel', onClick: () => ctl.abort() },
+    });
+    const progressMsg = progress.el.querySelector('.toast-msg');
+    const budget = platform.caps.mobile() ? CAPS.blobMobile : CAPS.blobDesktop;
     const staged = [];
+    let held = 0;
+    let left = 0;
+    let saved = 0;
+    let lastName = null;
     let viaDownloads = false;
     let error = null;
-    for (const info of infos) {
+    for (const [i, info] of infos.entries()) {
+      if (ctl.signal.aborted) break;
+      // One more staged copy would go over what this browser can hold at once: the rest waits for another round.
+      if (target.kind === 'stage' && staged.length && info.size <= budget && held + info.size > budget) {
+        left = infos.length - i;
+        break;
+      }
+      if (!one && progressMsg) progressMsg.textContent = `Decrypting ${i + 1} of ${infos.length}…`;
       let src = null;
       try {
         src = await v.sourceFor(info.id);
-        const r = await saveDecrypted(target, src, { name: info.name, type: info.type });
-        if (r?.staged) staged.push(r.staged);
+        const r = await saveDecrypted(target, src, { name: info.name, type: info.type, signal: ctl.signal });
+        if (r?.staged) {
+          staged.push(r.staged);
+          held += r.staged.size;
+        }
         if (r?.where === 'downloads') viaDownloads = true;
+        lastName = r?.name ?? lastName;
+        saved++;
       } catch (e) {
         error = e;
         break;
@@ -2023,23 +2129,29 @@ function unlockedScreen({ vault: v, route, host }) {
       }
     }
     progress.close();
-    saveBusy = false;
-    // Locked meanwhile: decrypted copies are not handed out on a locked screen (and "unlock first" says nothing new).
-    if (error || v.status !== 'unlocked') {
+    saveState = null;
+    // Locked meanwhile or cancelled: decrypted copies are not handed out (and "unlock first" says nothing new).
+    if (error || ctl.signal.aborted || v.status !== 'unlocked') {
       staged.length = 0;
-      if (error && v.status === 'unlocked') report(error);
+      if (error && !ctl.signal.aborted && v.status === 'unlocked') report(error);
       return;
     }
-    if (g.selecting) setSelecting(false);
+    if (g.selecting && !left) setSelecting(false);
+    if (left) {
+      toast(`${left} more didn't fit in this round (this browser holds only so much at once). ${left === 1 ? "It's still selected — save it next." : "They're still selected — save them next."}`, { kind: 'warn', timeout: 10_000 });
+      if (g.selecting) g.select(infos.slice(saved).map((i) => i.id));
+    }
     if (staged.length) deliverStaged(staged);
     else if (viaDownloads) toast('Download started', { kind: 'ok' });
-    else toast(one ? `Saved “${shortName(name)}”` : `Saved ${infos.length} files`, { kind: 'ok' });
+    else if (!left) toast(one ? `Saved “${shortName(lastName ?? name)}”` : `Saved ${infos.length} files`, { kind: 'ok' });
   }
 
   /** Share (coarse pointers): decrypt first, then a Share button whose own click calls navigator.share (§5.1). */
+  let preparing = false; // a second tap while one copy is decrypting does not decrypt another
   async function shareItem(id) {
     const info = safeItem(id);
-    if (!info) return;
+    if (!info || preparing) return;
+    preparing = true;
     const t = toast(`Preparing “${shortName(info, 30)}”…`, { timeout: 0 });
     let src = null;
     let file = null;
@@ -2050,6 +2162,7 @@ function unlockedScreen({ vault: v, route, host }) {
       if (alive && v.status === 'unlocked') report(e);
       return;
     } finally {
+      preparing = false;
       t.close();
       if (src) disposeSource(src);
     }
@@ -2213,8 +2326,25 @@ function unlockedScreen({ vault: v, route, host }) {
   function onViewerClose(rec, reason) {
     if (viewer === rec) viewer = null;
     cleanupFresh();
-    if (!alive || reason === 'replaced' || reason === 'closed' || reason === 'purge') return;
+    if (!alive || reason === 'replaced' || reason === 'purge') return;
+    refocusCard(rec.id);
+    if (reason === 'closed') return;
     leaveItem();
+  }
+
+  /**
+   * After the viewer closes, keyboard focus (and the scroll position) follow the item it showed last, not the card
+   * that opened it — unless focus already went somewhere else on purpose (a dialog, a toast's Undo).
+   */
+  function refocusCard(id) {
+    const raf = globalThis.requestAnimationFrame ?? ((f) => setTimeout(f, 16));
+    raf(() => {
+      if (!alive || viewer || v.status !== 'unlocked') return;
+      const d = globalThis.document;
+      const a = d?.activeElement;
+      if (a && a !== d.body && !g.el.contains(a)) return;
+      g.focusItem(id);
+    });
   }
 
   function leaveItem() {

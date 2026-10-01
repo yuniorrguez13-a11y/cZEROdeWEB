@@ -162,6 +162,11 @@
 @keyframes st-indet { from { transform: translateX(-110%); } to { transform: translateX(270%); } }
 .st-error { padding: 9px 12px; border: 1px solid var(--err); border-radius: var(--r); background: var(--errbg); }
 .st-reason { min-height: 1.45em; }
+.st-unsaved { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border: 1px solid var(--warn); border-radius: var(--r); background: var(--warnbg); color: var(--txt); }
+.st-unsaved[hidden] { display: none; }
+.st-discard { color: var(--err); }
+.st-discard:hover:not(:disabled) { border-color: var(--err); color: var(--err); }
+.st-unsaved .icon { width: 16px; height: 16px; margin-top: 2px; flex: none; color: var(--warn); }
 .st-reason.st-ready { color: var(--ok); }
 .st-form { display: flex; flex-direction: column; gap: 14px; }
 .st-check { padding: 2px 0; color: var(--txt); font-size: 15px; }
@@ -253,7 +258,7 @@
 .st-origin-title { color: var(--txt); font-family: var(--bf); font-size: 19px; font-weight: var(--fw-strong); line-height: 1.25; }
 .st-origin-text { color: var(--txt); font-size: 16px; line-height: 1.6; max-width: 80ch; }
 .st-origin-road { color: var(--tdim); font-size: 14px; line-height: 1.5; }
-.st-about-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.st-about-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: stretch; }
 .st-points { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 14px 0 12px; list-style: none; }
 .st-point { display: flex; align-items: flex-start; gap: 12px; }
 .st-point-icon { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border: 1px solid var(--bdim); border-radius: var(--r); color: var(--tdim); }

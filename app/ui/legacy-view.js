@@ -8,7 +8,7 @@
 //   "Delete old data" (asks first, never automatic).
 // - Old desktop .czd: picked or dropped files (web), the old app folder (desktop), state 'legacy.files' (handed
 //   over by other views) → PIN → Preview / Save / Import.
-// Every lock forgets the old PINs and drops decoded outputs. Node-importable: the DOM is only touched inside functions.
+// Every lock forgets the old PINs and drops decoded outputs (leaving the screen drops the outputs). Node-importable: the DOM is only touched inside functions.
 
 import { CzdError, isCancel, userMessage } from '../errors.js';
 import * as state from '../state.js';
@@ -34,8 +34,13 @@ const VERSIONS = Object.freeze({
   v3: { num: 'III', name: 'old cipher', title: 'Mixed Script v3', pin: true },
   v4: { num: 'IV', name: 'cZEROde v1 AES', title: 'cZEROde v4 AES', pin: true },
 });
-const MAX_MESSAGE = 4 * 2 ** 20;
+// Old messages were typed into a text box: far below this. Bigger pastes are refused before they reach the
+// textarea (laying out megabytes of Georgian text freezes the page for seconds).
+const MAX_MESSAGE = 2 ** 20;
+// Above this, detection waits for a pause in typing (it reads the whole text).
+const BIG_MESSAGE = 100_000;
 const LIVE_MS = 150;
+const MAX_OLD_CZD = 256 * 2 ** 20;
 const KV_IMPORTED = 'legacy-imported';
 const KV_ALBUMS = 'legacy-albums';
 
@@ -52,6 +57,16 @@ const KIND_LABEL = Object.freeze({ image: 'Photo', video: 'Video', audio: 'Music
 
 // Remembered old PINs never outlive a lock, wherever the user is.
 state.onPurge(() => oldvault.forgetPins());
+
+// Work started before a lock must not hand decrypted output over after it (a save finishing, a PIN still opening
+// files): each lock aborts the signal of the generation it ends.
+let lockCtl = new AbortController();
+state.onPurge(() => {
+  lockCtl.abort(new CzdError('aborted'));
+  lockCtl = new AbortController();
+});
+/** Aborted at the next lock. */
+const untilLock = () => lockCtl.signal;
 
 const getVault = () => vaultModule.vault;
 const unlocked = () => getVault()?.status === 'unlocked';
@@ -81,6 +96,12 @@ const btn = (label, iconId, { kind, small = true, onClick, disabled, className, 
   title,
   on: { click: onClick },
 }, iconId ? icon(iconId) : null, h('span', { class: 'lg-btn-label', text: label }));
+
+/** Busy look without `disabled` (a disabled button drops keyboard focus); callers guard re-entry themselves. */
+function setBusy(b, on) {
+  b.setAttribute('aria-disabled', String(Boolean(on)));
+  b.classList.toggle('lg-busy', Boolean(on));
+}
 
 function versionBadge(ver, { small = false } = {}) {
   const v = VERSIONS[ver];
@@ -126,6 +147,45 @@ function deliverStaged(file) {
       h('div', { class: 'lg-ready' }, h('span', { class: 'lg-ready-name', text: safeFilename(file.name) }), h('span', { class: 'lg-ready-size', text: fmtSize(file.size) }), save)),
     actions: [{ label: 'Close', kind: 'ghost', value: null }],
   });
+}
+
+/**
+ * Re-renders `container` without losing keyboard focus: the element that had it (found again by its row's
+ * data-key and its first lg- class) gets it back; when that one is gone or disabled now, the row's first enabled
+ * button does, else the row itself.
+ */
+function keepFocus(container, render) {
+  const d = globalThis.document;
+  const a = d?.activeElement;
+  const inside = a && a !== d.body && container.contains(a);
+  const rowKey = inside ? a.closest('[data-key]')?.dataset.key : undefined;
+  const cls = inside ? [...a.classList].find((c) => c.startsWith('lg-')) : undefined;
+  render();
+  if (!inside || (a.isConnected && !a.disabled)) return;
+  const row = rowKey !== undefined ? [...container.querySelectorAll('[data-key]')].find((r) => r.dataset.key === rowKey) : null;
+  const scope = row ?? container;
+  const again = cls ? scope.querySelector(`.${cls}`) : null;
+  const target = again && !again.disabled ? again : row?.querySelector('button:not([disabled]), a[href]');
+  if (target) target.focus({ preventScroll: true });
+  else if (row) {
+    row.tabIndex = -1;
+    row.focus({ preventScroll: true });
+  }
+}
+
+/**
+ * A double click on the button that opened a modal must not dismiss it with its second click (the backdrop is
+ * under the pointer by then): backdrop presses during the first moments are ignored.
+ */
+function holdBackdrop(dlg, ms = 500) {
+  const panel = dlg?.el ?? globalThis.document?.querySelector('#modals > .modal-backdrop:last-child > .modal');
+  const backdrop = panel?.parentElement;
+  if (!backdrop) return;
+  const t0 = Date.now();
+  // Capture at the target runs before modal()'s own (bubble) listener.
+  backdrop.addEventListener('pointerdown', (e) => {
+    if (e.target === backdrop && Date.now() - t0 < ms) e.stopImmediatePropagation();
+  }, true);
 }
 
 function delivered(out, fallbackName) {
@@ -176,9 +236,15 @@ async function importDecoded(v, r) {
   return info;
 }
 
+/** The viewer this screen opened: it belongs to this screen and closes when the screen goes. */
+let ownViewer = null;
+
 function viewerHere(items, index, onAction) {
   // Never from inside a modal/sheet (the viewer sits below the modal layer).
-  openViewer({ items, index, onAction });
+  const handle = openViewer({ items, index, onAction, onClose: () => {
+    if (ownViewer === handle) ownViewer = null;
+  } });
+  ownViewer = handle;
 }
 
 // ───────── old messages
@@ -245,7 +311,26 @@ function messagesCard(ctx) {
       outSlot,
       legend));
 
-  ta.addEventListener('input', () => changed());
+  let detectTimer = null;
+  ta.addEventListener('input', () => {
+    clearTimeout(detectTimer);
+    if (ta.value.length > BIG_MESSAGE) {
+      // Long text: the old result goes now, detection (and live decoding) after a pause.
+      seq++;
+      clearOutput();
+      detectTimer = setTimeout(() => {
+        detectTimer = null;
+        changed();
+      }, 250);
+    } else changed();
+  });
+  ta.addEventListener('paste', (e) => {
+    const text = e.clipboardData?.getData('text/plain') ?? '';
+    const kept = ta.value.length - Math.abs((ta.selectionEnd ?? 0) - (ta.selectionStart ?? 0));
+    if (kept + text.length <= MAX_MESSAGE) return;
+    e.preventDefault();
+    setError(`That’s too long for an old cZEROde message (${fmtSize(text.length)} of text).`);
+  });
   ta.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
@@ -291,7 +376,7 @@ function messagesCard(ctx) {
     setError(null);
     seq++;
     status.textContent = '';
-    goBtn.disabled = false;
+    setBusy(goBtn, false);
     if (output && output.source !== s) clearOutput();
     // Keyless formats decode as you type.
     if ((m === 'v1' || m === 'v2') && s.trim()) liveTimer = setTimeout(() => decode({ quiet: true }), LIVE_MS);
@@ -300,11 +385,21 @@ function messagesCard(ctx) {
 
   function clearOutput() {
     output = null;
+    tools = null;
+    saveBtn = null;
+    saving = false;
     outSlot.replaceChildren();
   }
 
   async function decode({ quiet = false } = {}) {
     clearTimeout(liveTimer);
+    if (detectTimer) {
+      // Decode pressed during the pause after editing a long text: detect now.
+      clearTimeout(detectTimer);
+      detectTimer = null;
+      changed();
+      clearTimeout(liveTimer);
+    }
     const s = ta.value;
     const m = mode();
     setError(null);
@@ -342,13 +437,13 @@ function messagesCard(ctx) {
         text = r.text;
         if (r.ambiguousQY) notes.push(QY_NOTE);
       } else {
-        goBtn.disabled = true;
+        setBusy(goBtn, true);
         status.replaceChildren(h('span', { class: 'lg-spin', aria: { hidden: 'true' } }), h('span', { text: '◀ Decrypting' }));
         text = await decryptV4Text(s, pinF.value);
       }
     } catch (e) {
       if (my !== seq) return;
-      goBtn.disabled = false;
+      setBusy(goBtn, false);
       status.textContent = '';
       clearOutput();
       if (isCancel(e)) return;
@@ -357,17 +452,47 @@ function messagesCard(ctx) {
       return;
     }
     if (my !== seq) return;
-    goBtn.disabled = false;
+    setBusy(goBtn, false);
     status.textContent = '';
     showOutput({ source: s, text, version: m, extra, notes });
   }
 
+  let tools = null;
+  let saveBtn = null;
+  let saving = false;
+
+  /** "Save to vault as note" exists while the vault is unlocked; once saved, it stays "Saved" for this output. */
+  function paintSave() {
+    if (!tools) return;
+    const want = unlocked();
+    if (!want) {
+      if (saveBtn) {
+        const hadFocus = saveBtn.contains(globalThis.document?.activeElement);
+        saveBtn.remove();
+        saveBtn = null;
+        if (hadFocus) tools.querySelector('button')?.focus();
+      }
+      return;
+    }
+    if (!saveBtn) {
+      saveBtn = btn('Save to vault as note', 'lock', { className: 'lg-save-note', onClick: () => saveNote() });
+      tools.append(saveBtn);
+    }
+    const done = output?.saved === true;
+    // aria-disabled, not disabled: the button keeps keyboard focus while it says "Saving…" / "Saved to vault".
+    saveBtn.setAttribute('aria-disabled', String(saving || done));
+    saveBtn.classList.toggle('lg-done', done);
+    saveBtn.querySelector('.lg-btn-label').textContent = done ? 'Saved to vault' : saving ? 'Saving…' : 'Save to vault as note';
+    saveBtn.querySelector('.icon')?.replaceWith(icon(done ? 'check' : 'lock'));
+  }
+
   function showOutput({ source, text, version, extra, notes }) {
     output = { source, text, version, extra, notes };
+    saving = false;
+    saveBtn = null;
     const pre = h('pre', { class: 'lg-out-text', tabIndex: 0, text, aria: { label: 'Decoded message' } });
-    const tools = h('div', { class: 'lg-out-tools' },
-      copyButton(() => output?.text ?? '', { secret: true }),
-      unlocked() ? btn('Save to vault as note', 'lock', { className: 'lg-save-note', onClick: () => saveNote() }) : null);
+    tools = h('div', { class: 'lg-out-tools' }, copyButton(() => output?.text ?? '', { secret: true }));
+    paintSave();
     const box = h('div', { class: 'lg-out', dataset: { version } },
       h('div', { class: 'lg-out-head' },
         h('span', { class: 'lg-out-title', text: 'Decoded' }),
@@ -386,18 +511,28 @@ function messagesCard(ctx) {
       needVault();
       return;
     }
-    if (!output) return;
-    const ver = VERSIONS[output.version];
+    const out = output;
+    if (!out || saving || out.saved) return;
+    const ver = VERSIONS[out.version];
+    saving = true;
+    paintSave();
     try {
-      await v.addNote({ title: `Old message (${ver.title})`, body: output.text });
+      await v.addNote({ title: `Old message (${ver.title})`, body: out.text });
+      out.saved = true;
       toast('Saved to your vault as a note.', { kind: 'ok' });
     } catch (e) {
       report(e);
+    } finally {
+      if (output === out) {
+        saving = false;
+        paintSave();
+      }
     }
   }
 
   function purge() {
     clearTimeout(liveTimer);
+    clearTimeout(detectTimer);
     seq++;
     ta.value = '';
     pinF.clear();
@@ -410,7 +545,7 @@ function messagesCard(ctx) {
     el,
     purge,
     refresh() {
-      if (output) showOutput(output);
+      paintSave();
     },
     destroy() {
       clearTimeout(liveTimer);
@@ -428,6 +563,7 @@ function oldVaultCard(ctx, { onGone }) {
   const imported = new Map(); // old id → new vault id
   const albums = new Map(); // old playlist id → vault list id
   const failed = new Map(); // old id → message
+  const importing = new Set(); // old ids with a single import running
   let job = null; // {ctl, done, total, name}
   let pinBusy = false;
 
@@ -526,9 +662,13 @@ function oldVaultCard(ctx, { onGone }) {
     }
   }
 
-  const importable = () => items.filter((e) => e.unlocked && e.format !== 'bad' && !isImported(e.id));
+  const importable = () => items.filter((e) => e.unlocked && e.format !== 'bad' && !isImported(e.id) && !importing.has(e.id));
 
   function paint() {
+    keepFocus(el, paintNow);
+  }
+
+  function paintNow() {
     const notes = items.filter((e) => e.store === 'vault');
     const files = items.filter((e) => e.store === 'files');
     const open = items.filter((e) => e.unlocked).length;
@@ -543,11 +683,11 @@ function oldVaultCard(ctx, { onGone }) {
     pinBar.hidden = allOpen;
     if (allOpen && !pinStatus.textContent) pinStatus.textContent = 'Everything is unlocked.';
     const n = importable().length;
-    const canImport = unlocked() && n > 0 && !job;
+    const canImport = unlocked() && n > 0 && !job && importing.size === 0;
     toolbar.replaceChildren(
       btn(n ? `Import all unlocked (${n})` : 'Import all unlocked', 'download', { kind: 'primary', small: false, className: 'lg-import-all', disabled: !canImport, onClick: () => importAll() }),
       !unlocked() ? h('p', { class: 'lg-toolbar-hint' }, icon('lock'), h('span', null, 'Imports go into your new vault — ', h('a', { href: '#/vault', text: 'unlock it first' }), '.')) : h('span', { class: 'lg-gap' }),
-      btn('Delete old data', 'trash', { kind: 'danger', small: false, className: 'lg-delete-old', disabled: Boolean(job), onClick: () => deleteOld() }));
+      btn('Delete old data', 'trash', { kind: 'danger', small: false, className: 'lg-delete-old', disabled: Boolean(job) || importing.size > 0, onClick: () => deleteOld() }));
     listSlot.replaceChildren(
       notes.length ? group('Notes', notes) : '',
       files.length ? group('Files', files) : '',
@@ -580,7 +720,8 @@ function oldVaultCard(ctx, { onGone }) {
     const tags = [];
     if (e.format === 'v3') tags.push(h('span', { class: 'badge badge-warn lg-tag', title: 'v3 notes are decoded with a PIN that can’t be checked — the result may be gibberish.', text: 'best effort' }));
     if (e.format === 'plain') tags.push(h('span', { class: 'badge lg-tag', title: 'Saved by cZEROde 1 without encryption.', text: 'plain text' }));
-    return h('li', { class: 'lg-item', dataset: { state: st.key, id: e.id } },
+    const inFlight = importing.has(e.id);
+    return h('li', { class: 'lg-item', dataset: { state: st.key, id: e.id, key: e.id } },
       h('span', { class: 'lg-item-icon' }, kindIcon(kind)),
       h('div', { class: 'lg-item-main' },
         h('p', { class: 'lg-item-name' }, h('span', { class: 'lg-item-text', text: e.name }), ...tags),
@@ -590,7 +731,7 @@ function oldVaultCard(ctx, { onGone }) {
       h('div', { class: 'lg-item-actions' },
         btn('Preview', 'eye', { kind: 'ghost', className: 'lg-act-preview', disabled: !ready, onClick: () => preview(e) }),
         btn('Save', 'download', { kind: 'ghost', className: 'lg-act-save', disabled: !ready, onClick: () => saveItem(e) }),
-        btn(isImported(e.id) ? 'Imported' : 'Import', isImported(e.id) ? 'check' : 'plus', { className: 'lg-act-import', disabled: !ready || isImported(e.id) || Boolean(job), onClick: () => importOne(e) })));
+        btn(isImported(e.id) ? 'Imported' : inFlight ? 'Importing…' : 'Import', isImported(e.id) ? 'check' : 'plus', { className: 'lg-act-import', disabled: !ready || isImported(e.id) || inFlight || Boolean(job), onClick: () => importOne(e) })));
   }
 
   function viewerItem(e) {
@@ -621,6 +762,7 @@ function oldVaultCard(ctx, { onGone }) {
   async function saveItem(e) {
     const isNote = e.store === 'vault';
     const name = isNote ? `${safeFilename(e.name)}.txt` : e.name;
+    const signal = untilLock();
     let target;
     try {
       target = await platform.chooseSaveTarget({ name, count: 1 });
@@ -631,8 +773,10 @@ function oldVaultCard(ctx, { onGone }) {
     if (!target) return;
     try {
       const r = await oldvault.decodeOldItem(e.id);
+      signal.throwIfAborted();
       const src = plainSource(r);
-      const out = await saveDecrypted(target, src, r.note ? {} : { name: src.name, type: src.type });
+      const out = await saveDecrypted(target, src, r.note ? { signal } : { name: src.name, type: src.type, signal });
+      signal.throwIfAborted();
       delivered(out, name);
     } catch (err) {
       await target.abort().catch(() => {});
@@ -646,6 +790,14 @@ function oldVaultCard(ctx, { onGone }) {
       needVault();
       return;
     }
+    // One import per item (double clicks, the viewer's "Add to vault" while the row's button runs).
+    if (importing.has(e.id) || job) return;
+    if (isImported(e.id)) {
+      toast(`“${e.name}” is already in your vault.`, { kind: 'info' });
+      return;
+    }
+    importing.add(e.id);
+    paint();
     try {
       const r = await oldvault.decodeOldItem(e.id);
       const info = await importDecoded(v, r);
@@ -654,10 +806,15 @@ function oldVaultCard(ctx, { onGone }) {
       await saveMaps();
       await linkAlbums(v);
       toast(`“${e.name}” is in your vault now.`, { kind: 'ok' });
+      // Everything unlocked is in the vault now (one by one): same as "Import all" — the vault banner can go.
+      if (importable().length === 0) await markDone(v);
     } catch (err) {
-      if (isCancel(err)) return;
-      failed.set(e.id, errorText(err));
-      report(err);
+      if (!isCancel(err)) {
+        failed.set(e.id, errorText(err));
+        report(err);
+      }
+    } finally {
+      importing.delete(e.id);
     }
     if (alive) paint();
   }
@@ -712,7 +869,7 @@ function oldVaultCard(ctx, { onGone }) {
       return;
     }
     pinBusy = true;
-    pinBtn.disabled = true;
+    setBusy(pinBtn, true);
     const locked = items.filter((e) => !e.unlocked && e.format !== 'bad').length;
     pinStatus.replaceChildren(h('span', { class: 'lg-spin', aria: { hidden: 'true' } }), h('span', { text: `Trying that PIN on ${plural(locked, 'locked item')}…` }));
     try {
@@ -733,7 +890,7 @@ function oldVaultCard(ctx, { onGone }) {
       if (!isCancel(e)) pinF.setError(userMessage(e));
     } finally {
       pinBusy = false;
-      pinBtn.disabled = false;
+      setBusy(pinBtn, false);
     }
   }
 
@@ -753,7 +910,9 @@ function oldVaultCard(ctx, { onGone }) {
     const text = h('p', { class: 'lg-job-text' });
     const cancel = btn('Cancel', 'close', { kind: 'ghost', className: 'lg-job-cancel', onClick: () => ctl.abort() });
     jobSlot.replaceChildren(h('div', { class: 'lg-job', role: 'status' }, h('div', { class: 'lg-job-head' }, text, cancel), bar));
+    const fromToolbar = toolbar.contains(globalThis.document?.activeElement);
     paint();
+    if (fromToolbar) cancel.focus(); // the Import button is disabled while the run goes
     let ok = 0;
     let bad = 0;
     for (const e of list) {
@@ -768,7 +927,8 @@ function oldVaultCard(ctx, { onGone }) {
         ok++;
         await saveMaps();
       } catch (err) {
-        if (isCancel(err) || err?.code === 'interrupted') break;
+        // A lock (or Cancel) stops the run; it isn't this item's fault.
+        if (isCancel(err) || err?.code === 'interrupted' || err?.code === 'vault-locked') break;
         failed.set(e.id, errorText(err));
         bad++;
       }
@@ -787,15 +947,10 @@ function oldVaultCard(ctx, { onGone }) {
     job = null;
     jobSlot.replaceChildren();
     if (!alive) return;
-    if (ok > 0 && !stopped) {
-      try {
-        await v.kvSet('legacy-import-done', true);
-      } catch {
-        // the banner just stays
-      }
-      state.set('legacy.importDone', true);
-    }
+    if (ok > 0 && !stopped) await markDone(v);
     paint();
+    const d = globalThis.document;
+    if (!d.activeElement || d.activeElement === d.body || !d.activeElement.isConnected) focusTitle();
     if (stopped && !unlocked()) toast(userMessage('interrupted'), { kind: 'warn' });
     else {
       const parts = [`Imported ${plural(ok, 'item')}`];
@@ -804,20 +959,41 @@ function oldVaultCard(ctx, { onGone }) {
     }
   }
 
+  async function markDone(v) {
+    try {
+      await v.kvSet('legacy-import-done', true);
+    } catch {
+      // the banner just stays
+    }
+    state.set('legacy.importDone', true);
+  }
+
+  /** Focus fallback when the focused control went away: the card's title (read out, then Tab goes on from there). */
+  function focusTitle() {
+    const t = el.querySelector('#lg-ov-title');
+    if (!t || el.hidden) return;
+    t.tabIndex = -1;
+    t.focus({ preventScroll: true });
+  }
+
   async function deleteOld() {
     const canBackup = unlocked();
-    const choice = await modal({
+    const left = items.filter((e) => e.format !== 'bad' && !isImported(e.id)).length;
+    const dlg = modal({
       title: 'Delete old cZEROde 1 data?',
       className: 'lg-modal',
       body: h('div', { class: 'stack' },
         h('p', { text: 'This removes the old web vault from this browser for good. Anything you haven’t imported is gone.' }),
+        left ? banner({ kind: 'warn', text: `${plural(left, 'old item')} ${left === 1 ? 'isn’t' : 'aren’t'} in your new vault yet.` }) : null,
         h('p', { text: canBackup ? 'Make a backup first? Imported items live in your new vault — a .czb backup keeps them safe.' : 'Make a backup first? Unlock your new vault and export a backup of what you imported.' })),
       actions: [
         { label: 'Cancel', kind: 'ghost', value: null },
-        ...(canBackup ? [{ label: 'Back up first', value: 'backup' }] : []),
         { label: 'Delete old data', kind: 'danger', value: 'delete' },
+        ...(canBackup ? [{ label: 'Back up first', kind: 'primary', value: 'backup', autofocus: true }] : []),
       ],
     });
+    holdBackdrop(dlg);
+    const choice = await dlg;
     if (choice === 'backup') {
       // Still inside the click's activation: the save picker can open (openBackupExport's first await is the picker).
       openBackupExport();
@@ -893,7 +1069,9 @@ function desktopCard(ctx) {
     try {
       const head = new Uint8Array(await file.slice(0, 64).arrayBuffer());
       if (isCzd2(head.subarray(0, 8))) return 'czd2';
-      return isOldCzd(head) ? 'locked' : 'bad';
+      if (!isOldCzd(head)) return 'bad';
+      // An old .czd is read whole as text: far bigger than any image cZEROde 1 locked means it isn't one.
+      return file.size > MAX_OLD_CZD ? 'huge' : 'locked';
     } catch {
       return 'bad';
     }
@@ -903,7 +1081,8 @@ function desktopCard(ctx) {
     for (const f of files) {
       if (!(f instanceof Blob)) continue;
       const status = await sniff(f);
-      entries.push({ key: `f${++entrySeq}`, name: safeFilename(f.name), size: f.size, file: f, status, message: status === 'bad' ? 'Not an old cZEROde .czd' : undefined });
+      const message = status === 'bad' ? 'Not an old cZEROde .czd' : status === 'huge' ? 'Too big to be an old cZEROde .czd' : undefined;
+      entries.push({ key: `f${++entrySeq}`, name: safeFilename(f.name), size: f.size, file: f, status: status === 'huge' ? 'bad' : status, message });
     }
     paint();
     el.scrollIntoView?.({ block: 'nearest' });
@@ -932,15 +1111,21 @@ function desktopCard(ctx) {
     if (!alive) return;
     folderNote.hidden = false;
     folderNote.textContent = found.length ? `${plural(found.length, 'file')} found in the old app’s vault folder.` : 'No files in the old app’s vault folder.';
-    for (const f of found) entries.push({ key: `p${++entrySeq}`, name: f.name, size: f.size, path: f.path, status: 'locked' });
+    for (const f of found) {
+      const size = Number(f.size) || 0;
+      const huge = size > MAX_OLD_CZD;
+      entries.push({ key: `p${++entrySeq}`, name: safeFilename(f.name), size, path: f.path, status: huge ? 'bad' : 'locked', message: huge ? 'Too big to be an old cZEROde .czd' : undefined });
+    }
     paint();
   }
 
   function paint() {
-    pinBar.hidden = !entries.some((e) => e.status === 'locked' || e.status === 'wrong');
-    listSlot.hidden = entries.length === 0;
-    drop.classList.toggle('lg-drop-compact', entries.length > 0);
-    listSlot.replaceChildren(...entries.map((e) => entryRow(e)));
+    keepFocus(el, () => {
+      pinBar.hidden = !entries.some((e) => e.status === 'locked' || e.status === 'wrong');
+      listSlot.hidden = entries.length === 0;
+      drop.classList.toggle('lg-drop-compact', entries.length > 0);
+      listSlot.replaceChildren(...entries.map((e) => entryRow(e)));
+    });
   }
 
   function entryRow(e) {
@@ -953,24 +1138,32 @@ function desktopCard(ctx) {
       actions.push(
         btn('Preview', 'eye', { kind: 'ghost', className: 'lg-act-preview', onClick: () => preview(e) }),
         btn('Save', 'download', { kind: 'ghost', className: 'lg-act-save', onClick: () => saveEntry(e) }),
-        btn(e.imported ? 'Imported' : 'Import', e.imported ? 'check' : 'plus', { className: 'lg-act-import', disabled: Boolean(e.imported), onClick: () => importEntry(e) }));
+        btn(e.imported ? 'Imported' : e.importing ? 'Importing…' : 'Import', e.imported ? 'check' : 'plus', { className: 'lg-act-import', disabled: Boolean(e.imported || e.importing), onClick: () => importEntry(e) }));
     } else if (e.status === 'czd2') {
       actions.push(btn('Open in Send · Open', 'unlock', { className: 'lg-act-open', onClick: () => {
         state.set('incoming.files', [e.file]);
         router.navigate('#/open');
       } }));
     }
-    actions.push(h('button', { type: 'button', class: 'btn-icon lg-act-remove', aria: { label: `Remove ${e.name}` }, title: 'Remove from the list', on: { click: () => {
-      entries.splice(entries.indexOf(e), 1);
-      paint();
-    } } }, icon('close')));
-    return h('li', { class: 'lg-item', dataset: { state: e.status } },
+    actions.push(h('button', { type: 'button', class: 'btn-icon lg-act-remove', aria: { label: `Remove ${e.name}` }, title: 'Remove from the list', disabled: busy, on: { click: () => remove(e) } }, icon('close')));
+    return h('li', { class: 'lg-item', dataset: { state: e.status, key: e.key } },
       h('span', { class: 'lg-item-icon' }, kindIcon(r ? kind : 'other')),
       h('div', { class: 'lg-item-main' },
         h('p', { class: 'lg-item-name' }, h('span', { class: 'lg-item-text', text: r ? r.name : e.name })),
         h('p', { class: 'lg-item-meta', text: meta })),
       h('span', { class: ['badge', label[2], 'lg-item-state'].filter(Boolean) }, icon(label[1]), h('span', { text: label[0] })),
       h('div', { class: 'lg-item-actions' }, actions));
+  }
+
+  function remove(e) {
+    const i = entries.indexOf(e);
+    if (i < 0 || busy) return;
+    const hadFocus = el.contains(globalThis.document?.activeElement);
+    entries.splice(i, 1);
+    e.result = undefined;
+    paint();
+    // Focus moves to the neighbour's Remove button (or the picker when the list is empty).
+    if (hadFocus) (listSlot.querySelectorAll('.lg-act-remove')[Math.min(i, entries.length - 1)] ?? pick).focus({ preventScroll: true });
   }
 
   async function readText(e) {
@@ -988,24 +1181,35 @@ function desktopCard(ctx) {
       return;
     }
     busy = true;
-    openBtn.disabled = true;
+    setBusy(openBtn, true);
+    const signal = untilLock();
     let opened = 0;
     for (const e of todo) {
+      if (signal.aborted) break;
       e.status = 'busy';
       paint();
       try {
-        e.result = await openOldCzd(await readText(e), pin);
+        const r = await openOldCzd(await readText(e), pin);
+        // A lock while it was opening: nothing decrypted is kept (purge already reset the list).
+        if (signal.aborted) break;
+        e.result = r;
         e.status = 'open';
         e.message = undefined;
         opened++;
       } catch (err) {
+        if (signal.aborted) break;
         e.status = err?.code === 'legacy-wrong-pin' ? 'wrong' : 'bad';
         e.message = err?.code === 'legacy-wrong-pin' ? undefined : userMessage(err);
       }
       if (!alive) return;
     }
     busy = false;
-    openBtn.disabled = false;
+    setBusy(openBtn, false);
+    if (signal.aborted) {
+      for (const e of entries) if (e.status === 'busy') e.status = 'locked';
+      paint();
+      return;
+    }
     paint();
     if (opened) {
       pinF.clear();
@@ -1043,6 +1247,7 @@ function desktopCard(ctx) {
   async function saveEntry(e) {
     const r = e.result;
     if (!r) return;
+    const signal = untilLock();
     let target;
     try {
       target = await platform.chooseSaveTarget({ name: r.name, count: 1 });
@@ -1052,7 +1257,9 @@ function desktopCard(ctx) {
     }
     if (!target) return;
     try {
-      const out = await saveDecrypted(target, plainSource(r), { name: r.name, type: r.type });
+      signal.throwIfAborted();
+      const out = await saveDecrypted(target, plainSource(r), { name: r.name, type: r.type, signal });
+      signal.throwIfAborted();
       delivered(out, r.name);
     } catch (err) {
       await target.abort().catch(() => {});
@@ -1066,13 +1273,22 @@ function desktopCard(ctx) {
       needVault();
       return;
     }
-    if (!e.result) return;
+    const r = e.result;
+    if (!r || e.importing) return;
+    if (e.imported) {
+      toast(`“${r.name}” is already in your vault.`, { kind: 'info' });
+      return;
+    }
+    e.importing = true;
+    paint();
     try {
-      await importDecoded(v, { name: e.result.name, type: e.result.type, blob: e.result.blob, mtime: e.file?.lastModified });
-      e.imported = true;
-      toast(`“${e.result.name}” is in your vault now.`, { kind: 'ok' });
+      await importDecoded(v, { name: r.name, type: r.type, blob: r.blob, mtime: e.file?.lastModified });
+      if (e.result === r) e.imported = true;
+      toast(`“${r.name}” is in your vault now.`, { kind: 'ok' });
     } catch (err) {
       report(err);
+    } finally {
+      e.importing = false;
     }
     if (alive) paint();
   }
@@ -1084,7 +1300,7 @@ function desktopCard(ctx) {
   function purge() {
     pinF.clear();
     for (const e of entries) {
-      if (e.result) {
+      if (e.result || e.status === 'busy') {
         e.result = undefined;
         e.status = 'locked';
         e.imported = false;
@@ -1184,7 +1400,10 @@ export function mount(root, route, ctx) {
     unmount() {
       for (const off of offs.splice(0)) off();
       for (const off of vaultOffs.splice(0)) off();
-      oldvault.forgetPins();
+      ownViewer?.close();
+      ownViewer = null;
+      // The old PINs stay until the next lock (state.onPurge above): a trip to the vault to check an import doesn't
+      // mean typing every old PIN again.
       msgs.destroy();
       ov.destroy();
       desk.destroy();

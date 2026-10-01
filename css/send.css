@@ -111,6 +111,7 @@
 /* ───────── Lock: working */
 .sd-job { display: flex; flex-direction: column; gap: 14px; padding: 6px 0; }
 .sd-phase { display: flex; align-items: center; gap: 10px; color: var(--txt); font-size: 16px; font-weight: 700; letter-spacing: .04em; }
+.sd-phase:focus { outline: none; }
 
 /* ───────── Lock: result */
 .sd-result { display: flex; flex-direction: column; gap: 18px; }
@@ -184,6 +185,12 @@
 .sd-entry-single .sd-entry-actions { justify-content: flex-start; gap: 8px; }
 .sd-activity { display: flex; flex-direction: column; gap: 8px; }
 .sd-vault-hint { padding-top: 12px; border-top: 1px solid var(--bdim); }
+.sd-vault-locked { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; color: var(--tdim); font-size: 14px; line-height: 1.45; }
+.sd-vault-locked > .icon { width: 18px; height: 18px; flex: none; color: var(--gold); }
+.sd-vault-locked .sd-vault-text { flex: 1 1 220px; min-width: 0; }
+.sd-vault-form .sd-vault-text { color: var(--txt); font-size: 15px; line-height: 1.45; }
+.sd-vault-form { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--brd); border-left: 3px solid var(--gold); border-radius: var(--r); background: var(--obg); }
+[data-theme^="minimal"] .sd-vault-form { border-left-color: var(--acc); }
 
 /* ───────── Incoming */
 .sd-incoming { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; padding: 0; border-color: var(--acc); }
@@ -229,7 +236,7 @@
 .sd-ready-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--bdim); }
 .sd-ready-row:first-child { border-top: 0; }
 .sd-ready-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--txt); font-weight: 600; }
-.sd-ready-size { color: var(--tdim); font-size: 13px; font-variant-numeric: tabular-nums; }
+.sd-ready-size { flex: none; color: var(--tdim); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sd-ready-file { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .sd-share-go { min-height: 48px; }
 
@@ -278,6 +285,10 @@
   .sd-in-actions { order: 3; width: 100%; margin-left: 48px; justify-content: flex-start; }
   .sd-output-actions { width: 100%; margin-left: 48px; }
   .sd-help-sheet .sheet-title { white-space: normal; font-size: 20px; line-height: 1.15; }
+}
+/* Touch screens keep :hover after a tap: the drop area must not stay highlighted after "Choose files". */
+@media (hover: none) {
+  .sd-drop:hover { border-color: var(--ibrd); background: var(--obg); color: var(--tdim); }
 }
 @media (prefers-reduced-motion: reduce) {
   .sd-indet .progress-fill { animation: none; width: 100%; opacity: .5; }

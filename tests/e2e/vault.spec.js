@@ -1087,3 +1087,120 @@ test('forgot it → delete vault and start over (typed DELETE) brings back the f
   expect(await status(page)).toBe('none');
   await check();
 });
+
+// ───────── second review pass
+
+test('a delete still in its undo window when the page goes away is committed at the next unlock', async ({ page }) => {
+  const check = await watch(page);
+  await openApp(page);
+  await createVault(page);
+  await addFiles(page, ['image.png', 'notes.txt', 'doc.pdf']);
+  // In an album: remove() has work to do (re-sealing the album) before its commit.
+  await page.evaluate(async () => {
+    const { vault } = await import('/app/vault/vault.js');
+    await vault.createList({ name: 'Trip', itemIds: vault.items().map((i) => i.id) });
+  });
+  await cardMenu(page, 'doc.pdf', 'Delete');
+  await expect(card(page, 'doc.pdf')).toHaveCount(0);
+  await page.reload(); // pagehide inside the undo window
+  await expect(page.locator('.vv-lockpage')).toBeVisible();
+  await unlock(page);
+  const stored = () => page.evaluate(async () => (await import('/app/vault/vault.js')).vault.items().map((i) => i.name).sort());
+  await expect.poll(stored).toEqual(['image.png', 'notes.txt']);
+  await expect(page.locator('.vv-card')).toHaveCount(2);
+  await expect(card(page, 'doc.pdf')).toHaveCount(0);
+  // Nothing is left over to delete at the next unlock: an Undo'd delete stays undone.
+  await cardMenu(page, 'notes.txt', 'Delete');
+  await page.locator('.toast', { hasText: 'Deleted' }).getByRole('button', { name: 'Undo' }).click();
+  await expect(card(page, 'notes.txt')).toHaveCount(1);
+  // The Undo is written down (the pending list empties) before the page goes away.
+  await expect.poll(() => page.evaluate(async () => (await import('/app/vault/vault.js')).vault.kvGet('pending-deletes'))).toBeUndefined();
+  await page.reload();
+  await unlock(page);
+  await expect.poll(stored).toEqual(['image.png', 'notes.txt']);
+  await check();
+});
+
+test('closing the viewer puts keyboard focus on the card of the item it showed last', async ({ page }) => {
+  const check = await watch(page);
+  await openApp(page);
+  await createVault(page);
+  await addFiles(page, ['image.png', 'notes.txt', 'doc.pdf']);
+  const order = await names(page);
+  await card(page, order[0]).locator('.vv-open').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.vw-name')).toHaveText(order[0]);
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('.vw-name')).toHaveText(order[2]);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.vw-root')).toHaveCount(0);
+  await expect(page).toHaveURL(/#\/vault$/);
+  await expect(card(page, order[2]).locator('.vv-open')).toBeFocused();
+  await check();
+});
+
+test('a double click on Save asks for one folder only (no second, staged save)', async ({ page }) => {
+  const check = await watch(page);
+  await page.addInitScript(() => {
+    window.__pickerCalls = 0;
+    // The first picker stays open a moment, then is cancelled; a second call while it is open is refused like
+    // Chromium does ("File picker already active").
+    window.showDirectoryPicker = () => {
+      window.__pickerCalls++;
+      if (window.__pickerCalls > 1) return Promise.reject(new DOMException('File picker already active.', 'NotAllowedError'));
+      return new Promise((_, reject) => setTimeout(() => reject(new DOMException('The user aborted a request.', 'AbortError')), 600));
+    };
+  });
+  await openApp(page);
+  await createVault(page);
+  await addFiles(page, ['image.png', 'notes.txt']);
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  await page.click('.vv-selectbtn');
+  await page.locator('.vv-selall').click();
+  await page.locator('.vv-selbar').getByRole('button', { name: 'Save' }).dblclick();
+  await page.waitForTimeout(1500);
+  expect(await page.evaluate(() => window.__pickerCalls)).toBe(1);
+  expect(downloads).toBe(0);
+  await expect(page.locator('.vv-ready')).toHaveCount(0);
+  await expect(page.locator('.toast', { hasText: /Saved|Download/ })).toHaveCount(0);
+  await check();
+});
+
+test.describe('phone long-press', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('a long press on a card starts select mode with that card selected; taps then toggle', async ({ page, context }) => {
+    const check = await watch(page);
+    await openApp(page);
+    await createVault(page);
+    await addFiles(page, ['image.png', 'notes.txt', 'doc.pdf']);
+    const order = await names(page);
+    const target = card(page, order[1]).locator('.vv-open');
+    await target.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    const box = await target.boundingBox();
+    const cdp = await context.newCDPSession(page);
+    const pt = { x: box.x + box.width / 2, y: box.y + 40 };
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [pt] });
+    await page.waitForTimeout(900);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect(page.locator('.vv-selbar')).toBeVisible();
+    await expect(page.locator('.vv-selcount')).toHaveText('1 selected');
+    await expect(card(page, order[1])).toHaveClass(/is-selected/);
+    await expect(page.locator('.vw-root')).toHaveCount(0); // the press did not open the viewer
+    await expect(page.locator('.menu')).toHaveCount(0); // nor the card menu
+    await page.touchscreen.tap(pt.x, pt.y); // the same card again: deselected (no click left swallowed)
+    await expect(page.locator('.vv-selcount')).toHaveText('Tap items to select');
+    // A toast shown in select mode (★ on two items) does not cover the selection bar's buttons.
+    await card(page, order[0]).locator('.vv-open').click();
+    await card(page, order[2]).locator('.vv-open').click();
+    await page.locator('.vv-selbar').getByRole('button', { name: 'Favorite' }).click();
+    const t = page.locator('.toast', { hasText: 'Added 2 to favorites' });
+    await expect(t).toBeVisible();
+    const [bar, tb] = [await page.locator('.vv-selbar').boundingBox(), await t.boundingBox()];
+    expect(bar.y >= 0 && bar.y + bar.height <= 844).toBe(true);
+    expect(tb.y >= bar.y + bar.height || tb.y + tb.height <= bar.y).toBe(true);
+    await check();
+  });
+});
