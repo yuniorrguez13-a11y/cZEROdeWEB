@@ -1,0 +1,114 @@
+name: Desktop build
+
+# Installers with tauri-action (research-tauri §5.1). Windows NSIS is required; Linux deb/AppImage and macOS
+# arm64 app/dmg are best effort (a failure there doesn't fail the run).
+#   push to main / PR touching the desktop build / manual -> installers as workflow artifacts
+#   push tag v*                                           -> same, plus a draft GitHub Release that is
+#                                                            published once every required build passed
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore: ['**.md']
+  pull_request:
+    paths:
+      - 'src-tauri/**'
+      - 'scripts/**'
+      - 'package*.json'
+      - '.github/workflows/desktop.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  create-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      release_id: ${{ steps.create.outputs.id }}
+    steps:
+      - id: create
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          id=$(gh api -X POST "repos/$GITHUB_REPOSITORY/releases" \
+                 -f tag_name="$TAG" -f name="cZEROde $TAG" \
+                 -F draft=true -F generate_release_notes=true --jq .id)
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: create-release
+    # Runs on branch pushes and PRs too (create-release is skipped there), but not if it failed.
+    if: ${{ !cancelled() && needs.create-release.result != 'failure' }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: --bundles nsis
+            optional: false
+          - platform: ubuntu-22.04
+            args: --bundles deb,appimage
+            optional: true
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin --bundles app,dmg
+            optional: true
+    runs-on: ${{ matrix.platform }}
+    continue-on-error: ${{ matrix.optional }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Linux system libraries
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ matrix.args }}
+          # empty except on v* tags -> nothing is uploaded to Releases
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          uploadUpdaterJson: false
+          uploadWorkflowArtifacts: true
+          workflowArtifactNamePattern: cZEROde-[platform]-[arch]-[bundle]
+
+  publish-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [create-release, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ID: ${{ needs.create-release.outputs.release_id }}
+        run: gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$ID" -F draft=false

@@ -66,6 +66,8 @@ const MESSAGES = Object.freeze({
   'store-unavailable': "This browser can't reach your vault storage (private window?).",
   'legacy-wrong-pin': 'Wrong PIN.',
   'legacy-missing-chunks': 'Parts of this old file are missing.',
+  'legacy-bad-record': "This old item is damaged and can't be opened.",
+  'legacy-no-db': 'No old cZEROde data was found.',
   'not-czb': BAD_BACKUP,
   'czb-version': BAD_BACKUP,
   'czb-mac': BAD_BACKUP,

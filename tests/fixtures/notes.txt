@@ -1,0 +1,4 @@
+cZEROde test notes
+
+Plain UTF-8 text with a few non-ASCII characters: ä ö ü ß, ქართული, Кириллица, 日本語, emoji 🔒💀.
+Line endings are LF. The last line ends with a newline.

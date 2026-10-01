@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob: czstream: http://czstream.localhost https://czstream.localhost; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost https://ipc.localhost; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
 <title>cZEROde legacy seed</title>
-<!-- Seeds the old czeroode_db from the legacy vectors for e2e. Owner: C2 (phase 1). Phase-0 placeholder. -->
+<!-- E2E helper (same origin as the app): recreates the cZEROde 1 web database czeroode_db v2 from
+     tests/vectors/legacy-web-vectors.json. seed.html?clear=1 only deletes it. When done:
+     window.__seeded = {vault, files, playlists} (record counts) or {cleared:true}; on failure {error}. -->
+<script type="module" src="./seed.js"></script>
 </head>
-<body></body>
+<body>
+<p id="status">seeding…</p>
+</body>
 </html>

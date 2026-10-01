@@ -1,0 +1,35 @@
+[package]
+name = "czeroode"
+version = "2.0.0"
+description = "cZEROde - private encrypted file vault"
+authors = ["cZEROde"]
+license = ""
+repository = "https://github.com/yuniorrguez13-a11y/cZEROdeWEB"
+edition = "2024"
+rust-version = "1.90"
+
+# lib + thin main.rs is the Tauri 2 template layout.
+# The `_lib` suffix avoids a bin/lib output filename collision on Windows.
+[lib]
+name = "czeroode_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = [] }
+tauri-plugin-dialog = "2.8"
+tauri-plugin-fs = "2.6"
+tauri-plugin-opener = "2.7"
+tauri-plugin-single-instance = "2.5"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Smaller, faster release binary (Tauri "App Size" guide).
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

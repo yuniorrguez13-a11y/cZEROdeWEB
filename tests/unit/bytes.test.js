@@ -17,11 +17,11 @@ test('concat joins views and buffers into a new array', () => {
 });
 
 test('utf8 / fromUtf8 round trip, BOM kept, fatal by default', () => {
-  const s = '﻿hé 日本 😀 ქართ';
+  const s = '\ufeffhé 日本 😀 ქართ';
   assert.equal(B.fromUtf8(B.utf8(s)), s);
-  assert.equal(B.fromUtf8(new Uint8Array([0xef, 0xbb, 0xbf, 0x41])), '﻿A');
+  assert.equal(B.fromUtf8(new Uint8Array([0xef, 0xbb, 0xbf, 0x41])), '\ufeffA');
   assert.throws(() => B.fromUtf8(new Uint8Array([0xc3])), TypeError);
-  assert.equal(B.fromUtf8(new Uint8Array([0x41, 0xff]), { fatal: false }), 'A�');
+  assert.equal(B.fromUtf8(new Uint8Array([0x41, 0xff]), { fatal: false }), 'A\ufffd');
   assert.deepEqual([...B.utf8('\uD800')], [0xef, 0xbf, 0xbd]);
 });
 

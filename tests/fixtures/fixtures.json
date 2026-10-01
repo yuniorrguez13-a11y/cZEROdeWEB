@@ -1,0 +1,78 @@
+{
+  "generator": "scripts/gen-fixtures.mjs",
+  "files": {
+    "image.png": {
+      "size": 6497,
+      "sha256": "61f7d3cb96276507e08701f119d285d3a0249baba80e757ad7ddda8a37e81cf7",
+      "mime": "image/png",
+      "about": "320×200 PNG (Node encoder)"
+    },
+    "large.jpg": {
+      "size": 6155117,
+      "sha256": "9105cd2fec7422ca70b8be15298bb822ae9cf14dbc8aae6d56976e8363ed60e3",
+      "mime": "image/jpeg",
+      "about": "4000×3000 JPEG, ~6 MB (Chromium canvas)"
+    },
+    "clip.webm": {
+      "size": 670202,
+      "sha256": "bb4b99da7b89777bd509fab8c3216db11a2c21ad2f7cadd25d0a3fa4fb9c97d7",
+      "mime": "video/webm",
+      "about": "5 s 640×360 VP8 + Opus WebM with Cues (Chromium frames + MediaRecorder audio, ffmpeg)"
+    },
+    "audio.webm": {
+      "size": 43229,
+      "sha256": "348c45000628e377735406a9e055751de3aac4ff5cdabf667cab2f8a47e75872",
+      "mime": "audio/webm",
+      "about": "5 s Opus in WebM with Cues (MediaRecorder, ffmpeg remux)"
+    },
+    "tone.wav": {
+      "size": 132344,
+      "sha256": "4bb98d4a021f15e0452f1ca8a5b75aeffcc35136f8373cafef76410b485b2910",
+      "mime": "audio/wav",
+      "about": "1.5 s 44.1 kHz 16-bit mono PCM (Node)"
+    },
+    "doc.pdf": {
+      "size": 602,
+      "sha256": "147b065ce34cceeb5011ad36681ecf454a2903124603bb72e7fbb32e1b8c2c63",
+      "mime": "application/pdf",
+      "about": "one-page PDF 1.4 with a valid xref (Node)"
+    },
+    "notes.txt": {
+      "size": 209,
+      "sha256": "4a01fb8f26f766d921172cacbd64645148e941435a7b06bc86c60bae4ccc60d4",
+      "mime": "text/plain",
+      "about": "UTF-8 text with non-ASCII characters"
+    },
+    "folder/readme.txt": {
+      "size": 15,
+      "sha256": "95dd7c58e0f20fe76a6f9d2aa493544ecf3200888ab436606db277240eaf00a3",
+      "mime": "text/plain",
+      "about": "folder import: top-level file"
+    },
+    "folder/.hidden": {
+      "size": 7,
+      "sha256": "e084a3683ef795d1cdbf5e9b253f2ca1f783ae0d0d6e47e419acbbc4fc80bbfa",
+      "mime": "application/octet-stream",
+      "about": "folder import: dotfile (must be skipped)"
+    },
+    "folder/photos/dot.png": {
+      "size": 244,
+      "sha256": "c23d9438105f26a3024f888d8e97c2875ce7009ce55ab693ceaa4eeafafe03d1",
+      "mime": "image/png",
+      "about": "folder import: nested PNG"
+    },
+    "folder/photos/more/deep.txt": {
+      "size": 10,
+      "sha256": "30cf6f2de471343739bcc1dde393c0c0771814ac3ad798f68c8a74495174521a",
+      "mime": "text/plain",
+      "about": "folder import: depth 3"
+    },
+    "legacy/red-dot.czd": {
+      "size": 738,
+      "sha256": "00e30fb632bff8294f422f5fe5a8768d3a88aee72153b9276f7a5a27aee97dd7",
+      "mime": "application/x-czeroode",
+      "about": "old desktop .czd (cZEROde 1, PIN 1234) from tests/vectors",
+      "pin": "1234"
+    }
+  }
+}

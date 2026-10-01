@@ -157,15 +157,15 @@ test('desktop decode edge cases: whitespace anywhere and raw base64 give the bas
 test('whitespace: the full ECMAScript WhiteSpace + LineTerminator set is ignored', () => {
   const v = desk.v4_text[0];
   const blob = fromB64(v.blob_b64);
-  const ws = ['\t', '\n', '\v', '\f', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '　', '﻿'];
+  const ws = ['\t', '\n', '\v', '\f', '\r', ' ', '\u00a0', '\u1680', '\u2000', '\u2005', '\u200a', '\u2028', '\u2029', '\u202f', '\u205f', '\u3000', '\ufeff'];
   const chars = [...v.ciphertext];
   const noisy = chars.map((c, i) => c + ws[i % ws.length]).join('');
   assert.deepEqual(scriptToBytes(noisy), blob);
   assert.deepEqual(scriptToBytes(`\r\n  ${v.ciphertext}\n\n`), blob);
   assert.equal(stripWs(noisy), v.ciphertext);
-  assert.equal(stripWs(' a　b﻿ c '), 'abc');
+  assert.equal(stripWs(' a\u3000b\ufeff\u2028c '), 'abc');
   // not whitespace: zero-width space, NUL
-  assert.throws(() => scriptToBytes(`${v.ciphertext}​`), notCipher);
+  assert.throws(() => scriptToBytes(`${v.ciphertext}\u200b`), notCipher);
   assert.throws(() => scriptToBytes(`${v.ciphertext}\u0000`), notCipher);
 });
 

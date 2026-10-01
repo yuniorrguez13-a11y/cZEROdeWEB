@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Registers the cZEROde file types on Linux (shared-mime-info; dpkg's trigger runs update-mime-database). -->
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-czeroode">
+    <comment>cZEROde locked file</comment>
+    <glob pattern="*.czd"/>
+  </mime-type>
+  <mime-type type="application/x-czeroode-backup">
+    <comment>cZEROde backup</comment>
+    <glob pattern="*.czb"/>
+  </mime-type>
+</mime-info>

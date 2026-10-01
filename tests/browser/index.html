@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob: czstream: http://czstream.localhost https://czstream.localhost; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost https://ipc.localhost; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
 <title>cZEROde browser units</title>
-<!-- Browser unit harness (index.html?suite=X). Owner: C2 (phase 1). Phase-0 placeholder. -->
+<!-- Browser unit harness: index.html?suite=<area> runs tests/browser/<area>.test.js under the app's CSP
+     and sets window.__results = {passed, failed, failures:[{name, message}], logs}. Driven by
+     tests/e2e/browser-units.spec.js; open it by hand while serving the repo (node scripts/serve.mjs). -->
 <script type="module" src="./runner.js"></script>
 </head>
-<body></body>
+<body>
+<h1>cZEROde browser units</h1>
+<p id="status">loading…</p>
+<ol id="results"></ol>
+</body>
 </html>

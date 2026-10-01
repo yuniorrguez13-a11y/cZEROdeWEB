@@ -8,7 +8,7 @@ import { ROOT } from './helpers-phase0.js';
 
 const CSP = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' blob: data:; "
   + "media-src 'self' blob: czstream: http://czstream.localhost https://czstream.localhost; font-src 'self'; "
-  + "connect-src 'self' ipc: http://ipc.localhost; worker-src 'self'; manifest-src 'self'; object-src 'none'; "
+  + "connect-src 'self' ipc: http://ipc.localhost https://ipc.localhost; worker-src 'self'; manifest-src 'self'; object-src 'none'; "
   + "base-uri 'none'; form-action 'none'; frame-src 'none'";
 const CSS = ['app', 'vault', 'viewer', 'player', 'upload', 'albums', 'send', 'text', 'legacy', 'settings', 'extras'].map((n) => `./css/${n}.css`);
 

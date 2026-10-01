@@ -1,34 +1,187 @@
-// Tiny app state store + the lock/purge registry.
-// Owner: C1 (phase 1). Phase-0 stub: exports match DESIGN §10; bodies throw CzdError('not-implemented').
+// Tiny app state store + the lock/purge registry (DESIGN §10).
+// Keys: 'vault.status' 'route' 'sw.updateReady' 'install.prompt' 'busy' 'send.pending' {itemIds}
+//       'incoming.files' File[] 'settings' {key,value} 'player' {playing:boolean}
+// purge(reason) is what "lock" means for everything outside the vault: every module that holds
+// keys, object URLs or decrypted DOM registers an onPurge handler.
 
-import { CzdError } from './errors.js';
+import { randomBytes, toHex } from './util/bytes.js';
 
-/** Current value. */
+const values = new Map([['busy', 0], ['sw.updateReady', false]]);
+const listeners = new Map(); // key | '*' → Set<fn>
+const purgeHandlers = new Set();
+let channel; // BroadcastChannel('czd-lock'), created on first use
+let purging = false;
+
+/**
+ * Random id of this tab, sent as `from` with every 'czd-lock' broadcast. A BroadcastChannel never delivers
+ * a message to the object that posted it, but it DOES deliver it to other channel objects of the same tab,
+ * so a listener with its own channel must ignore messages whose `from` is TAB_ID (onRemoteLock does that).
+ */
+export const TAB_ID = (() => {
+  try {
+    return toHex(randomBytes(8));
+  } catch {
+    return `${Date.now().toString(16)}${Math.random().toString(16).slice(2, 10)}`;
+  }
+})();
+
+function lockChannel() {
+  if (channel) return channel;
+  if (typeof globalThis.BroadcastChannel !== 'function') return null;
+  try {
+    channel = new BroadcastChannel('czd-lock');
+    channel.unref?.(); // Node: don't keep the process alive (browsers have no unref)
+  } catch (e) {
+    report('BroadcastChannel czd-lock', e);
+    channel = null;
+  }
+  return channel;
+}
+
+function report(where, err) {
+  try {
+    globalThis.console?.error?.(`[state] ${where} failed`, err);
+  } catch {
+    // ignore
+  }
+}
+
+/**
+ * Current value of a key (undefined when never set).
+ * @param {string} key
+ * @returns {any}
+ */
 export function get(key) {
-  throw new CzdError('not-implemented');
+  return values.get(key);
 }
 
-/** Sets and notifies. */
+/**
+ * Sets a key and notifies its listeners and '*' listeners when the value changed (Object.is).
+ * Listener errors are isolated (logged, never thrown to the caller).
+ * @param {string} key
+ * @param {any} value
+ */
 export function set(key, value) {
-  throw new CzdError('not-implemented');
+  const old = values.get(key);
+  if (values.has(key) && Object.is(old, value)) return;
+  values.set(key, value);
+  const info = { key, old };
+  for (const k of [key, '*']) {
+    const fns = listeners.get(k);
+    if (!fns) continue;
+    for (const fn of [...fns]) {
+      try {
+        fn(value, info);
+      } catch (e) {
+        report(`listener for '${key}'`, e);
+      }
+    }
+  }
 }
 
-/** Subscribe (key or '*'); returns off(). */
+/**
+ * Subscribes to a key (or '*' for every key). The listener gets (value, {key, old}).
+ * @param {string} key
+ * @param {(value: any, info: {key: string, old: any}) => void} fn
+ * @returns {() => void} off
+ */
 export function on(key, fn) {
-  throw new CzdError('not-implemented');
+  if (typeof fn !== 'function') throw new TypeError('state.on(): fn must be a function');
+  let fns = listeners.get(key);
+  if (!fns) listeners.set(key, (fns = new Set()));
+  fns.add(fn);
+  return () => {
+    fns.delete(fn);
+  };
 }
 
-/** Registers a purge handler (reason) => void; returns off(). */
+/**
+ * Registers a purge handler, called with the lock reason ('user'|'idle'|'hidden'|'pagehide'|'panic'|'remote'|…).
+ * @param {(reason: string) => void} fn
+ * @returns {() => void} off
+ */
 export function onPurge(fn) {
-  throw new CzdError('not-implemented');
+  if (typeof fn !== 'function') throw new TypeError('state.onPurge(): fn must be a function');
+  purgeHandlers.add(fn);
+  return () => {
+    purgeHandlers.delete(fn);
+  };
 }
 
-/** Runs purge handlers (errors isolated), posts SW {cmd:'lock'}, Tauri stream_clear, BroadcastChannel 'czd-lock'. */
+/**
+ * Lock-time cleanup: runs every purge handler (errors and rejections isolated, registration order),
+ * then best effort: SW {cmd:'lock'} (drops streaming keys), Tauri stream_clear, and
+ * BroadcastChannel 'czd-lock' {cmd:'lock', reason, from: TAB_ID} so other tabs lock too (not re-broadcast
+ * for 'remote'). Synchronous; the cross-process parts finish in the background. A purge() called from a
+ * purge handler is ignored (the running one already clears everything).
+ * @param {string} reason
+ */
 export function purge(reason) {
-  throw new CzdError('not-implemented');
+  // A handler that locks again (vault.lock → purge) must not recurse: the running purge covers it.
+  if (purging) return;
+  purging = true;
+  try {
+    for (const fn of [...purgeHandlers]) {
+      try {
+        const r = fn(reason);
+        if (r && typeof r.then === 'function') r.then(undefined, (e) => report('purge handler', e));
+      } catch (e) {
+        report('purge handler', e);
+      }
+    }
+  } finally {
+    purging = false;
+  }
+  try {
+    globalThis.navigator?.serviceWorker?.controller?.postMessage({ cmd: 'lock' });
+  } catch (e) {
+    report('SW lock message', e);
+  }
+  if (globalThis.__TAURI__ || globalThis.isTauri === true) {
+    import('./platform.js')
+      .then((p) => (p.isTauri && typeof p.tauriStreamClear === 'function' ? p.tauriStreamClear() : undefined))
+      .catch((e) => report('tauriStreamClear', e));
+  }
+  if (reason !== 'remote') {
+    try {
+      lockChannel()?.postMessage({ cmd: 'lock', reason: String(reason), from: TAB_ID });
+    } catch (e) {
+      report('BroadcastChannel czd-lock', e);
+    }
+  }
 }
 
-/** Adjusts 'busy'. */
+/**
+ * Subscribes to lock broadcasts from OTHER tabs ('czd-lock' messages whose `from` isn't TAB_ID); the
+ * listener gets the remote reason and is expected to lock this tab (vault.lock('remote')).
+ * Extra over §10 (used by vault boot/autolock). No-op without BroadcastChannel.
+ * @param {(reason: string) => void} fn
+ * @returns {() => void} off
+ */
+export function onRemoteLock(fn) {
+  if (typeof fn !== 'function') throw new TypeError('state.onRemoteLock(): fn must be a function');
+  const ch = lockChannel();
+  if (!ch) return () => {};
+  const handler = (e) => {
+    const m = e?.data;
+    if (!m || typeof m !== 'object' || m.cmd !== 'lock' || m.from === TAB_ID) return;
+    try {
+      fn(typeof m.reason === 'string' ? m.reason : 'remote');
+    } catch (err) {
+      report('remote lock listener', err);
+    }
+  };
+  ch.addEventListener('message', handler);
+  return () => ch.removeEventListener('message', handler);
+}
+
+/**
+ * Adjusts the 'busy' counter (running jobs; > 0 blocks update reloads). Never goes below 0.
+ * @param {number} delta
+ * @returns {number} the new count
+ */
 export function busy(delta) {
-  throw new CzdError('not-implemented');
+  const n = Math.max(0, (Number(values.get('busy')) || 0) + (Number(delta) || 0));
+  set('busy', n);
+  return n;
 }

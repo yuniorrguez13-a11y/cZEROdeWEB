@@ -1,0 +1,72 @@
+{
+  "format": "cZEROde text v2 (DESIGN §3.4)",
+  "generator": "scripts/gen-vectors.mjs",
+  "note": "Decrypt-only golden vectors.",
+  "vectors": [
+    {
+      "id": "policy-ascii",
+      "preset": 1,
+      "params": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "decryptWith": "cZEROde golden vectors 2.0 ✓",
+      "message": "hello world",
+      "text": "ჶაჰთსГПЗСЛცУУЫНЧოიჟЖЙჭКЦДТЖზჭტვМИულყЖЕგჟВყЙЕლხჟწღნჟაჯყგФЩვჯЭВРშСფШМყЪФВОБდპძПЕВБმვПწВЦტთЖГცჟოპყვუГყფТუიОლ"
+    },
+    {
+      "id": "policy-empty",
+      "preset": 1,
+      "params": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "decryptWith": "cZEROde golden vectors 2.0 ✓",
+      "message": "",
+      "text": "ჶაჰვЬБЖცЖЧჩИფფШტРИჟГЭЛКНახჰТგЕЧვЦДწЩპФჯცЭჩЩოძქЦВჰფВПЭრЮЖსПჟზМГВЦტცЮУირЦძუღЮБОШხАГნБხШჩЪსცუთЦЛაყგცНПЦЙЭაГპ"
+    },
+    {
+      "id": "policy-unicode",
+      "preset": 1,
+      "params": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "decryptWith": "cZEROde golden vectors 2.0 ✓",
+      "message": "ძალიან საიდუმლო 🔐\nСекрет — line 2\t(tab)  ",
+      "text": "ჶაჰზტБკზჯМჰКЫАღშვЫЮაЩОჟბЕნВჯთდლუЛპწკშაჯИფФИКვЭЙიჭჰწЩაქჯშეჭДКЬУЦГАჰФПდწცВუნწФМუФЩМЕВგსოМЕРБЧუტტგТВლУДЖАЛრჭპЬყЫКლბრЮნჭЫტჯგზСრЩწჰაЦНПЩიქფუკდმЕჯЪმМჩАკЪშჭჰუПუЛლКარსთЬჭЦЗФთძХМვАოОСЛჟВძპХХУФტЛიЗНღჟАПჰქЦუДჟპხРსХცЩნДაЪუჩა"
+    },
+    {
+      "id": "floor-16",
+      "preset": 2,
+      "params": {
+        "m": 19456,
+        "t": 2,
+        "p": 1
+      },
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "decryptWith": "cZEROde golden vectors 2.0 ✓",
+      "message": "exactly 16 bytes",
+      "text": "ჶაჰიიАშრЖЗეБმЮТЕჭპძლВპРრДОჟХЪЬФწИცფუЙШლძყცМცჰაშოსТჟОლШЙჰОბხჯხნЕГიჩტვФРДКრШЫВАПზნზИСძШАЭუЗნШაШჭЦЖუЗМЗЙაОАბჟუНБХღКТყჟლრКდТВФოფЩსრ"
+    },
+    {
+      "id": "floor-canonical",
+      "preset": 2,
+      "params": {
+        "m": 19456,
+        "t": 2,
+        "p": 1
+      },
+      "passphrase": "Tést  phrase",
+      "decryptWith": "  Tést phrase ",
+      "message": "canonical passphrase",
+      "text": "ჶაჰმოვძЬУКძოდშკЕСЕსტზЧЕЪДФЮЗЩზЪПთКБღКАტვЭЪიЛВБჩვЗЬჯხЧყЪსიЫСრЖЪჩЙთკიჰდრУРПნИქმცჰლЩЙჰჟОნყჟდЭЖПОოАჟАწჩპჟЮАФЦСთჰПКНБბЙშМРდმРЕДЖტУПა"
+    }
+  ]
+}

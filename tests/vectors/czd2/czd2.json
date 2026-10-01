@@ -1,0 +1,361 @@
+{
+  "format": "czd2 FORMAT v2 (DESIGN §3.3)",
+  "generator": "scripts/gen-vectors.mjs",
+  "note": "Decrypt-only golden vectors. plaintext = prng(seed, size); bundle plaintext = entries concatenated (entrySeeds). fileKeyHex/streamSaltHex let readers without Argon2 (src-tauri stream.rs) derive the payload key.",
+  "prng": "mulberry32: a = seed; per step a = (a + 0x6D2B79F5) >>> 0; t = imul(a ^ a >>> 15, a | 1); t ^= t + imul(t ^ t >>> 7, t | 61); u32 = (t ^ t >>> 14) >>> 0, written little-endian; truncated to size",
+  "passphrase": "cZEROde golden vectors 2.0 ✓",
+  "kdf": {
+    "m": 65536,
+    "t": 3,
+    "p": 1
+  },
+  "chunkExp": 18,
+  "vectors": [
+    {
+      "id": "size-0",
+      "file": "size-0.czd",
+      "size": 0,
+      "paddedSize": 0,
+      "n": 1,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 453,
+      "containerSha256": "d5a9ed87bea10542a848234efcb1767c91da8c4ba4db4e818d84e4f7dd1fe2dc",
+      "plaintextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fileKeyHex": "5d4275042addcc732f5ef2dda98878591065586abb62a4f657873ed297294488",
+      "streamSaltHex": "e8455df34c1881a1560b93fa0a44b1d0",
+      "kind": "single",
+      "seed": 1000,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "76a48b0bf75254643ade97a7049e86e1",
+      "meta": {
+        "v": 1,
+        "name": "vector-0.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 0
+      }
+    },
+    {
+      "id": "size-1",
+      "file": "size-1.czd",
+      "size": 1,
+      "paddedSize": 1,
+      "n": 1,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 454,
+      "containerSha256": "b4f546fc42b7199f0eaa9e5283810f1126f422b4f375dfae6bc81409cac7f42a",
+      "plaintextSha256": "bd4fc42a21f1f860a1030e6eba23d53ecab71bd19297ab6c074381d4ecee0018",
+      "fileKeyHex": "22e1e31eef2b7645e12870069a8c2951800d5af1570a7cbd2196d5642e277692",
+      "streamSaltHex": "5d440cb5a974e8399fbb8d9cbb017fb8",
+      "kind": "single",
+      "seed": 1001,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "21844be99b13db11628fb916495060a6",
+      "meta": {
+        "v": 1,
+        "name": "vector-1.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 1
+      }
+    },
+    {
+      "id": "size-262143",
+      "file": "size-262143.czd",
+      "size": 262143,
+      "paddedSize": 262144,
+      "n": 1,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 262597,
+      "containerSha256": "5efcaae282f7c5a1514f2fb5d138fb32e3caba035d00500ebd8f75498ed99d36",
+      "plaintextSha256": "1fa1cf2d8dd548820a36dff4f6fa8eec1d7e313d6f55f5a537995a175ea2de25",
+      "fileKeyHex": "47dbc9e72e0c87606b2d9d67748e7e2d47a6d9ce8853d2961cd0dea453c20878",
+      "streamSaltHex": "5b02e3fd5f8f5723162b98fe737e1942",
+      "kind": "single",
+      "seed": 263143,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "c56dfbbb9251f0a833efcd6b18b82ad6",
+      "meta": {
+        "v": 1,
+        "name": "vector-262143.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 262143
+      }
+    },
+    {
+      "id": "size-262144",
+      "file": "size-262144.czd",
+      "size": 262144,
+      "paddedSize": 262144,
+      "n": 1,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 262597,
+      "containerSha256": "1775c19cdd5dd0558c9bef98d5dc91ca594e8fb38f13336ae64918eb8e510e14",
+      "plaintextSha256": "a5f5c34166582b6797b625e240651f3b172f38c08d7a8e099c4d8dcb4ae74c16",
+      "fileKeyHex": "91be4eb24e300ef3cccf926a75b0396896eee2130d513b142a1b1cfa67fff962",
+      "streamSaltHex": "e4201e5ab8f68802c52783ab90d5613d",
+      "kind": "single",
+      "seed": 263144,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "aa9ef20eacfa3bb81379778e6261a473",
+      "meta": {
+        "v": 1,
+        "name": "vector-262144.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 262144
+      }
+    },
+    {
+      "id": "size-262145",
+      "file": "size-262145.czd",
+      "size": 262145,
+      "paddedSize": 270336,
+      "n": 2,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 270805,
+      "containerSha256": "293a4cdba09f80ff58ea1945fc3888f2873e0e0b63db6b059bd43394a2a53afd",
+      "plaintextSha256": "8ccce9d0689c28d0e87dd30e502af384f43681c26e6c8b13cf0079b3b166161b",
+      "fileKeyHex": "2a3f1f2c43c76900145b39fb37b6aa1fd326adfb43a52c10cde5017f40791108",
+      "streamSaltHex": "6ece9464409e349fbd77e46ae23601ca",
+      "kind": "single",
+      "seed": 263145,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "01a4e69f13278acfdfed9d6fb6865c8e",
+      "meta": {
+        "v": 1,
+        "name": "vector-262145.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 262145
+      }
+    },
+    {
+      "id": "size-786439",
+      "file": "size-786439.czd",
+      "size": 786439,
+      "paddedSize": 802816,
+      "n": 4,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 803317,
+      "containerSha256": "8535cdbb21a5b4f633e2f64a4055244ee1e90519e5486a9e6a3f25e5c525dbe3",
+      "plaintextSha256": "58ac3dd5185b80f5927235a30d716d52c8b83fc99f0eb6fc35a0e0b5b892d3ec",
+      "fileKeyHex": "f23893f063c8c213fc93eba398ab72aa369abead97e8dfa9a384bc90aaef0fd1",
+      "streamSaltHex": "30643120ea109b8cd67d82f959380922",
+      "kind": "single",
+      "seed": 787439,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "4948c14ffd8eb2e454d93d0d8d7800ef",
+      "meta": {
+        "v": 1,
+        "name": "vector-786439.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 786439
+      }
+    },
+    {
+      "id": "batch-0",
+      "file": "batch-0.czd",
+      "size": 1000,
+      "paddedSize": 1024,
+      "n": 1,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 1477,
+      "containerSha256": "d552645b2928f15b0b25bfa38bd7c575e9bbcfbc54897e702384ba82b4f862c7",
+      "plaintextSha256": "cadada6caa7b19121c79a7393675246ddb0d087cabdbd15105c00138c4982887",
+      "fileKeyHex": "e793d12fdfcfcfe007f3feaab71ce34bdeb237c1ecff368108d9cebd6fa83243",
+      "streamSaltHex": "c78c6fbe1ef092aa8861cadf97f15ffd",
+      "kind": "batch",
+      "batch": "batch",
+      "seed": 2000,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "d85c6fe311460e54409cae25fc4c8e25",
+      "meta": {
+        "v": 1,
+        "name": "résumé ✓.txt",
+        "type": "text/plain",
+        "size": 1000
+      }
+    },
+    {
+      "id": "batch-1",
+      "file": "batch-1.czd",
+      "size": 300000,
+      "paddedSize": 303104,
+      "n": 2,
+      "chunkExp": 18,
+      "headerLen": 437,
+      "containerSize": 303573,
+      "containerSha256": "996212cb563e4e023c7e705bc1491de047b354478a129b02ceebbed6653d21ad",
+      "plaintextSha256": "f7814ac5f93d588058bad20eb9814f50d3bc223cd6779a613f08ba873dabca21",
+      "fileKeyHex": "eaf9384a6e351f17a6046eed9450837684a8cfdb98c81a9f30b04df7d6718e35",
+      "streamSaltHex": "572dbbcd38ffeef38db2b457dafacef8",
+      "kind": "batch",
+      "batch": "batch",
+      "seed": 2001,
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "d85c6fe311460e54409cae25fc4c8e25",
+      "meta": {
+        "v": 1,
+        "name": "photo.jpg",
+        "type": "image/jpeg",
+        "size": 300000
+      }
+    },
+    {
+      "id": "bundle-3",
+      "file": "bundle-3.czd",
+      "size": 275000,
+      "paddedSize": 278528,
+      "n": 2,
+      "chunkExp": 18,
+      "headerLen": 693,
+      "containerSize": 279253,
+      "containerSha256": "4e8fabe6802249dc5ec27c888615cdfaba102c621f211a0b9d38027d0ef107d0",
+      "plaintextSha256": "b8a886c46071f4a34f6ec32a164a40df610292b5e5ca67b7f1f949165cef2a2b",
+      "fileKeyHex": "af91a49c795da3d704d29e2396376be2713bddb8e4855d88d25546ac9f43f68e",
+      "streamSaltHex": "adee4d993728dd40b24a39fa5032f515",
+      "kind": "bundle",
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "kdf": {
+        "m": 65536,
+        "t": 3,
+        "p": 1
+      },
+      "passSaltHex": "cc4a6c1fdb89718c6b2dedf6c6c4492b",
+      "meta": {
+        "v": 1,
+        "name": "3 files",
+        "type": "application/x-czd-bundle",
+        "size": 275000,
+        "entries": [
+          {
+            "name": "notes.txt",
+            "type": "text/plain",
+            "size": 5000,
+            "off": 0,
+            "mtime": 1767225600000
+          },
+          {
+            "name": "empty.bin",
+            "type": "application/octet-stream",
+            "size": 0,
+            "off": 5000
+          },
+          {
+            "name": "clip.webm",
+            "type": "video/webm",
+            "size": 270000,
+            "off": 5000,
+            "mtime": 1767139200000
+          }
+        ]
+      },
+      "entrySeeds": [
+        3000,
+        3001,
+        3002
+      ],
+      "entrySha256": [
+        "fbdc355e161da698bf9247d37d3115b644fe3f84f13d94c3887c1265d7050b63",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "35711614ee657f4ea73f9b3dc27a7d17fc99a1031338f83cc75fd960aa700ee5"
+      ]
+    },
+    {
+      "id": "vault-1",
+      "file": "vault-1.czd",
+      "size": 1000,
+      "paddedSize": 1024,
+      "n": 1,
+      "chunkExp": 18,
+      "headerLen": 443,
+      "containerSize": 1483,
+      "containerSha256": "1c12d845a0b1b3ee1206b14f7058efa64b1c072c1892ab0ebf24fd2bfac58d9a",
+      "plaintextSha256": "7dbd3c53f7584d60aba0d45ea34705904b9b2b6a1e7ac805d8d7973920ab66bb",
+      "fileKeyHex": "ca5cdefa7e8850a102f7f33d9bccaec5c9e11d391d7e074991ae5d1dfa1b1226",
+      "streamSaltHex": "1e5afe1e34ca92eefe18186cb868f93f",
+      "kind": "vault",
+      "seed": 4003,
+      "vmkHex": "d47b4722e82d71d35f9359e39e2c09929fd02ca4a376451c839d251bb6c4ea7d",
+      "vaultIdHex": "fdbbdaf83d55ca338eb4b19c6f14b3fa",
+      "itemIdHex": "070c163a392caf25cc0268393f89cf9c",
+      "meta": {
+        "v": 1,
+        "name": "vault-item.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 1000
+      }
+    }
+  ],
+  "generated": [
+    {
+      "id": "size-17039359",
+      "kind": "single",
+      "size": 17039359,
+      "seed": 17039359,
+      "paddedSize": 17301504,
+      "n": 66,
+      "plaintextSha256": "b43835754e259e22937a68097f22c9753f1407ecf5f154e7daaf7d4eb40604ea",
+      "passphrase": "cZEROde golden vectors 2.0 ✓",
+      "meta": {
+        "v": 1,
+        "name": "vector-17039359.bin",
+        "type": "application/octet-stream",
+        "mtime": 1767225600000,
+        "size": 17039359
+      },
+      "howto": "not committed: rebuild the plaintext from the seed, encrypt, decrypt (node scripts/gen-vectors.mjs --big <dir> writes a container)"
+    }
+  ]
+}
