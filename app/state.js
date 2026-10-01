@@ -11,6 +11,19 @@ const listeners = new Map(); // key | '*' → Set<fn>
 const purgeHandlers = new Set();
 let channel; // BroadcastChannel('czd-lock'), created on first use
 let purging = false;
+/** Lock reasons that come from this tab's own inactivity: they lock this tab only (see purge, isPassive). */
+const PASSIVE = new Set(['idle', 'hidden', 'pagehide', 'freeze']);
+
+/**
+ * Whether a lock reason is passive — this tab's idle or hidden timer, or the page being hidden/frozen — as opposed
+ * to a deliberate lock (user, panic, destroy, a closed database…). Passive purges never reach other tabs: the
+ * service worker drops only this page's streams and nothing is broadcast. Extra over §10 (vault boot uses it too).
+ * @param {string} reason
+ * @returns {boolean}
+ */
+export function isPassive(reason) {
+  return PASSIVE.has(String(reason));
+}
 
 /**
  * Random id of this tab, sent as `from` with every 'czd-lock' broadcast. A BroadcastChannel never delivers
@@ -112,8 +125,11 @@ export function onPurge(fn) {
  * Lock-time cleanup: runs every purge handler (errors and rejections isolated, registration order),
  * then best effort: SW {cmd:'lock'} (drops streaming keys), Tauri stream_clear, and
  * BroadcastChannel 'czd-lock' {cmd:'lock', reason, from: TAB_ID} so other tabs lock too (not re-broadcast
- * for 'remote'). Synchronous; the cross-process parts finish in the background. A purge() called from a
- * purge handler is ignored (the running one already clears everything).
+ * for 'remote'). A passive reason (isPassive: idle, hidden, pagehide, freeze) stays in this tab: the SW gets
+ * {cmd:'lock', scope:'client'} (only this page's streams) and nothing is broadcast, so a background tab's own
+ * idle/hidden purge never stops the media or locks the vault of the tab in use. Synchronous; the cross-process
+ * parts finish in the background. A purge() called from a purge handler is ignored (the running one already
+ * clears everything).
  * @param {string} reason
  */
 export function purge(reason) {
@@ -132,8 +148,9 @@ export function purge(reason) {
   } finally {
     purging = false;
   }
+  const passive = isPassive(reason);
   try {
-    globalThis.navigator?.serviceWorker?.controller?.postMessage({ cmd: 'lock' });
+    globalThis.navigator?.serviceWorker?.controller?.postMessage(passive ? { cmd: 'lock', scope: 'client' } : { cmd: 'lock' });
   } catch (e) {
     report('SW lock message', e);
   }
@@ -142,7 +159,7 @@ export function purge(reason) {
       .then((p) => (p.isTauri && typeof p.tauriStreamClear === 'function' ? p.tauriStreamClear() : undefined))
       .catch((e) => report('tauriStreamClear', e));
   }
-  if (reason !== 'remote') {
+  if (reason !== 'remote' && !passive) {
     try {
       lockChannel()?.postMessage({ cmd: 'lock', reason: String(reason), from: TAB_ID });
     } catch (e) {

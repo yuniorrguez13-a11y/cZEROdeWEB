@@ -36,7 +36,9 @@
 .al-card-frame::after { content: ''; position: absolute; inset: 4px; border: 1px solid rgba(255, 255, 255, .07); pointer-events: none; }
 [data-theme^="minimal"] .al-card-frame::after { display: none; }
 [data-theme^="minimal"] .al-card-frame { box-shadow: var(--sh); }
-.al-card:hover .al-card-frame { border-color: var(--acc); }
+@media (hover: hover) {
+  .al-card:hover .al-card-frame { border-color: var(--acc); }
+}
 /* The album shown by the route */
 .al-card[aria-current="page"] .al-card-frame { border-color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
 .al-card[aria-current="page"] .al-card-count { color: var(--accd); }
@@ -50,10 +52,14 @@
 .al-card-new .al-card-frame { border-style: dashed; border-color: var(--ibrd); background: transparent; }
 .al-card-new .al-card-frame::after { display: none; }
 .al-card-plus { background: transparent; color: var(--tdim); transition: color .15s; }
-.al-card-new:hover .al-card-plus { color: var(--accd); }
-[data-theme^="minimal"] .al-card-new:hover .al-card-plus { color: var(--txt); }
+@media (hover: hover) {
+  .al-card-new:hover .al-card-plus { color: var(--accd); }
+  [data-theme^="minimal"] .al-card-new:hover .al-card-plus { color: var(--txt); }
+}
 .al-card-new .al-card-name { color: var(--tdim); }
-.al-card-new:hover .al-card-name { color: var(--txt); }
+@media (hover: hover) {
+  .al-card-new:hover .al-card-name { color: var(--txt); }
+}
 
 /* No albums yet: a compact "+ New album" tile instead of a big empty square */
 .al-strip-none .al-card { display: grid; grid-template-columns: 56px auto; grid-template-rows: auto auto; column-gap: 12px; row-gap: 0; align-items: center; width: auto; padding: 0 16px 0 0; }
@@ -82,7 +88,9 @@
   grid-area: handle; display: grid; place-items: center; width: 30px; height: 46px; color: var(--tfaint);
   cursor: grab; touch-action: none; user-select: none;
 }
-.al-ed-handle:hover { color: var(--txt); }
+@media (hover: hover) {
+  .al-ed-handle:hover { color: var(--txt); }
+}
 .al-grip { width: 10px; height: 18px; background-image: radial-gradient(circle, currentColor 1.3px, transparent 1.6px); background-size: 5px 6px; }
 .al-ed-thumb { grid-area: thumb; width: 52px; height: 52px; border: 1px solid var(--bdim); border-radius: var(--r-sm); }
 .al-ed-is-cover .al-ed-thumb { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
@@ -96,7 +104,9 @@
 .al-ed-up .icon { transform: rotate(90deg); }
 .al-ed-down .icon { transform: rotate(-90deg); }
 .al-ed-cover[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); }
-.al-ed-remove:hover:not(:disabled) { border-color: var(--err); background: var(--errbg); color: var(--err); }
+@media (hover: hover) {
+  .al-ed-remove:hover:not(:disabled) { border-color: var(--err); background: var(--errbg); color: var(--err); }
+}
 .al-ed-sorting { user-select: none; }
 .al-ed-row.al-dragging { position: relative; z-index: 2; background: var(--surf); box-shadow: inset 0 0 0 1px var(--acc), var(--sh-pop); }
 .al-ed-row.al-dragging .al-ed-handle { color: var(--accd); cursor: grabbing; }
@@ -120,7 +130,9 @@
   border: 1px solid var(--bdim); border-radius: var(--r); background: var(--bg); color: var(--txt); text-align: left;
   transition: border-color .15s, background-color .15s;
 }
-.al-pick:hover:not(:disabled) { border-color: var(--acc); background: var(--accbg); }
+@media (hover: hover) {
+  .al-pick:hover:not(:disabled) { border-color: var(--acc); background: var(--accbg); }
+}
 .al-pick:disabled { cursor: default; opacity: .65; }
 .al-pick-thumb { flex: none; width: 48px; height: 48px; border: 1px solid var(--bdim); border-radius: var(--r-sm); }
 .al-pick-meta { display: flex; flex: 1; flex-direction: column; gap: 1px; min-width: 0; }

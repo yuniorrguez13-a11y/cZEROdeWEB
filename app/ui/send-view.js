@@ -1704,10 +1704,22 @@ function openHelp() {
 
 // ───────── Incoming (share target, file handlers, Tauri associations, sniffed vault drops)
 
-/** Files waiting for a decision; kept across visits (they came from outside, nothing here is decrypted). */
+/**
+ * Files waiting for a decision; kept across visits (they came from outside, nothing here is decrypted) but not
+ * across a lock: their names must not stay on screen, so every purge empties the list.
+ */
 const stash = [];
 let stashSeq = 0;
 const takenShares = new Set();
+/** Repaint functions of mounted Incoming panels. */
+const stashViews = new Set();
+/** Bumped by every purge: files still being sniffed then are dropped instead of listed. */
+let stashEpoch = 0;
+state.onPurge(() => {
+  stashEpoch++;
+  stash.length = 0;
+  for (const paint of [...stashViews]) paint();
+});
 
 function incomingPanel({ getVault, open, lock }) {
   const list = h('ul', { class: 'sd-in-list' });
@@ -1812,7 +1824,9 @@ function incomingPanel({ getVault, open, lock }) {
   async function add(files, { autoOpen = true } = {}) {
     const list0 = [...(files ?? [])].filter((f) => typeof Blob !== 'undefined' && f instanceof Blob);
     if (!list0.length) return;
+    const epoch = stashEpoch;
     const kinds = await Promise.all(list0.map((f) => sniff(f)));
+    if (epoch !== stashEpoch) return; // a lock came while they were checked
     if (autoOpen && list0.length === 1 && (kinds[0] === 'czd2' || kinds[0] === 'oldczd')) {
       open.load(list0[0], kinds[0]);
       open.el.scrollIntoView?.({ block: 'nearest' });
@@ -1825,7 +1839,8 @@ function incomingPanel({ getVault, open, lock }) {
   }
 
   render();
-  return { el, add, refresh: render };
+  stashViews.add(render);
+  return { el, add, refresh: render, destroy: () => stashViews.delete(render) };
 }
 
 // ───────── the page
@@ -1936,6 +1951,7 @@ function sendPage(host, { getVault }) {
       helpSheet?.close();
       lock.destroy();
       open.destroy();
+      incoming.destroy();
     },
   };
 }

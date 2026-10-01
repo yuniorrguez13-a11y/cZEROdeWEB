@@ -109,7 +109,9 @@ test('a lock clears the old message handed to Legacy', async ({ page }) => {
   await msg(page).fill(vec('legacy-desktop-vectors.json').legacy_text.v1[0].encoded);
   await page.locator('.tx-mixed .banner').getByRole('button', { name: 'Open in Legacy' }).click();
   await expect(page).toHaveURL(/#\/legacy$/);
+  await expect(page.locator('#lg-msg')).not.toHaveValue('');
   await page.evaluate(async () => (await import('/app/state.js')).purge('user'));
   expect(await page.evaluate(async () => (await import('/app/state.js')).get('legacy.text') ?? null)).toBeNull();
+  await expect(page.locator('#lg-msg')).toHaveValue('');
   await check();
 });

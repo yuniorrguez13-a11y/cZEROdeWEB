@@ -424,6 +424,8 @@ export class Vault extends EventTarget {
     /** @type {Map<string, {name: string, itemIds: string[], cover?: string, createdAt: number}>} */
     this._lists = new Map();
     this._thumbUrls = new Map();
+    /** id → how many thumbUrl() calls got the current URL and haven't released it (releaseThumb). */
+    this._thumbRefs = new Map();
     this._thumbPending = new Map();
     this._opened = new Set();
     this._jobs = new Set();
@@ -575,7 +577,10 @@ export class Vault extends EventTarget {
     this._opened.delete(opened);
   }
 
+  /** Revokes an item's thumbnail URL whatever its references (lock, removal, replacement) and drops a pending decrypt. */
   _revokeThumb(id) {
+    this._thumbRefs.delete(id);
+    this._thumbPending.delete(id);
     const url = this._thumbUrls.get(id);
     if (url) {
       this._thumbUrls.delete(id);
@@ -590,6 +595,7 @@ export class Vault extends EventTarget {
   _revokeThumbs() {
     for (const id of [...this._thumbUrls.keys()]) this._revokeThumb(id);
     this._thumbPending.clear();
+    this._thumbRefs.clear();
   }
 
   /** Decrypts every items and lists record (thumbs stay encrypted until thumbUrl). Broken records are skipped. */
@@ -973,45 +979,61 @@ export class Vault extends EventTarget {
     return listInfo(id, l, ctx.items);
   }
 
-  /** Object URL of the item's thumbnail (decrypted on first use, cached per id) or null; revoked on lock/remove. */
+  /**
+   * Object URL of the item's thumbnail (decrypted on first use, shared by every view showing it) or null. Each call
+   * that resolves to a URL takes one reference: hand it back with releaseThumb(id) once that view no longer shows
+   * it (a null result needs no release). The URL is revoked when the last reference goes, and on lock/removal.
+   * @param {string} id
+   * @returns {Promise<string|null>}
+   */
   async thumbUrl(id) {
     const ctx = this._ctx();
     const e = ctx.items.get(id);
     if (!e || e.ix.hasThumb !== true) return null;
-    const have = this._thumbUrls.get(id);
-    if (have) return have;
-    let pending = this._thumbPending.get(id);
-    if (!pending) {
-      pending = (async () => {
-        const rec = await this._db.get('thumbs', id);
-        if (!rec) return null;
-        let jpeg;
-        try {
-          jpeg = await openRecord(ctx.keys.index, REC.thumb, fromHex(id), rec);
-        } catch {
-          return null;
-        }
-        // Locked, removed, or released (releaseThumb) while decrypting: nobody will revoke a URL made now.
-        if (!this._live(ctx) || !ctx.items.has(id) || this._thumbPending.get(id) !== pending) return null;
-        const url = URL.createObjectURL(new Blob([jpeg], { type: 'image/jpeg' }));
-        this._thumbUrls.set(id, url);
-        return url;
-      })().finally(() => {
-        if (this._thumbPending.get(id) === pending) this._thumbPending.delete(id);
-      });
-      this._thumbPending.set(id, pending);
+    let url = this._thumbUrls.get(id);
+    if (!url) {
+      let pending = this._thumbPending.get(id);
+      if (!pending) {
+        pending = (async () => {
+          const rec = await this._db.get('thumbs', id);
+          if (!rec) return null;
+          let jpeg;
+          try {
+            jpeg = await openRecord(ctx.keys.index, REC.thumb, fromHex(id), rec);
+          } catch {
+            return null;
+          }
+          // Locked or removed while decrypting: nobody would revoke a URL made now.
+          if (!this._live(ctx) || !ctx.items.has(id) || this._thumbPending.get(id) !== pending) return null;
+          const made = URL.createObjectURL(new Blob([jpeg], { type: 'image/jpeg' }));
+          this._thumbUrls.set(id, made);
+          return made;
+        })().finally(() => {
+          if (this._thumbPending.get(id) === pending) this._thumbPending.delete(id);
+        });
+        this._thumbPending.set(id, pending);
+      }
+      url = await pending;
     }
-    return pending;
+    // Only the URL still current gets a reference (a lock or removal may have revoked it meanwhile).
+    if (!url || this._thumbUrls.get(id) !== url) return null;
+    this._thumbRefs.set(id, (this._thumbRefs.get(id) ?? 0) + 1);
+    return url;
   }
 
   /**
-   * Revokes one item's thumbnail URL (its grid card left the screen, §1.5); a later thumbUrl(id) decrypts a fresh one.
-   * Extra over §10. Safe while locked and for unknown ids.
+   * Hands back one reference taken by thumbUrl(id) (a grid card, album cover or picker row stopped showing it,
+   * §12); the URL is revoked when none is left, and a later thumbUrl(id) decrypts a fresh one. Extra over §10. Safe
+   * while locked and for unknown ids (no-op without a reference).
    * @param {string} id
    */
   releaseThumb(id) {
-    this._thumbPending.delete(id);
-    this._revokeThumb(id);
+    const n = this._thumbRefs.get(id) ?? 0;
+    if (n > 1) {
+      this._thumbRefs.set(id, n - 1);
+      return;
+    }
+    if (n === 1) this._revokeThumb(id);
   }
 
   // ───────── adding
@@ -1441,9 +1463,12 @@ export class Vault extends EventTarget {
   /**
    * .czb export: the plan (entries, record hashes, exact size) is made now; the stream emits it (records re-read and
    * checked) and sets lastBackupAt when it completes. -> {name, size, stream} (+ skipped: items whose container is
-   * missing or unreadable and were left out).
+   * missing or unreadable and were left out; createdAt: the backup's time). markDone:false (extra over §10) leaves
+   * lastBackupAt alone: the caller calls markBackedUp(createdAt) once the file was really kept (a staged backup
+   * exists only in this tab until the user saves it).
+   * @param {{signal?: AbortSignal, onProgress?: (done: number) => void, markDone?: boolean}} [opts]
    */
-  async exportBackup({ signal, onProgress } = {}) {
+  async exportBackup({ signal, onProgress, markDone = true } = {}) {
     const ctx = this._ctx();
     this._requireHolder();
     // Planning reads and checks every record and container header: a job of its own (busy, wake lock, lock aborts it).
@@ -1476,9 +1501,21 @@ export class Vault extends EventTarget {
       } finally {
         job.end();
       }
-      await self._touchBackup(plan.createdAt);
+      if (markDone) await self._touchBackup(plan.createdAt);
     }
-    return { name: `cZEROde-backup-${isoDay(plan.createdAt)}.czb`, size: plan.size, stream: stream(), skipped: plan.skipped.length };
+    return { name: `cZEROde-backup-${isoDay(plan.createdAt)}.czb`, size: plan.size, stream: stream(), skipped: plan.skipped.length, createdAt: plan.createdAt };
+  }
+
+  /**
+   * Records a finished backup (meta lastBackupAt; the backup reminder goes quiet). For exportBackup({markDone:
+   * false}) callers once the user really kept the file — e.g. a staged backup only after its Save click. Extra over
+   * §10. Never rejects (a failure is logged).
+   * @param {number} [at] backup time (ms), default now (pass exportBackup's createdAt to date it by its snapshot)
+   * @returns {Promise<void>}
+   */
+  async markBackedUp(at = this._now()) {
+    if (!isUint(at) || !this._db) return;
+    await this._touchBackup(at);
   }
 
   async _touchBackup(at) {

@@ -16,29 +16,13 @@ function logo() {
   return h('span', { class: 'logo' }, h('span', { class: 'logo-c', text: 'c' }), 'ZER', h('span', { class: 'logo-o', text: 'O' }), 'de');
 }
 
-/**
- * The second click of a double click on a card must not dismiss the dialog the first one opened (the backdrop is
- * under the pointer by then): backdrop presses are ignored during its first moments.
- */
-function held(dlg, ms = 500) {
-  const backdrop = dlg?.el?.parentElement;
-  if (backdrop) {
-    const t0 = Date.now();
-    // Capture at the target runs before modal()'s own (bubble) listener.
-    backdrop.addEventListener('pointerdown', (e) => {
-      if (e.target === backdrop && Date.now() - t0 < ms) e.stopImmediatePropagation();
-    }, true);
-  }
-  return dlg;
-}
-
 function step(n, ...text) {
   return h('li', { class: 'st-step' }, h('span', { class: 'st-step-n', text: String(n) }), h('span', { class: 'st-step-text' }, text));
 }
 
 /** Install steps for iPhone/iPad (no install prompt there). */
 function iosSteps() {
-  return held(modal({
+  return modal({
     title: 'Install cZEROde',
     className: 'st-modal st-install-modal',
     body: h('div', { class: 'stack' },
@@ -48,12 +32,12 @@ function iosSteps() {
         step(3, 'Open cZEROde from your Home Screen.')),
       h('p', { class: 'st-lead-sm', text: 'Your vault lives inside the installed app. A vault made in a Safari tab can be erased after 7 days without use. Already have a vault here? Export a backup first and restore it in the installed app.' })),
     actions: [{ label: 'Got it', kind: 'primary', value: true, autofocus: true }],
-  }));
+  });
 }
 
 /** Browsers without a captured install prompt (Firefox, desktop Safari, a prompt already used). */
 function otherSteps() {
-  return held(modal({
+  return modal({
     title: 'Install cZEROde',
     className: 'st-modal st-install-modal',
     body: h('div', { class: 'stack' },
@@ -63,7 +47,7 @@ function otherSteps() {
         step(3, 'Firefox: no install — keep a backup, or get the desktop app.')),
       h('p', { class: 'st-lead-sm', text: 'Installed, cZEROde opens in its own window, works offline and the browser is less likely to clear your vault.' })),
     actions: [{ label: 'Desktop app', kind: 'ghost', value: 'desktop' }, { label: 'Got it', kind: 'primary', value: true, autofocus: true }],
-  })).then((v) => {
+  }).then((v) => {
     if (v === 'desktop') platform.openExternal(RELEASES_URL).catch(() => toast(userMessage('internal'), { kind: 'err' }));
   });
 }

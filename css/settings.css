@@ -26,9 +26,17 @@
 }
 [data-theme^="minimal"] .st-toc-link { letter-spacing: .06em; }
 .st-toc-link .icon { width: 18px; height: 18px; color: var(--tfaint); }
-.st-toc-link:hover { color: var(--txt); border-color: var(--brd); }
-.st-toc-link:hover .icon, .st-toc-link.active .icon { color: var(--accd); }
-[data-theme^="minimal"] .st-toc-link:hover .icon, [data-theme^="minimal"] .st-toc-link.active .icon { color: var(--txt); }
+@media (hover: hover) {
+  .st-toc-link:hover { color: var(--txt); border-color: var(--brd); }
+}
+.st-toc-link.active .icon { color: var(--accd); }
+@media (hover: hover) {
+  .st-toc-link:hover .icon { color: var(--accd); }
+}
+[data-theme^="minimal"] .st-toc-link.active .icon { color: var(--txt); }
+@media (hover: hover) {
+  [data-theme^="minimal"] .st-toc-link:hover .icon { color: var(--txt); }
+}
 .st-toc-link.active { color: var(--txt); border-color: var(--bdim); background: var(--bg2); box-shadow: inset 2px 0 0 var(--acc); }
 .st-toc-about { margin-top: 10px; padding-top: 0; border-top-color: var(--bdim); border-radius: 0 0 var(--r) var(--r); }
 .st-toc-about { border-top: 1px solid var(--bdim); }
@@ -81,7 +89,9 @@
 .st-switch-input:checked + .st-switch-track .st-switch-thumb { transform: translateX(22px); background: var(--accd); }
 [data-theme^="minimal"] .st-switch-input:checked + .st-switch-track .st-switch-thumb { background: var(--onacc); }
 .st-switch-input:focus-visible + .st-switch-track { outline: 2px solid var(--focus); outline-offset: 2px; }
-.st-switch-input:hover + .st-switch-track { border-color: var(--tdim); }
+@media (hover: hover) {
+  .st-switch-input:hover + .st-switch-track { border-color: var(--tdim); }
+}
 
 /* ───────── Theme cards with live previews (each preview carries its own data-theme tokens) */
 .st-themes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
@@ -89,7 +99,9 @@
   position: relative; display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 12px; cursor: pointer;
   border: 1px solid var(--brd); border-radius: var(--r); background: var(--bg); transition: border-color .15s, box-shadow .15s, background-color .15s;
 }
-.st-theme:hover { border-color: var(--ibrd); }
+@media (hover: hover) {
+  .st-theme:hover { border-color: var(--ibrd); }
+}
 .st-theme-on { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc); background: var(--accbg); }
 [data-theme^="minimal"] .st-theme-on { background: var(--bg3); }
 .st-theme:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -165,7 +177,9 @@
 .st-unsaved { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border: 1px solid var(--warn); border-radius: var(--r); background: var(--warnbg); color: var(--txt); }
 .st-unsaved[hidden] { display: none; }
 .st-discard { color: var(--err); }
-.st-discard:hover:not(:disabled) { border-color: var(--err); color: var(--err); }
+@media (hover: hover) {
+  .st-discard:hover:not(:disabled) { border-color: var(--err); color: var(--err); }
+}
 .st-unsaved .icon { width: 16px; height: 16px; margin-top: 2px; flex: none; color: var(--warn); }
 .st-reason.st-ready { color: var(--ok); }
 .st-form { display: flex; flex-direction: column; gap: 14px; }
@@ -212,15 +226,19 @@
   border: 1px solid var(--brd); border-radius: var(--r); background: var(--bg2); box-shadow: var(--sh); color: inherit; text-align: left; text-decoration: none;
   transition: border-color .15s, background-color .15s, transform .15s;
 }
-.st-card:hover { border-color: var(--acc); background: var(--accbg); }
-[data-theme^="minimal"] .st-card:hover { background: var(--bg3); }
+@media (hover: hover) {
+  .st-card:hover { border-color: var(--acc); background: var(--accbg); }
+  [data-theme^="minimal"] .st-card:hover { background: var(--bg3); }
+}
 .st-card:active { transform: translateY(1px); }
 .st-card-icon {
   display: grid; place-items: center; width: 50px; height: 50px; flex: none;
   border: 1px solid var(--brd); border-radius: var(--r); background: var(--bg); color: var(--accd);
   transition: border-color .15s, background-color .15s;
 }
-.st-card:hover .st-card-icon { border-color: var(--acc); }
+@media (hover: hover) {
+  .st-card:hover .st-card-icon { border-color: var(--acc); }
+}
 [data-theme^="minimal"] .st-card-icon { color: var(--txt); }
 .st-card-icon .icon { width: 24px; height: 24px; stroke-width: 1.5; }
 .st-card-text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -229,12 +247,16 @@
 .st-card-badge { font-size: 10px; }
 .st-badge-prank { color: var(--grn); }
 .st-card-go { display: grid; place-items: center; flex: none; color: var(--tfaint); transform: rotate(180deg); transition: color .15s, transform .15s; }
-.st-card:hover .st-card-go { color: var(--accd); transform: rotate(180deg) translateX(3px); }
-[data-theme^="minimal"] .st-card:hover .st-card-go { color: var(--txt); }
+@media (hover: hover) {
+  .st-card:hover .st-card-go { color: var(--accd); transform: rotate(180deg) translateX(3px); }
+  [data-theme^="minimal"] .st-card:hover .st-card-go { color: var(--txt); }
+}
 .st-card-prank .st-card-icon { color: var(--grn); }
-.st-card-prank:hover { border-color: var(--grn); background: var(--gbg); }
-.st-card-prank:hover .st-card-icon { border-color: var(--grn); }
-.st-card-prank:hover .st-card-go { color: var(--grn); }
+@media (hover: hover) {
+  .st-card-prank:hover { border-color: var(--grn); background: var(--gbg); }
+  .st-card-prank:hover .st-card-icon { border-color: var(--grn); }
+  .st-card-prank:hover .st-card-go { color: var(--grn); }
+}
 
 /* ───────── Footer (More, About) */
 .st-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--bdim); color: var(--tfaint); font-size: 13px; }
@@ -243,7 +265,9 @@
 .st-foot-ver { color: var(--tdim); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: 12px; font-variant-numeric: tabular-nums; }
 .st-foot-note { flex: 1 1 260px; text-align: right; }
 .st-foot-link { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; color: var(--tdim); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: 12px; text-decoration: none; }
-.st-foot-link:hover { color: var(--txt); }
+@media (hover: hover) {
+  .st-foot-link:hover { color: var(--txt); }
+}
 .st-foot-link .icon { width: 16px; height: 16px; }
 
 /* ───────── About */

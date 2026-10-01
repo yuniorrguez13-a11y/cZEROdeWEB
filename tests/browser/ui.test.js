@@ -1,7 +1,7 @@
 // Browser units for the UI kit and shell (runner: tests/browser/index.html?suite=ui, app CSP):
 // dom.h safety rules, toasts/modals/sheets/focus trap, components behaviour, passphraseField rules
 // (easter egg only on secret-setting purposes, debounce, once per focus, purge clear), router + shell.
-import { h, svg, icon, clear, toast, modal, sheet, confirmDialog, promptDialog, trapFocus, onOutside, announce } from '../../app/util/dom.js';
+import { h, svg, icon, clear, toast, modal, sheet, confirmDialog, promptDialog, trapFocus, onOutside, announce, BACKDROP_GRACE_MS } from '../../app/util/dom.js';
 import * as C from '../../app/ui/components.js';
 import * as state from '../../app/state.js';
 import * as router from '../../app/router.js';
@@ -181,6 +181,11 @@ export default async function (t) {
     t.equal(await p2, null);
     const p3 = modal({ title: 'Backdrop' });
     const bd = p3.el.parentElement;
+    // The second click of a double click on the opener lands on the backdrop: ignored during the grace period.
+    bd.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    await wait(20);
+    t.assert(p3.el.isConnected, 'a backdrop press right after opening is ignored');
+    await wait(BACKDROP_GRACE_MS);
     bd.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     t.equal(await p3, null);
     const p4 = modal({ title: 'Sticky', dismissible: false, actions: [{ label: 'Only way out', value: 1 }] });
@@ -195,6 +200,69 @@ export default async function (t) {
     p5.el.querySelector('.btn').click();
     t.equal(await p5, 'Go', 'value defaults to the label');
     opener.remove();
+  });
+
+  t.test('modal/sheet/confirmDialog: backdrop grace period, busy, returnFocus when the opener is gone', async () => {
+    const press = (el) => el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    // busy: a function checked at each press (a running job keeps the dialog), or a plain flag.
+    let running = true;
+    const p = modal({ title: 'Working', busy: () => running });
+    await wait(BACKDROP_GRACE_MS + 20);
+    press(p.el.parentElement);
+    await wait(20);
+    t.assert(p.el.isConnected, 'busy keeps it');
+    running = false;
+    press(p.el.parentElement);
+    t.equal(await p, null, 'not busy any more: the backdrop dismisses it');
+    const flag = modal({ title: 'Flag', busy: true });
+    await wait(BACKDROP_GRACE_MS + 20);
+    press(flag.el.parentElement);
+    await wait(20);
+    t.assert(flag.el.isConnected, 'busy: true keeps it');
+    flag.close();
+    await flag;
+
+    // confirmDialog gets the grace period too (its modal handle is hidden).
+    const asked = confirmDialog({ title: 'Sure?', message: 'Really' });
+    const cbd = document.querySelector('#modals > .modal-backdrop:last-child');
+    press(cbd);
+    await wait(20);
+    t.assert(cbd.isConnected, 'confirmDialog: early press ignored');
+    await wait(BACKDROP_GRACE_MS);
+    press(cbd);
+    t.equal(await asked, false);
+
+    // sheet: grace period, then the backdrop closes it (onClose once).
+    let closes = 0;
+    const s = sheet({ title: 'Sheet', body: 'x', onClose: () => closes++ });
+    const sbd = s.el.parentElement;
+    press(sbd);
+    await wait(20);
+    t.assert(s.el.isConnected, 'sheet: early press ignored');
+    await wait(BACKDROP_GRACE_MS);
+    press(sbd);
+    t.assert(!s.el.isConnected, 'sheet closed by the backdrop');
+    t.equal(closes, 1);
+    await wait(100); // its history entry pops
+    history.pushState(null, '', location.href); // no forward entry left behind for later history-length checks
+
+    // returnFocus: the opener was re-rendered while the dialog was up.
+    const host = h('div', null, h('button', { type: 'button', class: 'rf-old', text: 'old' }));
+    document.body.append(host);
+    host.firstChild.focus();
+    const r = modal({ title: 'Return', actions: [{ label: 'OK', value: 1 }], returnFocus: () => host.querySelector('.rf-new') });
+    host.replaceChildren(h('button', { type: 'button', class: 'rf-new', text: 'new' }));
+    r.el.querySelector('.btn').click();
+    t.equal(await r, 1);
+    t.equal(document.activeElement, host.querySelector('.rf-new'), 'focus goes to returnFocus() when the opener is gone');
+    // The opener still there: it wins over returnFocus.
+    const keep = host.firstChild;
+    keep.focus();
+    const r2 = modal({ title: 'Return 2', actions: [{ label: 'OK' }], returnFocus: () => null });
+    r2.el.querySelector('.btn').click();
+    await r2;
+    t.equal(document.activeElement, keep);
+    host.remove();
   });
 
   t.test('trapFocus: Tab wraps inside, release() stops it', () => {

@@ -1,5 +1,8 @@
 // Seeds the old cZEROde 1 web database (czeroode_db v2: stores vault/files/playlists, keyPath id) with every
 // record of tests/vectors/legacy-web-vectors.json, exactly like the old app stored them. See seed.html.
+
+import '../local-only.js';
+
 const DB = 'czeroode_db';
 
 const req = (r) => new Promise((resolve, reject) => {

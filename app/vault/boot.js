@@ -5,6 +5,7 @@
 
 import * as platform from '../platform.js';
 import * as stateModule from '../state.js';
+import { isPassive } from '../state.js';
 import * as settingsModule from '../settings.js';
 import { bootProbe } from '../crypto/kdf.js';
 import { fromUtf8, utf8 } from '../util/bytes.js';
@@ -14,8 +15,6 @@ import { Vault, setVault } from './vault.js';
 import { makeThumb } from './thumbs.js';
 import { startAutolock } from './autolock.js';
 
-/** Lock reasons that come from inactivity (another tab's own, or this tab's with nothing unlocked). */
-const PASSIVE = new Set(['idle', 'hidden', 'pagehide', 'freeze']);
 const MIRROR_DELAY_MS = 500;
 const YIELD_WAIT_MS = 3000;
 const SWEEP_DELAY_MS = 3000;
@@ -109,13 +108,14 @@ export async function boot({
   // autolock applies the hidden rule again when the vault opens.
   if (typeof state.onPurge === 'function') {
     stops.push(state.onPurge((reason) => {
-      if (vault.status === 'unlocked' || !PASSIVE.has(reason)) vault.lock(reason);
+      if (vault.status === 'unlocked' || !isPassive(reason)) vault.lock(reason);
     }));
   }
 
   if (typeof state.onRemoteLock === 'function') {
     stops.push(state.onRemoteLock((reason) => {
-      if (!PASSIVE.has(reason)) vault.lock('remote');
+      // Passive reasons aren't broadcast any more (state.purge); a tab running older code may still send them.
+      if (!isPassive(reason)) vault.lock('remote');
     }));
   }
 

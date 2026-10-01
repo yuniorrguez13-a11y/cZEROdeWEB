@@ -447,6 +447,46 @@ test('lock: tokens dropped, streams in flight error at their next pull, a racing
   assert.equal((await pending).status, 403);
 });
 
+test("client-scoped lock (one tab's passive lock): only that page's tokens, streams and needs; others keep streaming", async () => {
+  const w = loadStream();
+  w.addClient('client-1');
+  w.addClient('client-2');
+  const fx = await fixture(50000);
+  const mine = fx.payload();
+  const theirs = fx.payload();
+  w.message(mine, 'client-1');
+  w.message(theirs, 'client-2');
+  const readAll = async (reader) => {
+    try {
+      for (;;) {
+        const r = await reader.read();
+        if (r.done) return true;
+      }
+    } catch {
+      return false;
+    }
+  };
+  const a = (await w.fetch(mine.token, { clientId: 'client-1' })).body.getReader();
+  const b = (await w.fetch(theirs.token, { clientId: 'client-2' })).body.getReader();
+  assert.equal((await a.read()).done, false);
+  assert.equal((await b.read()).done, false);
+  // client-2 locks passively (idle in a background tab): client-1's stream and token are untouched.
+  assert.deepEqual(w.message({ cmd: 'lock', scope: 'client' }, 'client-2'), { ok: true });
+  assert.equal(await readAll(b), false, "the locking page's own stream errors");
+  assert.equal(await readAll(a), true, "the other page's stream completes");
+  assert.equal((await w.fetch(mine.token, { clientId: 'client-1', range: 'bytes=0-9' })).status, 206, 'token still known (no need)');
+  assert.equal(w.clients.get('client-1').needs.length, 0);
+  assert.equal((await w.fetch(theirs.token, { clientId: 'client-2', range: 'bytes=0-0' })).status, 403, 'its token is gone (the page denies need)');
+  assert.deepEqual(w.clients.get('client-2').needs, [theirs.token]);
+  // A later stream of the locked page works again (its epoch moved on once, not for good).
+  const again = fx.payload();
+  w.message(again, 'client-2');
+  assert.ok(same(await bytesOf(await w.fetch(again.token, { clientId: 'client-2' })), fx.plain));
+  // A client lock without a known sender is a full lock (never weaker than asked).
+  w.message({ cmd: 'lock', scope: 'client' }, null);
+  assert.equal((await w.fetch(mine.token, { clientId: 'client-1', range: 'bytes=0-0' })).status, 403);
+});
+
 test('sw.js routes register/unregister/lock to czStream.onMessage and czstream fetches to czStream.handle', async () => {
   const SW = readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
   const listeners = {};

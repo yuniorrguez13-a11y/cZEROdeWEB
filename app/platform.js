@@ -707,6 +707,21 @@ export const tauriFs = {
     await tauri((t) => t.fs.remove(path));
   },
   /**
+   * Size and modification time of one file (plugin-fs stat; capability fs:allow-stat). TauriFsStore uses it to
+   * size an item without listing the whole folder. Rejects CzdError ('internal') when the file is missing.
+   * @param {string} path
+   * @returns {Promise<{size: number, mtime: number|null}>}
+   */
+  async stat(path) {
+    return tauri(async (t) => {
+      const st = await t.fs.stat(path);
+      const size = Number(st?.size);
+      if (!Number.isSafeInteger(size) || size < 0) throw new CzdError('internal', { detail: `stat(): bad size for ${basename(path)}` });
+      const ms = st?.mtime ? new Date(st.mtime).getTime() : NaN;
+      return { size, mtime: Number.isFinite(ms) ? ms : null };
+    });
+  },
+  /**
    * Directory entries: [{name, path, isFile, isDirectory, size, mtime}] (size/mtime via stat for files
    * unless {stat:false}).
    */
@@ -1047,6 +1062,23 @@ export async function tauriStreamUnregister(token) {
   const pending = streamPending.get(tok);
   if (pending) pending.cancelled = true;
   await tauri((t) => t.core.invoke('stream_unregister', { token: tok }));
+}
+
+/** Linux desktop: WebKitGTK can't play media from a custom URI scheme (stream.rs refuses there; DESIGN §12). */
+function linuxWebview() {
+  const nav = globalThis.navigator;
+  const s = `${nav?.userAgentData?.platform ?? ''} ${nav?.platform ?? ''} ${nav?.userAgent ?? ''}`;
+  return /linux/i.test(s) && !/android/i.test(s);
+}
+
+/**
+ * Whether desktop czstream playback is available: under Tauri, not on Linux, and Rust hasn't refused a
+ * registration yet. media.playLimit uses it for the import-time "too big to play on this device" warning.
+ * Extra over §10.
+ * @returns {boolean}
+ */
+export function tauriStreamAvailable() {
+  return isTauri && !streamUnsupported && !linuxWebview();
 }
 
 /** Drops every registration (lock; state.purge calls it), also those still in flight. No-op on web. */

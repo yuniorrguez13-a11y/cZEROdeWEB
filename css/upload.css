@@ -82,7 +82,9 @@
 .up-row-btn { width: 38px; height: 38px; border-color: transparent; }
 .up-row-btn:disabled.up-row-ok { opacity: 1; color: var(--ok); cursor: default; }
 .up-row.up-row-warn .up-row-btn:disabled.up-row-ok { color: var(--warn); }
-.up-row[data-state="running"] .up-row-btn:hover:not(:disabled) { border-color: var(--err); background: var(--errbg); color: var(--err); }
+@media (hover: hover) {
+  .up-row[data-state="running"] .up-row-btn:hover:not(:disabled) { border-color: var(--err); background: var(--errbg); color: var(--err); }
+}
 
 /* Rows outside the rendered window (big queues): "1,234 earlier files · 1,230 added" / "5,000 more files waiting" */
 .up-more {
@@ -100,7 +102,9 @@
 .up-group-count { flex: none; color: var(--tdim); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .up-group-opt { display: flex; align-items: center; gap: 10px; min-height: 40px; color: var(--tdim); font-size: 14px; cursor: pointer; }
 .up-group-opt input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--acc); }
-.up-group-opt:hover { color: var(--txt); }
+@media (hover: hover) {
+  .up-group-opt:hover { color: var(--txt); }
+}
 
 /* Footer: summary + Cancel all / Retry failed / Done */
 .up-foot { display: flex; flex: none; align-items: center; gap: 8px; min-height: 52px; padding: 8px 8px 8px 14px; border-top: 1px solid var(--bdim); background: var(--hbg); }

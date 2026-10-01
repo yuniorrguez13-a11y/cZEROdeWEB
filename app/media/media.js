@@ -336,6 +336,7 @@ async function tauriPlayable(src, info, type) {
   const id = itemIdOf(src);
   const { opened } = src;
   if (!id || src.entry || !(opened.fileKey instanceof Uint8Array) || opened.fileKey.length !== 32) return null;
+  if (!tauriStreams()) return null; // Linux, or Rust refused before: no key leaves for a stream that can't play
   const token = newToken();
   try {
     const r = await platform.tauriStreamRegister({
@@ -667,14 +668,21 @@ export async function attachMedia(el, src, { mode, signal } = {}) {
 
 /**
  * Largest item of this kind the viewer/player can show on this device: images CAPS.image; audio/video unlimited
- * when they can stream (desktop app, or a service worker outside iOS), else this device's Blob cap. For the import
- * warning "Stored, but too big to play or save on this device" (DESIGN §1.5). Extra over §10.
+ * when they can stream (desktop app with czstream, or a service worker outside iOS), else this device's Blob cap —
+ * also on the desktop app where czstream is unavailable (Linux, or after Rust refused a registration; DESIGN §12).
+ * For the import warning "Stored, but too big to play or save on this device" (DESIGN §1.5). Extra over §10.
  * @param {'image'|'audio'|'video'} kind
  * @returns {number} bytes (Infinity = no limit)
  */
 export function playLimit(kind) {
   if (kind === 'image') return CAPS.image;
-  return platform.isTauri || canSwMedia() ? Infinity : blobCap();
+  const streams = platform.isTauri ? tauriStreams() : canSwMedia();
+  return streams ? Infinity : blobCap();
+}
+
+/** Desktop: czstream can be used (not Linux, no refusal yet). */
+function tauriStreams() {
+  return typeof platform.tauriStreamAvailable === 'function' ? platform.tauriStreamAvailable() : true;
 }
 
 // ───────── prefetch and cleanup
@@ -699,7 +707,7 @@ export function prefetch(src) {
     if (src.kind !== 'container' || !src.opened.keys) return;
     const kind = kindOf(info.type, info.name);
     if (kind !== 'audio' && kind !== 'video' && kind !== 'image') return;
-    const streamed = kind !== 'image' && (platform.isTauri ? Boolean(itemIdOf(src)) && !src.entry : canSwMedia() && src.src.blob instanceof Blob);
+    const streamed = kind !== 'image' && (platform.isTauri ? tauriStreams() && Boolean(itemIdOf(src)) && !src.entry : canSwMedia() && src.src.blob instanceof Blob);
     if (streamed) return;
     const maxBytes = kind === 'image' ? CAPS.image : blobCap();
     if (info.size > maxBytes) return;

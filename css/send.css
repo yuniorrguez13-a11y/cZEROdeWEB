@@ -286,10 +286,6 @@
   .sd-output-actions { width: 100%; margin-left: 48px; }
   .sd-help-sheet .sheet-title { white-space: normal; font-size: 20px; line-height: 1.15; }
 }
-/* Touch screens keep :hover after a tap: the drop area must not stay highlighted after "Choose files". */
-@media (hover: none) {
-  .sd-drop:hover { border-color: var(--ibrd); background: var(--obg); color: var(--tdim); }
-}
 @media (prefers-reduced-motion: reduce) {
   .sd-indet .progress-fill { animation: none; width: 100%; opacity: .5; }
   .sd-spin { animation-duration: 2s; }

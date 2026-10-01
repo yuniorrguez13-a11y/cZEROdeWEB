@@ -842,14 +842,29 @@ test('album thumbnails go back to the vault when the editor/picker close; a stri
   expect(await urls()).toBe(3);
   await page.keyboard.press('Escape');
   await expect(editor).toHaveCount(0);
-  expect(await urls()).toBe(0);
+  // Thumbnail URLs are reference-counted: the strip card still shows a.png (the album cover), so its URL stays —
+  // the editor letting go of the same thumbnail must not revoke it under the strip.
+  const coverAlive = () => page.evaluate(async (id) => {
+    // A fresh image from the strip's URL decodes only while that URL is not revoked (img-src allows blob:).
+    const probe = new Image();
+    probe.src = document.querySelector(`#up-harness .al-card[data-id="${id}"] img`).src;
+    try {
+      await probe.decode();
+      return true;
+    } catch {
+      return false;
+    }
+  }, albumId);
+  expect(await urls()).toBe(1);
+  expect(await coverAlive()).toBe(true);
   await page.evaluate((id) => {
     window.__added = window.__A.addToAlbumDialog({ vault: window.__vault, itemIds: [id] });
   }, extra);
   await expect(page.locator('.al-pick img')).toHaveCount(1);
   await page.getByRole('dialog', { name: 'Add to album' }).getByRole('button', { name: 'Cancel' }).click();
   expect(await page.evaluate(() => window.__added)).toBeNull();
-  expect(await urls()).toBe(0);
+  expect(await urls()).toBe(1);
+  expect(await coverAlive()).toBe(true);
 
   // the card is updated in place: keyboard focus stays on it while the album changes
   await card.focus();

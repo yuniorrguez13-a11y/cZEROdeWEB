@@ -121,6 +121,11 @@ test('old Mixed Script is detected and pointed to Legacy', async ({ page }) => {
   await msg(page).fill(v1);
   await b.getByRole('button', { name: 'Open in Legacy' }).click();
   await expect(page).toHaveURL(/#\/legacy$/);
+  // Legacy takes the hand-off (state 'legacy.text'): the message is in its box, detected, and the key is cleared.
+  await expect(page.locator('#lg-msg')).toHaveValue(v1);
+  await expect(page.locator('.lg-msgs')).toHaveAttribute('data-version', 'v1');
+  await expect(page.locator('.lg-detect')).toContainText('Looks like');
+  expect(await page.evaluate(async () => (await import('/app/state.js')).get('legacy.text') ?? null)).toBeNull();
   await check();
 });
 

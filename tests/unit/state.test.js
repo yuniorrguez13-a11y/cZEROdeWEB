@@ -114,6 +114,39 @@ test('purge posts {cmd:"lock"} to the SW controller and broadcasts on czd-lock (
   }
 });
 
+test('passive purges (idle/hidden/pagehide/freeze) stay in this tab: a client-scoped SW lock, no broadcast', async () => {
+  const swMsgs = [];
+  const bcMsgs = [];
+  const origNav = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: { serviceWorker: { controller: { postMessage: (m) => swMsgs.push(m) } } },
+  });
+  const listener = new BroadcastChannel('czd-lock');
+  listener.onmessage = (e) => bcMsgs.push(e.data);
+  let ran = 0;
+  const off = state.onPurge(() => ran++);
+  try {
+    for (const r of ['idle', 'hidden', 'pagehide', 'freeze']) {
+      assert.equal(state.isPassive(r), true, r);
+      state.purge(r);
+    }
+    for (const r of ['user', 'panic', 'remote', 'destroy', 'closed']) assert.equal(state.isPassive(r), false, r);
+    await new Promise((r) => setTimeout(r, 50));
+    assert.equal(ran, 4, 'handlers still run (this tab clears its own secrets)');
+    assert.deepEqual(swMsgs, Array(4).fill({ cmd: 'lock', scope: 'client' }));
+    assert.deepEqual(bcMsgs, [], 'nothing reaches other tabs');
+    state.purge('panic');
+    await new Promise((r) => setTimeout(r, 50));
+    assert.deepEqual(swMsgs.at(-1), { cmd: 'lock' }, 'a deliberate lock clears every page');
+    assert.deepEqual(bcMsgs, [{ cmd: 'lock', reason: 'panic', from: state.TAB_ID }]);
+  } finally {
+    off();
+    listener.close();
+    if (origNav) Object.defineProperty(globalThis, 'navigator', origNav);
+  }
+});
+
 test('purge survives a throwing SW controller', (t) => {
   t.mock.method(console, 'error', () => {});
   const origNav = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
@@ -146,9 +179,9 @@ test('czd-lock: the broadcast carries this tab id; onRemoteLock hears other tabs
   const off = state.onRemoteLock((reason) => remote.push(reason));
   const otherTab = new BroadcastChannel('czd-lock');
   try {
-    state.purge('idle');
+    state.purge('user'); // (a passive reason isn't broadcast at all)
     await new Promise((r) => setTimeout(r, 50));
-    assert.deepEqual(seen, [{ cmd: 'lock', reason: 'idle', from: state.TAB_ID }], 'own tab id lets listeners ignore the echo');
+    assert.deepEqual(seen, [{ cmd: 'lock', reason: 'user', from: state.TAB_ID }], 'own tab id lets listeners ignore the echo');
     assert.deepEqual(remote, [], 'onRemoteLock never fires for this tab’s own purge');
     otherTab.postMessage({ cmd: 'lock', reason: 'user', from: 'some-other-tab' });
     otherTab.postMessage({ cmd: 'nope' });

@@ -1,8 +1,9 @@
 // Vault grid/list of items (DESIGN §1.5, §10, §12). Owner: V1a.
 // Cards render from the decrypted index at once (name, size, date, kind badge, ★, duration); thumbnails are decrypted
 // lazily: an IntersectionObserver (rootMargin one viewport) queues visible cards, at most THUMB_JOBS in flight, and a
-// card's thumbnail URL is handed back with vault.releaseThumb(id) when the card leaves the DOM (the vault revokes all
-// of them on lock). Cards use content-visibility:auto (vault.css). One DOM serves both layouts (data-view grid|list).
+// card hands its thumbnail reference back with vault.releaseThumb(id) when it leaves the DOM (the vault counts
+// references per id, so views sharing a thumbnail don't revoke it under each other; all are revoked on lock).
+// Cards use content-visibility:auto (vault.css). One DOM serves both layouts (data-view grid|list).
 // Keyboard: arrow keys move between cards (roving tabindex), Home/End, Enter opens, Space selects in select mode;
 // the context-menu key / right click opens the card menu. Long-press (touch) starts select mode.
 // Node-importable: the DOM is only touched inside functions.
@@ -224,11 +225,14 @@ export function grid({ vault, filter, onOpen, onSelect, menuItems, isHidden, ren
         continue;
       }
       c.thumbState = 'loading';
+      const load = ++c.load; // a dropThumb meanwhile makes this load stale
       inflight++;
       Promise.resolve()
         .then(() => vault.thumbUrl(c.id))
         .then((url) => {
-          if (destroyed || cards.get(c.id) !== c || !c.el.isConnected) {
+          const stale = destroyed || cards.get(c.id) !== c || !c.el.isConnected || c.load !== load;
+          // Every URL thumbUrl hands out holds one reference: one the card won't show goes straight back.
+          if (stale) {
             if (url) vault.releaseThumb?.(c.id);
             return;
           }
@@ -238,7 +242,7 @@ export function grid({ vault, filter, onOpen, onSelect, menuItems, isHidden, ren
           }
           showThumb(c, url);
         }, () => {
-          if (cards.get(c.id) === c) c.thumbState = 'failed';
+          if (cards.get(c.id) === c && c.load === load) c.thumbState = 'failed';
         })
         .finally(() => {
           inflight--;
@@ -255,7 +259,7 @@ export function grid({ vault, filter, onOpen, onSelect, menuItems, isHidden, ren
       if (c.img !== img) return;
       c.img = null;
       if (c.thumbState === 'loaded') vault.releaseThumb?.(c.id);
-      // Its URL can be revoked under it (another view released the same thumbnail): decrypt it once more.
+      // A broken image (or a URL revoked under it): hand the reference back and decrypt it once more.
       c.thumbState = c.retried ? 'failed' : 'none';
       c.retried = true;
       if (c.thumbState === 'none' && c.visible) {
@@ -270,7 +274,9 @@ export function grid({ vault, filter, onOpen, onSelect, menuItems, isHidden, ren
   }
 
   function dropThumb(c) {
-    if (c.thumbState === 'loaded' || c.thumbState === 'loading') vault.releaseThumb?.(c.id);
+    // A load still running hands its URL back when it arrives (c.load moved on).
+    if (c.thumbState === 'loaded') vault.releaseThumb?.(c.id);
+    c.load++;
     c.img?.removeAttribute('src');
     c.img?.remove();
     c.img = null;
@@ -281,7 +287,7 @@ export function grid({ vault, filter, onOpen, onSelect, menuItems, isHidden, ren
   // ───────── cards
 
   function createCard(info) {
-    const c = { id: info.id, info, thumbState: 'none', visible: false, img: null, sig: '' };
+    const c = { id: info.id, info, thumbState: 'none', visible: false, img: null, sig: '', load: 0 };
     c.check = h('span', { class: 'vv-tick', aria: { hidden: 'true' } }, iconOf('check'));
     c.kindBadge = h('span', { class: 'vv-kind' });
     c.fav = h('span', { class: 'vv-fav', title: 'Favorite' }, iconOf('star-filled'));

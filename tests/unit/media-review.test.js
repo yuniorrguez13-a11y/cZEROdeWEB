@@ -41,10 +41,16 @@ function fakeServiceWorker() {
   return { posted, restore: () => Object.defineProperty(globalThis, 'navigator', desc) };
 }
 
-/** A fake media element: `behave(url)` → 'ok' | 'error' | 'never' (the test dispatches later). */
+/**
+ * A fake media element: `behave(url)` → 'ok' | 'error' | 'never' (the test dispatches later). `srcSet` resolves when
+ * the first URL is set: tests wait on it instead of counting event-loop turns (the Blob decrypt runs on the
+ * WebCrypto thread pool, which a loaded machine can make slower than any fixed number of turns).
+ */
 function fakeEl(behave) {
   const el = new EventTarget();
   el.srcs = [];
+  let srcSet;
+  el.srcSet = new Promise((r) => (srcSet = r));
   el.error = null;
   el.removeAttribute = () => {};
   el.load = () => {};
@@ -52,6 +58,7 @@ function fakeEl(behave) {
   Object.defineProperty(el, 'src', {
     set(url) {
       el.srcs.push(url);
+      srcSet();
       const what = behave(url);
       if (what === 'never') return;
       setTimeout(() => el.dispatchEvent(new Event(what === 'ok' ? 'loadedmetadata' : 'error')), 1);
@@ -105,7 +112,7 @@ test('attachMedia above the Blob cap: a slow streamed load is not abandoned afte
     t.mock.timers.enable({ apis: ['setTimeout'] });
     let settled = null;
     const p = media.attachMedia(el, huge, { mode: 'video' }).then((h) => (settled = { h }), (e) => (settled = { e }));
-    for (let i = 0; i < 40 && el.srcs.length === 0; i++) await new Promise((r) => setImmediate(r));
+    await Promise.race([el.srcSet, p]);
     assert.equal(el.srcs.length, 1);
     t.mock.timers.tick(TIMES.mediaFallbackMs + 1000);
     for (let i = 0; i < 20; i++) await new Promise((r) => setImmediate(r));
@@ -122,7 +129,7 @@ test('attachMedia above the Blob cap: a slow streamed load is not abandoned afte
     t.mock.timers.enable({ apis: ['setTimeout'] });
     let out = null;
     const q = media.attachMedia(stuck, huge, { mode: 'video' }).then((h) => (out = { h }), (e) => (out = { e }));
-    for (let i = 0; i < 40 && stuck.srcs.length === 0; i++) await new Promise((r) => setImmediate(r));
+    await Promise.race([stuck.srcSet, q]);
     t.mock.timers.tick(TIMES.mediaFallbackMs * 10);
     await q;
     t.mock.timers.reset();
@@ -170,7 +177,7 @@ test('attachMedia (Blob path): an element that does not preload (no loadedmetada
   t.mock.timers.enable({ apis: ['setTimeout'] });
   let out = null;
   const p = media.attachMedia(el, s, { mode: 'audio' }).then((h) => (out = { h }), (e) => (out = { e }));
-  for (let i = 0; i < 200 && el.srcs.length === 0; i++) await new Promise((r) => setImmediate(r));
+  await Promise.race([el.srcSet, p]);
   assert.equal(el.srcs.length, 1);
   assert.match(el.srcs[0], /^blob:/);
   t.mock.timers.tick(TIMES.mediaFallbackMs + 10);

@@ -2,8 +2,9 @@
 // vault view uses for album headers and playback (DESIGN §1.5 Albums, §10). Owner: V1b.
 // An album is a list of item ids (an item can be in many albums); its cover is one of its items (default: the
 // first item with a thumbnail). Names are untrusted labels: only ever rendered as text.
-// Thumbnails come from vault.thumbUrl (shared, cached per item, revoked by the vault on lock); each piece hands the
-// ones it asked for back with vault.releaseThumb when it goes away (§12), and survives a URL revoked under it.
+// Thumbnails come from vault.thumbUrl (shared per item, reference-counted, all revoked by the vault on lock); each
+// piece keeps the references it got in a thumbRefs() bag and hands them back with vault.releaseThumb when it goes
+// away (§12).
 // Every piece re-renders from vault 'lists'/'items'/'status' events and clears itself on lock.
 // Node-importable: the DOM is only touched inside functions.
 
@@ -26,6 +27,15 @@ const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 function report(e) {
   if (isCancel(e)) return;
   toast(userMessage(e), { kind: 'err' });
+}
+
+/**
+ * A toast that names albums or items (decrypted names), shown after an await: only while the vault is still unlocked
+ * (a lock during that await must not leave a name on the locked screen).
+ */
+function namedToast(vault, msg, opts) {
+  if (vault?.status !== 'unlocked') return null;
+  return toast(msg, opts);
 }
 
 /** vault.item(id) or null (removed meanwhile, or locked). */
@@ -86,9 +96,27 @@ function routeAlbum(r) {
 }
 
 /**
- * A thumbnail box (used: a Set that collects the ids whose thumbnail URL was asked for, to release them later):
- * the item's decrypted thumbnail when it has one (loaded when it comes near the screen), else its
- * kind icon. alt = item name (empty when `decorative`).
+ * The thumbnail references one piece (strip card, editor, picker) holds: every vault.thumbUrl() that returned a URL
+ * adds its id once; releaseThumbs() hands them all back. `gen` moves on at each release, so a load still running
+ * then gives its reference straight back instead of keeping it.
+ * @returns {{ids: string[], gen: number}}
+ */
+function thumbRefs() {
+  return { ids: [], gen: 0 };
+}
+
+function releaseOne(vault, id) {
+  try {
+    vault.releaseThumb?.(id);
+  } catch {
+    // locked: already revoked
+  }
+}
+
+/**
+ * A thumbnail box (used: the piece's thumbRefs() bag, released when the piece goes away): the item's decrypted
+ * thumbnail when it has one (loaded when it comes near the screen), else its kind icon. alt = item name (empty when
+ * `decorative`).
  */
 function thumbBox(vault, info, { className, decorative = false, observer, used } = {}) {
   const box = h('span', { class: ['al-thumb', className], dataset: { kind: info?.kind ?? 'other' } });
@@ -97,12 +125,23 @@ function thumbBox(vault, info, { className, decorative = false, observer, used }
   if (!info?.hasThumb) return box;
   let tried = 0;
   const load = () => {
-    used?.add(info.id); // handed back with vault.releaseThumb when the piece showing it goes away
+    const gen = used?.gen;
     vault.thumbUrl(info.id).then((url) => {
-      if (!url || (observer && !box.isConnected)) return;
+      if (!url) return;
+      // Not shown (the box left, or the piece already released its thumbnails): the reference goes straight back.
+      if (!used || used.gen !== gen || (observer && !box.isConnected)) {
+        releaseOne(vault, info.id);
+        return;
+      }
+      used.ids.push(info.id);
       const img = h('img', { src: url, alt: decorative ? '' : info.name, decoding: 'async', draggable: false });
       img.addEventListener('error', () => {
-        // The URL was revoked under us (e.g. a grid card released it): ask once more, then show the icon.
+        // A broken image (or the vault revoked it): hand this reference back, ask once more, then show the icon.
+        const i = used.ids.indexOf(info.id);
+        if (used.gen === gen && i >= 0) {
+          used.ids.splice(i, 1);
+          releaseOne(vault, info.id);
+        }
         if (tried++ < 1) load();
         else fallback();
       }, { once: true });
@@ -119,16 +158,10 @@ function thumbBox(vault, info, { className, decorative = false, observer, used }
   return box;
 }
 
-/** Hands thumbnail URLs back to the vault (§12: when what shows them leaves the DOM). Safe while locked. */
-function releaseThumbs(vault, ids) {
-  for (const id of ids) {
-    try {
-      vault.releaseThumb?.(id);
-    } catch {
-      // locked: already revoked
-    }
-  }
-  ids.clear?.();
+/** Hands a piece's thumbnail references back to the vault (§12: when what shows them leaves the DOM). Safe while locked. */
+function releaseThumbs(vault, refs) {
+  refs.gen++;
+  for (const id of refs.ids.splice(0)) releaseOne(vault, id);
 }
 
 function lazyObserver() {
@@ -154,7 +187,7 @@ export async function createAlbumDialog({ vault, itemIds = [], name = '' } = {})
   if (value === null) return null;
   try {
     const l = await vault.createList({ name: value.trim() || 'Album', itemIds });
-    toast(itemIds.length ? `Album “${l.name}” created with ${plural(l.itemIds.length, 'item')}.` : `Album “${l.name}” created.`, { kind: 'ok' });
+    namedToast(vault, itemIds.length ? `Album “${l.name}” created with ${plural(l.itemIds.length, 'item')}.` : `Album “${l.name}” created.`, { kind: 'ok' });
     return l;
   } catch (e) {
     report(e);
@@ -207,7 +240,7 @@ async function removeAlbum(vault, id, name) {
     report(e);
     return false;
   }
-  toast(`Album “${name}” deleted.`, { kind: 'ok' });
+  namedToast(vault, `Album “${name}” deleted.`, { kind: 'ok' });
   if (routeAlbum(currentRoute()) === id) navigate('#/vault', { replace: true });
   return true;
 }
@@ -302,7 +335,7 @@ export function albumStrip({ vault, onOpen } = {}) {
     const name = h('span', { class: 'al-card-name' });
     const sub = h('span', { class: 'al-card-count' });
     const btn = h('button', { type: 'button', class: 'al-card', dataset: { id }, on: { click: () => open(id) } }, frame, name, sub);
-    return { li: h('li', { class: 'al-strip-item' }, btn), btn, frame, name, sub, coverSig: null, used: new Set() };
+    return { li: h('li', { class: 'al-strip-item' }, btn), btn, frame, name, sub, coverSig: null, used: thumbRefs() };
   }
 
   function paintCard(c, l) {
@@ -470,7 +503,7 @@ export function albumEditor({ vault, id } = {}) {
   let deleting = false;
   let asking = false;
   const io = lazyObserver();
-  const used = new Set();
+  const used = thumbRefs();
   const rows = new Map(); // id → {li, up, down, coverBtn, ...}
 
   const nameInput = h('input', { class: 'input al-ed-name-input', id: `al-name-${id}`, type: 'text', value: name, maxLength: 200, autocomplete: 'off', spellcheck: false });
@@ -711,7 +744,7 @@ export function albumEditor({ vault, id } = {}) {
       report(e);
       return;
     }
-    toast(`Removed ${info ? `“${info.name}”` : 'the item'} from the album.`, {
+    namedToast(vault, `Removed ${info ? `“${info.name}”` : 'the item'} from the album.`, {
       timeout: 6000,
       action: {
         label: 'Undo',
@@ -875,7 +908,7 @@ export async function addToAlbumDialog({ vault, itemIds } = {}) {
   const ids = [...new Set(Array.isArray(itemIds) ? itemIds : [])].filter((x) => itemOr(vault, x));
   if (!ids.length) return null;
   const lists = listsOr(vault);
-  const used = new Set();
+  const used = thumbRefs();
   const io = lazyObserver(); // the list scrolls: covers load as they come into view
   let p = null;
   let focusSet = false;
@@ -940,11 +973,11 @@ export async function addToAlbumDialog({ vault, itemIds } = {}) {
       const merged = [...l.itemIds, ...ids.filter((x) => !has.has(x))];
       const added = merged.length - l.itemIds.length;
       const r = await vault.updateList(picked.id, { itemIds: merged });
-      toast(added ? `Added ${plural(added, 'item')} to “${r.name}”.` : `Already in “${r.name}”.`, { kind: 'ok' });
+      namedToast(vault, added ? `Added ${plural(added, 'item')} to “${r.name}”.` : `Already in “${r.name}”.`, { kind: 'ok' });
       return picked.id;
     }
     const l = await vault.createList({ name: String(picked.name ?? '').trim() || 'Album', itemIds: ids });
-    toast(`Album “${l.name}” created with ${plural(l.itemIds.length, 'item')}.`, { kind: 'ok' });
+    namedToast(vault, `Album “${l.name}” created with ${plural(l.itemIds.length, 'item')}.`, { kind: 'ok' });
     return l.id;
   } catch (e) {
     report(e);

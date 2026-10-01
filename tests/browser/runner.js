@@ -5,6 +5,9 @@
 // against a pseudo-test "(suite)". A t.test called inside a running test runs immediately as a sub-test. A CSP
 // violation fails the running test (or "(suite)"). When done: window.__results = {passed, failed, failures:[{name, message}], logs}.
 
+import '../local-only.js';
+
+
 const results = { passed: 0, failed: 0, failures: [], logs: [] };
 let current = null;
 let chain = Promise.resolve();

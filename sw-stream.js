@@ -6,6 +6,8 @@
 //   register   {cmd, token, blob, payKey, headerLen, chunkExp, size, paddedSize, mime, filename, download, entry?}
 //              → {ok:true} on the port. The token is bound to the registering client (event.source.id).
 //   unregister {cmd, token}   lock {cmd}: every token dropped; streams in flight error at their next pull (epoch).
+//              lock {cmd, scope:'client'}: only the sending page's tokens and streams (one tab's passive lock —
+//              idle/hidden/pagehide/freeze — must not stop another tab's media; state.purge sends it).
 //   media      GET czstream/<token>: only for the bound client and never for navigations (else 403). An unknown
 //              token asks that client {cmd:'need', token} over a MessageChannel; the page answers with the register
 //              payload (or {deny:true}); no answer within 2 s → 403. Range math uses paddedSize (DESIGN §5.2).
@@ -32,6 +34,18 @@
   const needs = new Map();
   /** Bumped by every lock: a stream created under an older epoch errors at its next pull. */
   let epoch = 0;
+  /**
+   * clientId → that page's own lock count (client-scoped locks): only its streams error. Never pruned (a download a
+   * page started keeps streaming after the page is gone, and its check must not change); one small number per page.
+   */
+  const clientEpochs = new Map();
+
+  /** Snapshot of the lock epochs that concern `clientId`: the returned check is false once either moved on. */
+  function stamp(clientId) {
+    const g = epoch;
+    const c = clientEpochs.get(clientId) || 0;
+    return () => epoch === g && (clientEpochs.get(clientId) || 0) === c;
+  }
 
   // ───────── untrusted values (duplicated from app/util/format.js: this classic script can't import modules)
 
@@ -165,7 +179,7 @@
    * plaintext offsets). padding: also require zero bytes past `size` (downloads). A lock errors it.
    */
   function body(e, { c0, c1, from, to, padding = false, onEnd }) {
-    const born = epoch;
+    const live = stamp(e.clientId);
     let c = c0;
     let ended = false;
     const end = (ok) => {
@@ -176,7 +190,7 @@
     return new ReadableStream({
       async pull(controller) {
         try {
-          if (epoch !== born) throw new Error('locked');
+          if (!live()) throw new Error('locked');
           if (c > c1) {
             controller.close();
             end(true);
@@ -184,7 +198,7 @@
           }
           const i = c++;
           const pt = await decryptChunk(e, i);
-          if (epoch !== born) throw new Error('locked');
+          if (!live()) throw new Error('locked');
           const at = i * e.CS;
           if (padding) for (let j = Math.max(0, e.size - at); j < pt.length; j++) if (pt[j] !== 0) throw new Error('bad padding');
           const a = Math.max(from, at) - at;
@@ -329,7 +343,7 @@
   function need(clientId, token) {
     const key = `${clientId}\n${token}`;
     if (needs.has(key)) return needs.get(key);
-    const born = epoch;
+    const live = stamp(clientId);
     const p = (async () => {
       const clients = self.clients;
       const client = clients && clientId ? await clients.get(clientId) : null;
@@ -350,7 +364,7 @@
       });
       ch.port1.onmessage = null;
       ch.port1.close();
-      if (epoch !== born || !reply || reply.deny) return null;
+      if (!live() || !reply || reply.deny) return null;
       const e = makeEntry(reply, clientId);
       if (!e || e.token !== token || e.download) return null;
       remember(e);
@@ -415,9 +429,16 @@
         if (e && e.clientId === clientId) tokens.delete(d.token);
         reply({ ok: true });
       } else if (cmd === 'lock') {
-        epoch++;
-        tokens.clear();
-        needs.clear();
+        if (d.scope === 'client' && clientId) {
+          // One page's own (passive) lock: its tokens go and its streams error; other pages keep playing.
+          clientEpochs.set(clientId, (clientEpochs.get(clientId) || 0) + 1);
+          for (const [t, e] of tokens) if (e.clientId === clientId) tokens.delete(t);
+          for (const k of [...needs.keys()]) if (k.startsWith(`${clientId}\n`)) needs.delete(k);
+        } else {
+          epoch++;
+          tokens.clear();
+          needs.clear();
+        }
         reply({ ok: true });
       }
     },

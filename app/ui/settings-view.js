@@ -171,22 +171,6 @@ const btn = (label, iconId, { kind, small = true, onClick, disabled, className, 
   on: { click: onClick },
 }, iconId ? icon(iconId) : null, h('span', { text: label }));
 
-/**
- * A double click on the button that opened a modal must not dismiss it with its second click (the backdrop is
- * under the pointer by then): backdrop presses are ignored during the first moments, and while `hold()` is true
- * (a job runs). Without `dlg`, the newest modal is meant (confirmDialog hides its handle).
- */
-function holdBackdrop(dlg, { ms = 500, hold } = {}) {
-  const panel = dlg?.el ?? globalThis.document?.querySelector('#modals > .modal-backdrop:last-child > .modal');
-  const backdrop = panel?.parentElement;
-  if (!backdrop) return;
-  const t0 = Date.now();
-  // Capture at the target runs before modal()'s own (bubble) listener.
-  backdrop.addEventListener('pointerdown', (e) => {
-    if (e.target === backdrop && (Date.now() - t0 < ms || hold?.())) e.stopImmediatePropagation();
-  }, true);
-}
-
 const confirmKdf = (p) => confirmDialog({
   title: 'Heavy backup',
   message: `This backup needs ~${p.mib} MiB and ~${p.seconds} s to unlock. Continue?`,
@@ -257,7 +241,9 @@ async function runExport(v, target, name) {
   let prog = null;
   let plan;
   try {
-    plan = await v.exportBackup({ signal: ctl.signal, onProgress: (d) => prog?.update(d) });
+    // The backup counts as made (lastBackupAt; the reminder goes quiet) only once the file is really kept: a real
+    // file target when write() resolves, a staged one when the user taps "Save backup".
+    plan = await v.exportBackup({ signal: ctl.signal, onProgress: (d) => prog?.update(d), markDone: false });
   } catch (e) {
     running = false;
     await target.abort().catch(() => {});
@@ -282,6 +268,10 @@ async function runExport(v, target, name) {
     return;
   }
   running = false;
+  const markSaved = () => {
+    if (typeof v.markBackedUp === 'function') v.markBackedUp(plan.createdAt).catch(() => {});
+  };
+  if (!res?.staged) markSaved();
   prog.done(`Done · ${fmtSize(plan.size)}`);
   body.dataset.state = 'done';
   title.textContent = 'Backup ready';
@@ -315,6 +305,7 @@ async function runExport(v, target, name) {
     className: 'st-save-backup',
     onClick: () => {
       downloadFile(res.staged);
+      if (!saved) markSaved();
       saved = true;
       unsaved.hidden = true;
       save.disabled = true;
@@ -428,12 +419,6 @@ async function restoreFrom(f) {
   await restoreFlow(v, f, src, info);
 }
 
-/** holdBackdrop(dlg), then the dialog's promise. */
-function held(dlg) {
-  holdBackdrop(dlg);
-  return dlg;
-}
-
 function backupSummary(f, info) {
   const facts = [
     ['Made', info.createdAt ? fmtDate(info.createdAt) : 'unknown'],
@@ -457,14 +442,14 @@ async function restoreFlow(v, f, src, info) {
     const msg = status === 'locked'
       ? 'Unlock your vault first to merge this backup into it. To replace your vault with it instead, delete this vault in Settings → Vault, then restore.'
       : userMessage(status === 'other-tab' ? 'other-tab' : 'store-unavailable');
-    const go = await held(modal({
+    const go = await modal({
       title: 'Restore backup',
       className: 'st-modal',
       body: h('div', { class: 'stack' }, backupSummary(f, info), banner({ kind: 'info', text: msg })),
       actions: status === 'locked'
         ? [{ label: 'Close', kind: 'ghost', value: false }, { label: 'Unlock vault', kind: 'primary', value: true, autofocus: true }]
         : [{ label: 'Close', kind: 'primary', value: false }],
-    }));
+    });
     if (go === true) router.navigate('#/vault');
     return;
   }
@@ -510,8 +495,8 @@ async function restoreFlow(v, f, src, info) {
     progressSlot,
     errLine,
     h('div', { class: 'st-job-foot' }, cancelBtn, goBtn));
-  const dlg = modal({ title: mode === 'replace' ? 'Restore backup' : 'Merge backup', body, className: 'st-modal st-restore-modal' });
-  holdBackdrop(dlg, { hold: () => Boolean(running) });
+  // A stray click outside while it restores must not cancel it (Cancel does).
+  const dlg = modal({ title: mode === 'replace' ? 'Restore backup' : 'Merge backup', body, className: 'st-modal st-restore-modal', busy: () => Boolean(running) });
   let closed = false;
   dlg.then(() => {
     closed = true;
@@ -636,8 +621,7 @@ function changePassphraseDialog(v) {
     e.preventDefault();
     go();
   });
-  const dlg = modal({ title: 'Change passphrase', body: form, className: 'st-modal st-change-modal' });
-  holdBackdrop(dlg, { hold: () => busy });
+  const dlg = modal({ title: 'Change passphrase', body: form, className: 'st-modal st-change-modal', busy: () => busy });
   paint();
   oldF.focus();
 
@@ -697,9 +681,8 @@ function passphraseDialog({ title, text, confirmLabel, danger = false, run }) {
   const goBtn = btn(confirmLabel, null, { kind: danger ? 'danger' : 'primary', small: false, className: 'st-pass-go', onClick: () => go() });
   const body = h('div', { class: 'st-form' }, h('p', { class: 'st-lead-sm', text }), f.el, working, errLine,
     h('div', { class: 'st-job-foot' }, btn('Cancel', null, { kind: 'ghost', small: false, onClick: () => dlg.close(null) }), goBtn));
-  const dlg = modal({ title, body, className: 'st-modal' });
   let busy = false;
-  holdBackdrop(dlg, { hold: () => busy });
+  const dlg = modal({ title, body, className: 'st-modal', busy: () => busy });
   f.focus();
   async function go() {
     if (busy) return;
@@ -1123,15 +1106,13 @@ function settingsPage(host, ctx, route) {
   }
 
   async function deleteVault(v) {
-    const asked = confirmDialog({
+    const ok = await confirmDialog({
       title: 'Delete vault?',
       message: `This deletes every item in the vault on this device. There is no undo.\n\nMake a backup first if you might want anything back.`,
       confirmLabel: 'Delete vault',
       danger: true,
       typed: 'DELETE',
     });
-    holdBackdrop(null);
-    const ok = await asked;
     if (!ok) return;
     try {
       await v.destroy();

@@ -457,6 +457,45 @@ function bodyNodes(body) {
 
 let idSeq = 0;
 const uid = (p) => `${p}-${++idSeq}`;
+
+/**
+ * Backdrop presses are ignored this long after a modal/sheet opens: the second click of a double click on the
+ * button that opened it lands on the backdrop and must not dismiss it (it would cancel a flow silently).
+ */
+export const BACKDROP_GRACE_MS = 500;
+const clock = () => (typeof globalThis.performance?.now === 'function' ? globalThis.performance.now() : Date.now());
+
+/** `busy` option of modal()/sheet(): a boolean or a function saying whether a job runs (backdrop presses wait). */
+function isBusy(busy) {
+  if (typeof busy !== 'function') return busy === true;
+  try {
+    return Boolean(busy());
+  } catch {
+    return false;
+  }
+}
+
+/** A dismissal by backdrop press: not in the first BACKDROP_GRACE_MS after `opened`, and not while busy. */
+function backdropMayClose(opened, busy) {
+  return clock() - opened >= BACKDROP_GRACE_MS && !isBusy(busy);
+}
+
+/**
+ * Focus after a layer closes: back to the element that had it before, or — when that one left the DOM meanwhile
+ * (a re-render) — to returnFocus()'s element.
+ */
+function restoreFocus(previous, returnFocus) {
+  let target = previous && previous.isConnected ? previous : null;
+  if (!target && typeof returnFocus === 'function') {
+    try {
+      target = returnFocus();
+    } catch {
+      target = null;
+    }
+  }
+  if (target && target.isConnected && typeof target.focus === 'function') target.focus({ preventScroll: true });
+}
+
 /** Enter that confirms an IME composition (CJK input) must not submit (keyCode 229: Safari/old Chromium). */
 const composing = (e) => e.isComposing || e.keyCode === 229;
 
@@ -464,11 +503,15 @@ const composing = (e) => e.isComposing || e.keyCode === 229;
  * Modal dialog. Resolves with the clicked action's value (its label when value is undefined),
  * or null when dismissed (Esc, backdrop, close button, route change, lock).
  * actions: [{label, kind: 'primary'|'ghost'|'danger'|'go'|undefined, value, autofocus, disabled}].
+ * Backdrop presses are ignored for the first BACKDROP_GRACE_MS (a double click on the opener must not dismiss it)
+ * and while `busy` (boolean, or a function checked at each press) says a job runs. On close, focus goes back to the
+ * element that had it; when that element is gone, to `returnFocus()`'s element (extras over §10).
  * The returned promise also has .close(value) and .el.
- * @param {{title?: string, body?: any, actions?: Array<object>, dismissible?: boolean, className?: string}} opts
+ * @param {{title?: string, body?: any, actions?: Array<object>, dismissible?: boolean, className?: string,
+ *   busy?: boolean|(() => boolean), returnFocus?: () => (HTMLElement|null|undefined)}} opts
  * @returns {Promise<any>}
  */
-export function modal({ title, body, actions = [], dismissible = true, className } = {}) {
+export function modal({ title, body, actions = [], dismissible = true, className, busy, returnFocus } = {}) {
   installLayerHooks();
   const d = doc();
   const titleId = uid('modal-title');
@@ -486,7 +529,7 @@ export function modal({ title, body, actions = [], dismissible = true, className
     release();
     removeLayer(layer);
     backdrop.remove();
-    if (previous && previous.isConnected && typeof previous.focus === 'function') previous.focus({ preventScroll: true });
+    restoreFocus(previous, returnFocus);
     resolve(value);
   };
   layer.close = close;
@@ -504,8 +547,9 @@ export function modal({ title, body, actions = [], dismissible = true, className
       dismissible ? h('button', { type: 'button', class: 'btn-icon modal-close', aria: { label: 'Close' }, on: { click: () => close(null) } }, icon('close')) : null) : null,
     h('div', { class: 'modal-body' }, bodyNodes(body)),
     buttons.length ? h('div', { class: 'modal-actions' }, buttons) : null);
+  const opened = clock();
   const backdrop = h('div', { class: 'modal-backdrop', on: { pointerdown: (e) => {
-    if (e.target === backdrop && dismissible) close(null);
+    if (e.target === backdrop && dismissible && backdropMayClose(opened, busy)) close(null);
   } } }, panel);
   layer.el = backdrop;
   overlayRoot().append(backdrop);
@@ -518,11 +562,13 @@ export function modal({ title, body, actions = [], dismissible = true, className
 
 /**
  * Sheet: a large panel (full-screen on phones) with a title bar and a close button. Opening pushes
- * ONE history entry (Back closes it). onClose runs once, however it closes.
- * @param {{title?: string, body?: any, onClose?: () => void, className?: string}} opts
+ * ONE history entry (Back closes it). onClose runs once, however it closes. Backdrop presses follow modal()'s
+ * rules (grace period, `busy`), and so does focus on close (`returnFocus`).
+ * @param {{title?: string, body?: any, onClose?: () => void, className?: string, busy?: boolean|(() => boolean),
+ *   returnFocus?: () => (HTMLElement|null|undefined)}} opts
  * @returns {{el: HTMLElement, body: HTMLElement, close(): void}}
  */
-export function sheet({ title, body, onClose, className } = {}) {
+export function sheet({ title, body, onClose, className, busy, returnFocus } = {}) {
   installLayerHooks();
   const d = doc();
   const titleId = uid('sheet-title');
@@ -538,7 +584,7 @@ export function sheet({ title, body, onClose, className } = {}) {
     removeLayer(layer);
     wrap.remove();
     if (!fromPop) overlay?.close();
-    if (previous && previous.isConnected && typeof previous.focus === 'function') previous.focus({ preventScroll: true });
+    restoreFocus(previous, returnFocus);
     try {
       onClose?.();
     } catch (e) {
@@ -553,8 +599,9 @@ export function sheet({ title, body, onClose, className } = {}) {
       h('h2', { class: 'sheet-title', id: titleId, text: title ?? '' }),
       h('button', { type: 'button', class: 'btn-icon sheet-close', aria: { label: 'Close' }, on: { click: () => finish(false) } }, icon('close'))),
     content);
+  const opened = clock();
   const wrap = h('div', { class: 'sheet-backdrop', on: { pointerdown: (e) => {
-    if (e.target === wrap) finish(false);
+    if (e.target === wrap && backdropMayClose(opened, busy)) finish(false);
   } } }, panel);
   layer.el = wrap;
   overlayRoot().append(wrap);
@@ -569,10 +616,12 @@ export function sheet({ title, body, onClose, className } = {}) {
 
 /**
  * Confirmation dialog. typed: a word the user must type to enable the confirm button (e.g. 'DELETE').
- * @param {{title?: string, message?: string, confirmLabel?: string, danger?: boolean, typed?: string}} opts
+ * busy/returnFocus as in modal().
+ * @param {{title?: string, message?: string, confirmLabel?: string, danger?: boolean, typed?: string,
+ *   busy?: boolean|(() => boolean), returnFocus?: () => (HTMLElement|null|undefined)}} opts
  * @returns {Promise<boolean>}
  */
-export function confirmDialog({ title, message, confirmLabel = 'OK', danger = false, typed } = {}) {
+export function confirmDialog({ title, message, confirmLabel = 'OK', danger = false, typed, busy, returnFocus } = {}) {
   const parts = bodyNodes(message);
   let input = null;
   if (typed) {
@@ -582,6 +631,8 @@ export function confirmDialog({ title, message, confirmLabel = 'OK', danger = fa
   }
   const p = modal({
     title,
+    busy,
+    returnFocus,
     body: h('div', { class: 'stack' }, parts),
     actions: [
       { label: 'Cancel', kind: 'ghost', value: false },
@@ -605,16 +656,19 @@ export function confirmDialog({ title, message, confirmLabel = 'OK', danger = fa
 }
 
 /**
- * Asks for a short text (never a secret: use passphraseField for those). Enter submits.
- * @param {{title?: string, label?: string, value?: string, type?: string, placeholder?: string}} opts
+ * Asks for a short text (never a secret: use passphraseField for those). Enter submits. busy/returnFocus as in modal().
+ * @param {{title?: string, label?: string, value?: string, type?: string, placeholder?: string,
+ *   busy?: boolean|(() => boolean), returnFocus?: () => (HTMLElement|null|undefined)}} opts
  * @returns {Promise<string|null>}
  */
-export function promptDialog({ title, label, value = '', type = 'text', placeholder } = {}) {
+export function promptDialog({ title, label, value = '', type = 'text', placeholder, busy, returnFocus } = {}) {
   if (type === 'password') throw new TypeError('promptDialog: secrets must use passphraseField');
   const id = uid('prompt');
   const input = h('input', { class: 'input', id, type, value, placeholder, autocomplete: 'off', spellcheck: false });
   const p = modal({
     title,
+    busy,
+    returnFocus,
     body: h('div', { class: 'field' }, label ? h('label', { class: 'label', for: id, text: label }) : null, input),
     actions: [{ label: 'Cancel', kind: 'ghost', value: null }, { label: 'OK', kind: 'primary', value: '__ok__' }],
   });

@@ -1,7 +1,7 @@
 // Legacy screen (route 'legacy'; DESIGN §1.9, §3.8, §4.4, §11). Owner: V2b.
 // Decode-only access to everything cZEROde 1 made:
 // - Old messages: Mixed Script v1–v3 and v4 AES text (auto-detected, "Read as" override, PIN when needed), the
-//   letter Legend with the q/y note.
+//   letter Legend with the q/y note. State 'legacy.text' (Text's "Open in Legacy") fills the box once.
 // - Old web vault (only when legacy/oldvault finds czeroode_db; never creates it): names were never encrypted, so
 //   the list shows right away; "Unlock with your old PIN" (repeatable) unlocks what that PIN opens; per item
 //   Preview / Save / Import, "Import all unlocked" (each import re-opened and verified; old playlists → albums),
@@ -171,21 +171,6 @@ function keepFocus(container, render) {
     row.tabIndex = -1;
     row.focus({ preventScroll: true });
   }
-}
-
-/**
- * A double click on the button that opened a modal must not dismiss it with its second click (the backdrop is
- * under the pointer by then): backdrop presses during the first moments are ignored.
- */
-function holdBackdrop(dlg, ms = 500) {
-  const panel = dlg?.el ?? globalThis.document?.querySelector('#modals > .modal-backdrop:last-child > .modal');
-  const backdrop = panel?.parentElement;
-  if (!backdrop) return;
-  const t0 = Date.now();
-  // Capture at the target runs before modal()'s own (bubble) listener.
-  backdrop.addEventListener('pointerdown', (e) => {
-    if (e.target === backdrop && Date.now() - t0 < ms) e.stopImmediatePropagation();
-  }, true);
 }
 
 function delivered(out, fallbackName) {
@@ -540,10 +525,25 @@ function messagesCard(ctx) {
     changed();
   }
 
+  /** A message handed over by another screen (Text's "Open in Legacy"): shown and detected at once. */
+  function take(text) {
+    clearTimeout(detectTimer);
+    detectTimer = null;
+    if (text.length > MAX_MESSAGE) {
+      ta.value = '';
+      changed();
+      setError(`That’s too long for an old cZEROde message (${fmtSize(text.length)} of text).`);
+      return;
+    }
+    ta.value = text;
+    changed();
+  }
+
   changed();
   return {
     el,
     purge,
+    take,
     refresh() {
       paintSave();
     },
@@ -992,7 +992,6 @@ function oldVaultCard(ctx, { onGone }) {
         ...(canBackup ? [{ label: 'Back up first', kind: 'primary', value: 'backup', autofocus: true }] : []),
       ],
     });
-    holdBackdrop(dlg);
     const choice = await dlg;
     if (choice === 'backup') {
       // Still inside the click's activation: the save picker can open (openBackupExport's first await is the picker).
@@ -1365,6 +1364,17 @@ export function mount(root, route, ctx) {
   };
   takeFiles();
 
+  // Text → Legacy hand-off (state 'legacy.text', set by Text's "Open in Legacy"): read once, then cleared.
+  const takeText = () => {
+    const text = state.get('legacy.text');
+    if (text == null) return;
+    state.set('legacy.text', null);
+    if (typeof text !== 'string' || !text) return;
+    msgs.take(text);
+    msgs.el.scrollIntoView?.({ block: 'start' });
+  };
+  takeText();
+
   const refresh = () => {
     msgs.refresh?.();
     ov.refresh?.();
@@ -1382,6 +1392,7 @@ export function mount(root, route, ctx) {
   };
   hookVault();
   offs.push(state.on('legacy.files', () => takeFiles()));
+  offs.push(state.on('legacy.text', () => takeText()));
   offs.push(state.on('vault.status', () => {
     hookVault();
     refresh();
@@ -1396,6 +1407,7 @@ export function mount(root, route, ctx) {
   return {
     update() {
       takeFiles();
+      takeText();
     },
     unmount() {
       for (const off of offs.splice(0)) off();
