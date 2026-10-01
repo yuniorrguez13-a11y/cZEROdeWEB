@@ -1,5 +1,6 @@
 // Send · Open review e2e (DESIGN §1.6, §1.7, §5.1, §7): no decrypted object URL survives a lock (bundle thumbnails
-// re-rendered while decrypting), keyboard focus stays in the card while locking, double clicks start one save, a lock
+// re-rendered while decrypting), keyboard focus stays in the card while locking, double clicks start one save or add
+// (even when the first click's job is done before the second click lands), a lock
 // or a route change in the middle of "Lock & save" leaves nothing behind, a .czd dropped on the Lock card is offered
 // to the Open card, bundle row buttons name their file, the "create a vault" hint reads as one sentence, a locked
 // vault is unlocked right in the Open card (the file stays open), no decrypted name survives a lock anywhere in the
@@ -172,12 +173,62 @@ test('a double click on Save (staged decrypted copy) downloads once', async ({ p
   await openCzdInCard(page);
   let downloads = 0;
   page.on('download', () => downloads++);
-  await page.locator('.sd-entry-single .sd-act-save').dblclick();
-  await page.waitForTimeout(1500);
-  const ready = page.locator('.sd-ready .btn-primary');
-  if (await ready.count()) await ready.first().click();
-  await page.waitForTimeout(500);
+  const save = page.locator('.sd-entry-single .sd-act-save');
+  await save.dblclick();
+  // The copy downloads while the click's activation lasts; if decrypting outlasts it (a slow machine), a "Ready to
+  // save" dialog asks for one more click instead.
+  const ready = page.locator('.sd-ready');
+  await expect.poll(async () => downloads + (await ready.count()), { timeout: 30_000 }).toBeGreaterThan(0);
+  if (!downloads) {
+    await ready.locator('.sd-ready-row .btn-primary').click();
+    await ready.getByRole('button', { name: 'Done' }).click();
+    await expect(ready).toHaveCount(0);
+  }
+  await expect.poll(() => downloads).toBe(1);
+  // A small file is saved before the second click of a double click lands (sooner still on a busy machine, where
+  // the clicks arrive further apart): that second click doesn't save it again.
+  const box = await save.boundingBox();
+  const at = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  expect(await page.evaluate(({ x, y }) => Boolean(document.elementFromPoint(x, y)?.closest('.sd-act-save')), at)).toBe(true);
+  await page.mouse.move(at.x, at.y);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(1000);
   expect(downloads).toBe(1);
+  await expect(ready).toHaveCount(0);
+  await check();
+});
+
+test('the second click of a double click that lands after Add / Add all finished adds nothing more', async ({ page }) => {
+  const check = await watch(page);
+  await page.goto('/#/open');
+  await createVault(page);
+  await makeCzd(page, [{ name: 'a.txt', type: 'text/plain', text: 'aaa' }, { name: 'b.txt', type: 'text/plain', text: 'bbb' }], { name: 'trip.czd' });
+  await openCzdInCard(page);
+  const counts = () => page.evaluate(async () => {
+    const { vault } = await import('/app/vault/vault.js');
+    return { items: vault.items().length, albums: vault.lists().filter((l) => l.name === 'trip').length };
+  });
+  /** A lone second click (clickCount 2) on `button`, as when a double click's first click already did the job. */
+  const lateSecondClick = async (button) => {
+    const box = await button.boundingBox();
+    const at = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    expect(await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('button')?.className ?? '', at)).toMatch(/sd-act-add|sd-add-all/);
+    await page.mouse.move(at.x, at.y);
+    await page.mouse.down({ clickCount: 2 });
+    await page.mouse.up({ clickCount: 2 });
+    await page.waitForTimeout(1000);
+  };
+  const add = page.getByRole('button', { name: 'Add a.txt to my vault' });
+  await add.click();
+  await expect.poll(counts).toEqual({ items: 1, albums: 0 });
+  await lateSecondClick(add);
+  expect(await counts()).toEqual({ items: 1, albums: 0 });
+  await page.locator('.sd-add-all').click();
+  await expect.poll(counts, { timeout: 30_000 }).toEqual({ items: 3, albums: 1 });
+  await expect(page.locator('.sd-add-all')).toBeEnabled();
+  await lateSecondClick(page.locator('.sd-add-all'));
+  expect(await counts()).toEqual({ items: 3, albums: 1 });
   await check();
 });
 
@@ -232,9 +283,10 @@ test('bundle rows: icon buttons name their file; the vault hint is one sentence'
   await openCzdInCard(page);
   await expect(page.getByRole('button', { name: 'Preview a.txt' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Save b.txt' })).toBeVisible();
-  // One flowing sentence (icon + one text box), not three flex columns.
+  // One flowing sentence (icon + one text box, then its button), not three flex columns.
   const kids = await page.locator('.sd-vault-hint').evaluate((el) => [...el.children].map((c) => c.tagName));
-  expect(kids).toEqual(['svg', 'SPAN']);
+  expect(kids).toEqual(['svg', 'SPAN', 'BUTTON']);
+  await expect(page.locator('.sd-vault-hint .sd-vault-text')).toHaveText('Want to keep these files? Make your own vault first — the file waits here for you.');
   await createVault(page);
   await expect(page.getByRole('button', { name: 'Add a.txt to my vault' })).toBeVisible();
   await expect(page.locator('.sd-vault-hint')).toHaveCount(0);

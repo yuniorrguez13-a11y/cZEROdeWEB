@@ -128,6 +128,14 @@
 .vv-checkrow { padding: 4px 0; min-height: 0; color: var(--txt); font-size: 15px; }
 .vv-reason { min-height: 1.45em; font-size: 14px; }
 .vv-reason.vv-ready-ok { color: var(--ok); }
+.vv-phrase { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--brd); border-left: 3px solid var(--gold); border-radius: var(--r); background: var(--obg); }
+[data-theme^="minimal"] .vv-phrase { border-left-color: var(--acc); }
+.vv-phrase-label { color: var(--tdim); font-size: 12px; font-weight: 700; letter-spacing: var(--track); text-transform: uppercase; }
+.vv-phrase-text { font-family: var(--mono); font-size: 19px; line-height: 1.55; color: var(--txt); letter-spacing: .01em; overflow-wrap: anywhere; user-select: all; }
+.vv-phrase-sep { color: var(--acc); padding: 0 1px; }
+[data-theme^="minimal"] .vv-phrase-sep { color: var(--tfaint); }
+.vv-phrase-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.vv-phrase-tools .hint { flex: 1 1 180px; margin: 0; }
 .vv-options { display: grid; gap: 12px; }
 .vv-option { min-height: 0; }
 .vv-option .vv-choice-title { margin-top: 6px; }
@@ -413,11 +421,11 @@
   .vv-more { right: 2px; bottom: 4px; }
   .vv-items[data-view="list"] .vv-open { padding-right: 52px; }
   /* Sticky under the (54px) header, as on desktop: the bottom of the screen belongs to toasts (Undo) and the player dock. */
-  .vv-selbar { top: 62px; gap: 6px; padding: 6px 8px; }
-  .vv-selact { width: 42px; padding: 0; }
-  .vv-selact-label { display: none; }
-  .vv-selacts { gap: 4px; }
-  .vv-selall { display: none; }
+  /* Two rows on phones: count + Select all, then the actions with a short label under each icon. */
+  .vv-selbar { top: 62px; flex-wrap: wrap; gap: 4px 6px; padding: 6px 8px; }
+  .vv-selacts { flex: 1 1 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .vv-selact { flex-direction: column; gap: 3px; height: auto; min-height: 48px; padding: 4px 2px; }
+  .vv-selact-label { font-size: 10px; letter-spacing: .06em; line-height: 1.1; }
   .vv-album-actions { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {

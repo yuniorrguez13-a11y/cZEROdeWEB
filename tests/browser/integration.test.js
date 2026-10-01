@@ -22,12 +22,14 @@ function info(id, name) {
 
 /**
  * A vault stand-in that counts thumbnail references like the real one: every non-null thumbUrl() is one handed-out
- * reference, every releaseThumb() gives one back. thumbUrl resolves when `gate` opens (a slow decrypt).
+ * reference, every releaseThumb() gives one back. thumbUrl resolves when `gate` opens (a slow decrypt); `asked` counts
+ * the calls (the grid asks once a card is on screen, after an IntersectionObserver callback).
  */
 function fakeVault(items) {
   const v = {
     status: 'unlocked',
     list: items,
+    asked: 0,
     handed: 0,
     released: 0,
     open: null,
@@ -38,6 +40,7 @@ function fakeVault(items) {
     addEventListener() {},
     removeEventListener() {},
     async thumbUrl(id) {
+      v.asked++;
       const known = v.list.some((i) => i.id === id);
       await v.gate;
       if (!known) return null;
@@ -59,7 +62,7 @@ export default async function (t) {
     const g = grid({ vault: v, filter: { sort: 'new', view: 'grid' } });
     document.body.append(g.el);
     g.update();
-    await wait(100); // both cards are visible: their thumbnails are loading
+    await until(() => v.asked === 2); // both cards are visible: their thumbnails are loading
     v.list = v.list.slice(1); // 'a' goes away (deleted) while its decrypt runs
     g.update();
     open();
@@ -78,10 +81,11 @@ export default async function (t) {
     const g = grid({ vault: v, filter: { sort: 'new', view: 'grid' } });
     document.body.append(g.el);
     g.update();
-    await wait(100);
+    await until(() => v.asked === 3);
     g.destroy();
     open();
-    await wait(100);
+    await until(() => v.released >= 3);
+    await wait(50); // any extra release would have happened by now
     t.equal(v.handed, 3);
     t.equal(v.released, 3, 'one release per URL handed out');
   });

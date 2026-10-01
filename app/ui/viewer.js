@@ -39,6 +39,8 @@ const ACTIONS = {
   rename: { icon: 'note', label: 'Rename', more: true },
   album: { icon: 'album', label: 'Add to album', more: true },
   delete: { icon: 'trash', label: 'Delete', more: true, danger: true },
+  // Shown on the audio card itself, not in the bar: hands the track to the player dock (it keeps playing on other screens).
+  play: { icon: 'play', label: 'Play in background', inline: true },
 };
 /** Offered on the info card of 'none' items and of items this device can't show. */
 const CARD_ACTIONS = ['save', 'share', 'send', 'addToVault'];
@@ -268,7 +270,10 @@ function createViewer({ items: initial, index: startIndex, onAction, onClose, ro
       box = el;
     } else {
       el = h('audio', { class: 'vw-audio-el', controls: true, preload: 'metadata', attrs: { controlslist: 'nodownload' } });
-      box = h('div', { class: 'vw-audio' }, h('div', { class: 'vw-audio-art' }, icon('music')), h('p', { class: 'vw-audio-name', text: safeFilename(item.name) }), el);
+      const bg = actionsOf(item).includes('play') ? h('div', { class: 'vw-audio-bg' },
+        h('button', { type: 'button', class: 'btn btn-sm vw-audio-bgbtn', on: { click: () => callAction('play', item) } }, icon('play'), h('span', { text: ACTIONS.play.label })),
+        h('p', { class: 'vw-audio-hint', text: 'Keeps playing while you look around the app.' })) : null;
+      box = h('div', { class: 'vw-audio' }, h('div', { class: 'vw-audio-art' }, icon('music')), h('p', { class: 'vw-audio-name', text: safeFilename(item.name) }), el, bg);
     }
     // Hidden while loading; the element must be in the document for some engines to load it.
     box.classList.add('vw-pending');
@@ -438,7 +443,7 @@ function createViewer({ items: initial, index: startIndex, onAction, onClose, ro
   function paintActions(item) {
     offMenu?.();
     offMenu = null;
-    const list = actionsOf(item).filter((a) => Object.hasOwn(ACTIONS, a));
+    const list = actionsOf(item).filter((a) => Object.hasOwn(ACTIONS, a) && !ACTIONS[a].inline);
     const buttons = [];
     for (const a of list.filter((x) => !ACTIONS[x].more)) {
       const spec = ACTIONS[a];

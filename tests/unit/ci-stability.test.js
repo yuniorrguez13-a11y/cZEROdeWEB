@@ -34,10 +34,25 @@ test('playwright on CI: a flaky test fails the run; 2 workers, own server, trace
   assert.ok(c.reporter.some((r) => r[0] === 'html'), 'HTML report for the artifact');
 });
 
+test('playwright on CI: mass failures stop the run well before the web job times out (a timed-out job uploads nothing)', async () => {
+  const c = await configWith(true);
+  assert.ok(c.maxFailures > 0, 'maxFailures is set on CI');
+  const web = read('.github/workflows/ci.yml').split(/\n {2}rust:\n/)[0];
+  const jobMinutes = Number(/timeout-minutes: (\d+)/.exec(web)[1]);
+  // Every failed test can use its full timeout on each attempt; half the job is left for installs and passing tests.
+  const worstMinutes = (c.maxFailures * c.timeout * (c.retries + 1)) / c.workers / 60_000;
+  assert.ok(worstMinutes <= jobMinutes / 2, `failing tests alone can take ${worstMinutes} of ${jobMinutes} minutes`);
+  // Longer per-test timeouts (the browser-unit suites) are capped by globalTimeout, with time left for npm ci, the
+  // unit tests, the Chromium install and the upload.
+  assert.ok(c.globalTimeout > 0 && c.globalTimeout / 60_000 <= jobMinutes - 8, `globalTimeout ${c.globalTimeout} ms in a ${jobMinutes}-minute job`);
+});
+
 test('playwright locally: no retries, so a flake shows up as a failure', async () => {
   const c = await configWith(false);
   assert.equal(c.retries, 0);
   assert.equal(c.failOnFlakyTests, false);
+  assert.equal(c.maxFailures, 0, 'a local run reports every failure');
+  assert.equal(c.globalTimeout, 0);
 });
 
 test('ci.yml: Chromium is installed before the browser tests; a failure uploads the report and the traces', () => {

@@ -126,6 +126,8 @@
 /* ───────── Base */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scrollbar-color: var(--scr) var(--bg); }
+/* Things scrolled into view (a result card, a focused field) stop below the sticky header, not under it. */
+html { scroll-padding-top: 66px; }
 body {
   margin: 0; min-height: 100vh; min-height: 100dvh;
   background: var(--bg); color: var(--txt);
@@ -498,6 +500,7 @@ html.has-overlay { overflow: hidden; }
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions .btn { width: 100%; }
   .toasts { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  html { scroll-padding: 62px 0 calc(72px + env(safe-area-inset-bottom)); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }

@@ -13,12 +13,22 @@ const MiB = 2 ** 20;
 const T0 = 1_700_000_000_000;
 const FAST = { m: 64, t: 1, p: 1 };
 
+/**
+ * Empties OPFS before a test. A worker that the previous test terminated while it held a write handle lets go of it
+ * asynchronously (terminate() doesn't wait), so the files can stay locked for a moment: retry for up to 5 s, as
+ * OpfsStore._removeHere does, instead of failing whichever test comes next.
+ */
 async function resetOpfs() {
   const root = await navigator.storage.getDirectory();
-  try {
-    await root.removeEntry('czd', { recursive: true });
-  } catch (e) {
-    if (e.name !== 'NotFoundError') throw e;
+  for (let i = 0; ; i++) {
+    try {
+      await root.removeEntry('czd', { recursive: true });
+      return;
+    } catch (e) {
+      if (e.name === 'NotFoundError') return;
+      if (e.name !== 'NoModificationAllowedError' || i >= 100) throw e;
+    }
+    await new Promise((r) => setTimeout(r, 50));
   }
 }
 
@@ -285,6 +295,23 @@ export default async function (t) {
     } finally {
       w.close();
       s.close();
+    }
+  });
+
+  await t.test('test setup: resetOpfs works right after terminating a worker that holds a write handle', async () => {
+    // worker.terminate() returns before the worker lets go of its handles (the test above ends that way).
+    for (let i = 0; i < 5; i++) {
+      const w = rawWorker();
+      t.equal((await w.send({ cmd: 'write-begin', path: `czd/v1/items/${newId()}.czd` })).ok, true, 'the worker holds a handle');
+      w.close();
+      await resetOpfs();
+      let left = true;
+      try {
+        await (await navigator.storage.getDirectory()).getDirectoryHandle('czd');
+      } catch (e) {
+        left = e.name !== 'NotFoundError';
+      }
+      t.equal(left, false, 'czd removed');
     }
   });
 

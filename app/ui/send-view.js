@@ -852,7 +852,9 @@ function lockPanel({ getVault, toOpen }) {
       own.clear();
       render();
       (el.querySelector('.sd-save') ?? el.querySelector('.sd-result-title'))?.focus({ preventScroll: true });
-      el.scrollIntoView?.({ block: 'nearest' });
+      // The result head ("Locked. Ready to send." + Save), not the whole card: the card is taller than a phone screen,
+      // and 'nearest' on it left the page where the Lock button was, with the title under the sticky header.
+      (el.querySelector('.sd-result-head') ?? el).scrollIntoView?.({ block: 'nearest' });
       announce(outputs.length === 1 ? 'Locked. Ready to send.' : `Locked into ${outputs.length} files.`);
     } catch (e) {
       await target.abort().catch(() => {});
@@ -936,6 +938,17 @@ function plainBatch(list, keepDates) {
 }
 
 // ───────── Open card
+
+/**
+ * The .czd a receiver without a vault set aside to create one first ("Create my vault"): the Open card takes it back on
+ * the next visit, and the vault says it is waiting (state 'open.waiting'). Only the locked file is kept, never its
+ * passphrase; a lock drops it, like the Incoming list.
+ */
+let waitingFile = null;
+state.onPurge(() => {
+  waitingFile = null;
+  if (state.get('open.waiting')) state.set('open.waiting', null);
+});
 
 function openPanel({ getVault, toLock, onMany }) {
   let file = null;
@@ -1499,14 +1512,15 @@ function openPanel({ getVault, toLock, onMany }) {
 
   function entryActions(en, single) {
     const name = safeFilename(en.name);
-    // Bundle rows show icon-only buttons: their accessible name (and tooltip) says which file they act on.
+    // Bundle rows show icon-only buttons: their accessible name (and tooltip) says which file they act on. The second
+    // click of a double click is ignored: a small file can be saved or added before it lands, and it must not run again.
     const btn = (cls, ic, label, fn, primary, full) => h('button', {
       type: 'button',
       class: ['btn', single ? null : 'btn-sm', primary ? 'btn-primary' : null, 'sd-act', cls],
       dataset: { fk: `${cls}-${en.idx}`, fkFallback: cls === 'sd-act-preview' && en.idx === 0 ? '' : undefined },
       title: single ? label : full,
       aria: { label: single ? undefined : full },
-      on: { click: () => fn(en) },
+      on: { click: (e) => e.detail > 1 || fn(en) },
     }, icon(ic), h('span', { class: 'sd-act-label', text: label }));
     const v = vaultOf();
     return h('div', { class: 'sd-entry-actions' },
@@ -1540,7 +1554,7 @@ function openPanel({ getVault, toLock, onMany }) {
       h('p', { class: 'sd-label', text: `Bundle · ${plural(list.length, 'file')} · ${fmtSize(total)}` }),
       h('div', { class: 'sd-row' },
         h('button', { type: 'button', class: 'btn btn-sm sd-save-all', dataset: { fk: 'save-all' }, disabled: Boolean(activity), on: { click: () => saveAll() } }, icon('download'), h('span', { text: 'Save all' })),
-        v ? h('button', { type: 'button', class: 'btn btn-sm btn-primary sd-add-all', dataset: { fk: 'add-all' }, disabled: Boolean(activity), on: { click: () => addAll() } }, icon('lock'), h('span', { text: 'Add all to my vault' })) : null)) : null;
+        v ? h('button', { type: 'button', class: 'btn btn-sm btn-primary sd-add-all', dataset: { fk: 'add-all' }, disabled: Boolean(activity), on: { click: (e) => e.detail > 1 || addAll() } }, icon('lock'), h('span', { text: 'Add all to my vault' })) : null)) : null;
     const rows = list.slice(0, CAPS.bundleEntries).map((en) => entryRow(en, !bundle));
     return h('div', { class: 'sd-opened' },
       head,
@@ -1578,14 +1592,24 @@ function openPanel({ getVault, toLock, onMany }) {
           h('button', { type: 'button', class: 'btn btn-sm btn-ghost sd-vault-cancel', dataset: { fk: 'vault-cancel' }, disabled: u.busy, on: { click: () => closeVaultUnlock(true) } }, h('span', { text: 'Not now' }))));
     }
     if (st === 'none') {
-      return h('p', { class: 'sd-fine sd-vault-hint' }, icon('info'),
-        h('span', null, `To keep ${these}, create a vault in the `, h('a', { href: '#/vault', text: 'Vault tab' }), ' first — leaving this screen closes the file.'));
+      return h('div', { class: 'sd-vault-hint sd-vault-none' },
+        icon('info'),
+        h('span', { class: 'sd-vault-text', text: `Want to keep ${these}? Make your own vault first — the file waits here for you.` }),
+        h('button', { type: 'button', class: 'btn btn-sm sd-vault-make', dataset: { fk: 'vault-make' }, on: { click: () => setAside() } }, icon('lock'), h('span', { text: 'Create my vault' })));
     }
     if (st === 'other-tab') {
       return h('p', { class: 'sd-fine sd-vault-hint' }, icon('info'),
         h('span', { text: `Your vault is open in another cZEROde tab — add ${these} there.` }));
     }
     return null;
+  }
+
+  /** No vault yet: keep the locked file (not its passphrase) for the next visit and go make the vault. */
+  function setAside() {
+    if (!file || (kind !== 'czd2' && kind !== 'oldczd')) return;
+    waitingFile = { file, kind };
+    state.set('open.waiting', true);
+    router.navigate('#/vault');
   }
 
   function openVaultUnlock() {
@@ -1900,6 +1924,17 @@ function sendPage(host, { getVault }) {
     if (Array.isArray(files) && files.length) {
       state.set('incoming.files', null);
       incoming.add(files);
+    }
+    if (waitingFile) {
+      const w = waitingFile;
+      waitingFile = null;
+      state.set('open.waiting', null);
+      open.load(w.file, w.kind);
+      if (route?.top !== 'open') {
+        open.el.scrollIntoView?.({ block: 'nearest' });
+        open.focus();
+      }
+      toast('Your file is back. Type its passphrase again to open it.', { kind: 'info', timeout: 6000 });
     }
     const share = route?.top === 'incoming' ? route.query?.get('share') : null;
     if (share && !takenShares.has(share)) {

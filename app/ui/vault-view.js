@@ -18,7 +18,7 @@ import { isCancel, userMessage } from '../errors.js';
 import { CAPS, TIMES } from '../config.js';
 import { FLOOR, passphraseBytes } from '../crypto/kdf.js';
 import { meetsVaultMinimum } from '../crypto/passphrase.js';
-import { fmtSize, safeFilename } from '../util/format.js';
+import { extOf, fmtSize, safeFilename } from '../util/format.js';
 import { ctEqual } from '../util/bytes.js';
 import { disposeSource, prepareShare, saveDecrypted } from '../media/media.js';
 import { openViewer } from './viewer.js';
@@ -612,7 +612,28 @@ function newPassphraseBlock({ purpose, label = 'Passphrase', ack = true, onChang
   });
   const ackRow = ack ? checkRow('If I forget this passphrase AND lose my recovery code, my files are gone.', () => changed()) : null;
   const reason = h('p', { class: 'hint vv-reason', aria: { live: 'polite' } });
+  // Generated words, shown whole (the one-line field cuts them off on a phone, and so would a screenshot) + Copy.
+  const words = h('p', { class: 'vv-phrase-text', attrs: { translate: 'no' } });
+  const phrase = h('div', { class: 'vv-phrase', hidden: true },
+    h('p', { class: 'vv-phrase-label', text: 'Your new passphrase' }),
+    words,
+    h('div', { class: 'vv-phrase-tools' },
+      copyButton(() => pass.value, { secret: true }),
+      h('span', { class: 'hint', text: 'Write it down, or copy it into your password manager.' })));
+  let wordsFor = null;
   saved.el.hidden = true;
+  function paintWords() {
+    const v = pass.generated ? pass.value : '';
+    phrase.hidden = !v;
+    if (v === wordsFor) return;
+    wordsFor = v;
+    const parts = [];
+    v.split('-').forEach((w, i) => {
+      if (i) parts.push(h('span', { class: 'vv-phrase-sep', text: '-' }));
+      parts.push(h('span', { class: 'vv-phrase-word', text: w }));
+    });
+    words.replaceChildren(...parts);
+  }
   function problem() {
     const v = pass.value;
     if (!v) return { text: 'Pick a passphrase — or tap Generate for five random words.', soft: true };
@@ -637,6 +658,7 @@ function newPassphraseBlock({ purpose, label = 'Passphrase', ack = true, onChang
     }
     confirm.el.hidden = pass.generated;
     saved.el.hidden = !pass.generated;
+    paintWords();
     const p = problem();
     reason.textContent = p?.text ?? 'Ready.';
     reason.classList.toggle('hint-warn', Boolean(p && !p.soft));
@@ -645,7 +667,7 @@ function newPassphraseBlock({ purpose, label = 'Passphrase', ack = true, onChang
   }
   changed();
   return {
-    els: [pass.el, confirm.el, saved.el, ackRow?.el ?? null, reason],
+    els: [pass.el, phrase, confirm.el, saved.el, ackRow?.el ?? null, reason],
     pass,
     confirm,
     get ok() {
@@ -1486,7 +1508,14 @@ function unlockedScreen({ vault: v, route, host }) {
     if (s.albumId) {
       const album = albumItems();
       if (!album?.items.length) {
-        return emptyState({ icon: 'album', title: 'This album is empty', text: 'Add items to it from their ⋯ menu → Add to album, or drop files here.' });
+        return emptyState({
+          icon: 'album',
+          title: 'This album is empty',
+          text: finePointer()
+            ? 'Add new files straight into it (or drop them here). Already in your vault? Go to All items, click Select, pick them and choose Album.'
+            : 'Add new files straight into it. Already in your vault? Go to All items, tap Select, pick them and tap Album.',
+          action: { label: 'Add files', icon: 'upload', onClick: () => addFiles({ folder: false }) },
+        });
       }
     }
     if (searchKey(s.query)) {
@@ -1522,6 +1551,15 @@ function unlockedScreen({ vault: v, route, host }) {
     const [persisted, est] = await Promise.all([platform.storage.persisted(), platform.storage.estimate()]);
     if (!alive || seq !== bannerSeq) return;
     const list = [];
+    // A receiver set a .czd aside to make this vault first (send-view "Create my vault"): lead them back to it.
+    if (state.get('open.waiting')) {
+      list.push(banner({
+        kind: 'info',
+        text: h('span', null, h('strong', { text: 'Your locked file is waiting. ' }), 'Open it again and add it to your vault.'),
+        actions: [{ label: 'Back to my file', kind: 'primary', onClick: () => router.navigate('#/open') }],
+        onDismiss: () => state.set('open.waiting', null),
+      }));
+    }
     const legacy = state.get('legacy.found');
     if (legacy && state.get('legacy.importDone') !== true) {
       const sig = `${legacy.notes | 0}/${legacy.files | 0}/${legacy.playlists | 0}`;
@@ -2022,9 +2060,17 @@ function unlockedScreen({ vault: v, route, host }) {
   async function renameItem(id) {
     const info = safeItem(id);
     if (!info) return;
-    const name = await promptDialog({ title: info.kind === 'note' ? 'Rename note' : 'Rename', label: 'Name', value: info.name });
+    // Files keep their extension: only the part before it starts selected, and a name typed without one gets the
+    // old one back ("Beach day" → "Beach day.jpg"), so a saved or sent copy still opens in other apps.
+    const ext = info.kind === 'note' ? '' : extOf(info.name);
+    const tail = ext && info.name.toLowerCase().endsWith(`.${ext}`) ? info.name.slice(-(ext.length + 1)) : '';
+    const asked = promptDialog({ title: info.kind === 'note' ? 'Rename note' : 'Rename', label: 'Name', value: info.name });
+    const field = globalThis.document?.activeElement;
+    if (tail && field?.tagName === 'INPUT' && field.value === info.name) field.setSelectionRange(0, info.name.length - tail.length);
+    const name = await asked;
     if (name === null) return;
-    const next = name.trim();
+    let next = name.trim();
+    if (next && tail && !extOf(next)) next += tail;
     if (!next || next === info.name) return;
     try {
       await v.rename(id, next);
@@ -2212,6 +2258,7 @@ function unlockedScreen({ vault: v, route, host }) {
     if (canShare()) actions.push('share');
     actions.push('send', 'rename', 'album', 'delete');
     if (info.kind === 'note') actions.push('editNote');
+    if (info.kind === 'audio') actions.push('play');
     return {
       key: info.id,
       name: info.name,
@@ -2379,9 +2426,30 @@ function unlockedScreen({ vault: v, route, host }) {
         return undefined;
       case 'editNote':
         return saveNote(id, payload ?? {});
+      case 'play':
+        playInBackground(id);
+        return undefined;
       default:
         return undefined;
     }
+  }
+
+  /**
+   * The audio viewer's "Play in background": the viewer closes and the player dock takes over (it keeps playing on
+   * other screens), queued with the other songs the viewer was going through.
+   */
+  function playInBackground(id) {
+    const keys = viewer?.keys ?? [id];
+    const songs = keys.map(safeItem).filter((i) => i && i.kind === 'audio' && !del.isHidden(i.id));
+    const start = Math.max(0, songs.findIndex((i) => i.id === id));
+    const title = spec.albumId ? labelText(albumItems()?.list?.name ?? '') || 'Album' : 'Music';
+    if (viewer) {
+      const rec = viewer;
+      viewer = null;
+      rec.handle.close();
+    }
+    leaveItem();
+    if (songs.length) playQueue(songs.map(viewerItem), { start, title });
   }
 
   /** The viewer's note Save (and the hand-over of an unsaved edit): resolves to saveNote's ItemInfo (new id). */
@@ -2468,6 +2536,7 @@ function unlockedScreen({ vault: v, route, host }) {
     refresh();
   }));
   offs.push(state.on('legacy.found', () => paintBanners()));
+  offs.push(state.on('open.waiting', () => paintBanners()));
   offs.push(state.on('legacy.importDone', () => paintBanners()));
   offs.push(state.on('install.prompt', () => paintBanners()));
   // vault.lock() switches the screen before it purges; this also covers a purge that comes first (decrypted names,

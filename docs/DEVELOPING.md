@@ -240,8 +240,10 @@ npm run icons                          # = tauri icon src-tauri/icons/source.png
 **`.github/workflows/ci.yml`** runs on pushes to `main`, on pull requests and by hand:
 
 - `web` job (Ubuntu, Node 22): `npm ci`, `node scripts/precache.mjs --check`, unit tests,
-  `npx playwright install --with-deps chromium`, then all Playwright tests (browser units + e2e). On failure it
-  uploads the Playwright report.
+  `npx playwright install --with-deps chromium`, then all Playwright tests (browser units + e2e). On CI,
+  Playwright uses 2 workers and retries a failed test once, but a test that only passes on the retry (a flake)
+  still fails the run; it stops after 10 failed tests or 30 minutes. On failure the job uploads the HTML report and
+  `test-results/` (traces and screenshots of the failed tests).
 - `rust` job: WebKitGTK libraries, stable Rust with clippy/rustfmt, stage the web app, then `cargo fmt --check`,
   `cargo clippy --all-targets --locked -- -D warnings` and `cargo test --locked`.
 

@@ -29,7 +29,7 @@
  */
 
 /**
- * @typedef {{key:string, name:string, type:string, kind:Kind, size:number, getSource:()=>Promise<DecryptSource>, actions?:Array<'save'|'share'|'send'|'addToVault'|'rename'|'delete'|'fav'|'editNote'|'album'>}} ViewerItem
+ * @typedef {{key:string, name:string, type:string, kind:Kind, size:number, getSource:()=>Promise<DecryptSource>, actions?:Array<'save'|'share'|'send'|'addToVault'|'rename'|'delete'|'fav'|'editNote'|'album'|'play'>}} ViewerItem
  */
 
 /** @typedef {{top:string, parts:string[], query:URLSearchParams, hash:string}} Route */

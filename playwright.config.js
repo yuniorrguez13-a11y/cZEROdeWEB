@@ -16,6 +16,11 @@ export default defineConfig({
   // the run: a retry never hides a flake.
   retries: process.env.CI ? 1 : 0,
   failOnFlakyTests: Boolean(process.env.CI),
+  // Something that breaks many tests at once (say, a service worker that never installs) stops the CI run after 10
+  // failed tests, and hung browser-unit suites (10 minutes each) after 30 minutes: both inside the web job's
+  // timeout-minutes, since a job that times out is cancelled and uploads no report or traces.
+  maxFailures: process.env.CI ? 10 : 0,
+  globalTimeout: process.env.CI ? 30 * 60 * 1000 : 0,
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {

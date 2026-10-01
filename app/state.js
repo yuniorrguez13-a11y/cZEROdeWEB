@@ -1,6 +1,7 @@
 // Tiny app state store + the lock/purge registry (DESIGN §10).
 // Keys: 'vault.status' 'route' 'sw.updateReady' 'install.prompt' 'busy' 'send.pending' {itemIds}
 //       'incoming.files' File[] 'settings' {key,value} 'player' {playing:boolean}
+//       'open.waiting' true while a .czd set aside by a receiver without a vault waits in Send · Open
 // purge(reason) is what "lock" means for everything outside the vault: every module that holds
 // keys, object URLs or decrypted DOM registers an onPurge handler.
 
