@@ -243,8 +243,10 @@ test('openExternal: only the releases page through the opener', async () => {
   assert.deepEqual(fake.opened, [RELEASES_URL]);
 });
 
-test('czstream helpers stay stubs for G', async () => {
-  await rejectsCode(P.tauriStreamRegister({}), 'not-implemented');
+test('tauriStreamRegister validates its options before any IPC', async () => {
+  const before = fake.calls.length;
+  await assert.rejects(P.tauriStreamRegister({}));
+  assert.equal(fake.calls.length, before, 'invalid options never reach Rust');
 });
 
 // ───────── review additions (C2 adversarial review)

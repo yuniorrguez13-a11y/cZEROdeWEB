@@ -8,6 +8,7 @@ import { CAPS, RELEASES_URL, TIMES } from './config.js';
 import * as state from './state.js';
 import { dedupeName, safeFilename, safeMediaType } from './util/format.js';
 import { rechunk } from './util/stream.js';
+import { randomBytes, toBase32 } from './util/bytes.js';
 
 /** True inside the Tauri desktop app (Tauri defines window.isTauri before any page script runs). */
 export const isTauri = globalThis.isTauri === true || (typeof globalThis.__TAURI_INTERNALS__ === 'object' && globalThis.__TAURI_INTERNALS__ !== null);
@@ -921,19 +922,136 @@ export async function openExternal(url) {
   return true;
 }
 
-// ───────── Tauri czstream helpers (G, phase 2)
+// ───────── Tauri czstream helpers (DESIGN §5.3; src-tauri/src/stream.rs)
+// The page registers an opened vault item; Rust derives the payload key from the raw fileKey, reads
+// $APPDATA/vault2/items/<id>.czd and answers Range requests on czstream://localhost/<token> (Windows:
+// http(s)://czstream.localhost/<token>). Rust re-validates every value and checks the item file's length and
+// header before accepting; on lock (state.purge) and on page reload every registration is dropped.
+// Linux (WebKitGTK) cannot play media from a custom scheme: Rust refuses there, and after the first refusal
+// tauriStreamRegister rejects 'unsupported-media' without asking again.
 
-/** invoke stream_register; -> url. */
+/** 16 random bytes, RFC 4648 base32 without padding (sw-stream.js uses the same shape). */
+const STREAM_TOKEN = /^[A-Z2-7]{26}$/;
+const STREAM_ITEM_ID = /^[0-9a-f]{32}$/;
+/** Start of Rust's refusal where the webview can't play custom-scheme media (stream.rs UNSUPPORTED). */
+const STREAM_UNSUPPORTED = 'czstream: unsupported:';
+let streamUnsupported = false;
+/**
+ * Bumped by tauriStreamClear. Rust reads its own clear epoch inside the async stream_register, on a runtime
+ * thread, so a stream_clear sent after the register can still run before it and the registration would then
+ * outlive the lock: a register that saw a clear (or an unregister of its token) while in flight undoes itself.
+ */
+let streamClears = 0;
+/** token → {cancelled} for registrations in flight. */
+const streamPending = new Map();
+
+function streamArgError(what) {
+  return new CzdError('internal', { detail: `tauriStreamRegister(): bad ${what}` });
+}
+
+const isCount = (n) => Number.isSafeInteger(n) && n >= 0;
+
+/** The stream_register arguments (camelCase, as Tauri maps them to the Rust parameters); throws CzdError. */
+function streamRegisterArgs(opts) {
+  if (!opts || typeof opts !== 'object') throw streamArgError('options');
+  const { id, fileKey, streamSalt, headerLen, chunkExp, size, paddedSize, mime } = opts;
+  const token = opts.token === undefined ? toBase32(randomBytes(16)) : opts.token;
+  if (typeof token !== 'string' || !STREAM_TOKEN.test(token)) throw streamArgError('token');
+  if (typeof id !== 'string' || !STREAM_ITEM_ID.test(id)) throw streamArgError('id');
+  if (!(fileKey instanceof Uint8Array) || fileKey.length !== 32) throw streamArgError('fileKey');
+  if (!(streamSalt instanceof Uint8Array) || streamSalt.length !== 16) throw streamArgError('streamSalt');
+  if (!isCount(headerLen)) throw streamArgError('headerLen');
+  if (!Number.isInteger(chunkExp) || chunkExp < 12 || chunkExp > 24) throw streamArgError('chunkExp');
+  if (!isCount(size) || !isCount(paddedSize) || size > paddedSize) throw streamArgError('size');
+  return {
+    token,
+    id,
+    // Tauri IPC is JSON: plain number arrays (wiped after the call; Rust keeps only the derived payload key).
+    fileKey: Array.from(fileKey),
+    streamSalt: Array.from(streamSalt),
+    headerLen,
+    chunkExp,
+    size,
+    paddedSize,
+    mime: safeMediaType(typeof mime === 'string' ? mime : ''),
+  };
+}
+
+/** A token, or the czstream URL tauriStreamRegister returned (its last path segment). */
+function streamToken(tokenOrUrl) {
+  const s = typeof tokenOrUrl === 'string' ? tokenOrUrl : '';
+  if (STREAM_TOKEN.test(s)) return s;
+  const last = s.split(/[?#]/, 1)[0].split('/').pop();
+  if (s.includes('czstream') && STREAM_TOKEN.test(last)) return last;
+  throw new CzdError('internal', { detail: 'tauriStreamUnregister(): bad token' });
+}
+
+/**
+ * Registers an opened vault item (no bundle entries) for desktop streaming and returns its URL for
+ * <video>/<audio>. opts: {token?, id, fileKey, streamSalt, headerLen, chunkExp, size, paddedSize, mime} where
+ * id is the item id (32 hex), fileKey/streamSalt/headerLen/chunkExp/size/paddedSize come from the Opened, and
+ * mime is passed through safeMediaType. Without `token` a fresh one is drawn (unregister with the URL then).
+ * Rejects CzdError 'unsupported-media' where the webview can't stream (Linux), else 'internal' (Rust's reason in
+ * detail) for invalid values, a missing or different item file, or outside Tauri; callers fall back to a Blob.
+ * Rejects 'aborted' (silent, isCancel) when tauriStreamClear or an unregister of this token ran meanwhile.
+ * @param {{token?: string, id: string, fileKey: Uint8Array, streamSalt: Uint8Array, headerLen: number, chunkExp: number, size: number, paddedSize: number, mime: string}} opts
+ * @returns {Promise<string>} czstream URL (convertFileSrc(token, 'czstream'))
+ */
 export async function tauriStreamRegister(opts) {
-  throw new CzdError('not-implemented');
+  if (!isTauri) throw new CzdError('internal', { detail: 'desktop only' });
+  if (streamUnsupported) throw new CzdError('unsupported-media', { detail: 'czstream' });
+  const args = streamRegisterArgs(opts);
+  const { token } = args;
+  if (streamPending.has(token)) {
+    args.fileKey.fill(0);
+    throw new CzdError('internal', { detail: 'tauriStreamRegister(): token already being registered' });
+  }
+  const pending = { cancelled: false };
+  const clears = streamClears;
+  streamPending.set(token, pending);
+  try {
+    // The URL first (synchronously, so the IPC still leaves in call order): nothing can fail between a
+    // successful register and the caller holding its URL.
+    let url;
+    try {
+      url = String(T().core.convertFileSrc(token, 'czstream'));
+    } catch (e) {
+      throw mapError(e);
+    }
+    await tauri((t) => t.core.invoke('stream_register', args));
+    if (pending.cancelled || clears !== streamClears) {
+      await tauri((t) => t.core.invoke('stream_unregister', { token })).catch(() => {});
+      throw new CzdError('aborted', { detail: 'czstream: cleared or unregistered while registering' });
+    }
+    return url;
+  } catch (e) {
+    if (typeof e.detail === 'string' && e.detail.startsWith(STREAM_UNSUPPORTED)) {
+      streamUnsupported = true;
+      throw new CzdError('unsupported-media', { cause: e, detail: e.detail });
+    }
+    throw e;
+  } finally {
+    args.fileKey.fill(0);
+    streamPending.delete(token);
+  }
 }
 
-/** invoke stream_unregister. */
+/**
+ * Drops one registration (a token or the URL from tauriStreamRegister). Unknown tokens are fine; no-op on web.
+ * A registration of that token still in flight is dropped as soon as it lands (tauriStreamRegister rejects 'aborted').
+ * @param {string} token
+ */
 export async function tauriStreamUnregister(token) {
-  throw new CzdError('not-implemented');
+  if (!isTauri) return;
+  const tok = streamToken(token);
+  const pending = streamPending.get(tok);
+  if (pending) pending.cancelled = true;
+  await tauri((t) => t.core.invoke('stream_unregister', { token: tok }));
 }
 
-/** invoke stream_clear (lock). */
+/** Drops every registration (lock; state.purge calls it), also those still in flight. No-op on web. */
 export async function tauriStreamClear() {
-  throw new CzdError('not-implemented');
+  if (!isTauri) return;
+  streamClears += 1;
+  await tauri((t) => t.core.invoke('stream_clear'));
 }

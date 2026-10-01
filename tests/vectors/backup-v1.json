@@ -1,0 +1,83 @@
+{
+  "format": "czb-v1",
+  "generator": "scripts/gen-backup-vector.mjs",
+  "note": "Decrypt-only golden vector: restore with the passphrase (or the recovery code) and compare each item. Regenerating it requires a docs/FORMAT.md note.",
+  "passphrase": "cZEROde backup vector ✓ 2.0",
+  "recoveryCode": "CU2H-UNOK-OWIF-VJSC-6RLL-AS73-3KJ2-EROT",
+  "kdf": {
+    "m": 65536,
+    "t": 3,
+    "p": 1
+  },
+  "vaultIdHex": "b1e83a7214358b287c545561e8f7f6dc",
+  "createdAt": 1767225607000,
+  "size": 359577,
+  "sha256": "c1b2b500c1c6c81927d9c14964761883e81300810934927a185a0e17f67ca48c",
+  "items": [
+    {
+      "id": "70a0b1e770446e0242963c0397c33cfa",
+      "name": "Shopping",
+      "type": "application/x-czd-note",
+      "kind": "note",
+      "size": 52,
+      "fav": false,
+      "hasThumb": false
+    },
+    {
+      "id": "f9804a9bce20b53dc50b2ef4ff7d0baa",
+      "name": "empty.txt",
+      "type": "text/plain",
+      "kind": "doc",
+      "size": 0,
+      "fav": false,
+      "hasThumb": false,
+      "mtime": 1767225600000,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "d74f2b7b6aea4f922a427c3ee3a5bbd1",
+      "name": "Song (renamed).mp3",
+      "type": "audio/mpeg",
+      "kind": "audio",
+      "size": 300001,
+      "fav": false,
+      "hasThumb": false,
+      "mtime": 1767222000000,
+      "duration": 12.5,
+      "sha256": "39d24f5d117f88e6cbfe6554fb0decd2d7f5ab5de42d68ed387bd32901c65d0a"
+    },
+    {
+      "id": "fdaf73f184620776f7446020b763b39b",
+      "name": "photo.jpg",
+      "type": "image/jpeg",
+      "kind": "image",
+      "size": 50000,
+      "fav": true,
+      "hasThumb": true,
+      "mtime": 1767139200000,
+      "sha256": "e076b08de6dde4284929b6d9acf2b063f98a41e0569c2224a0dbee6a85809a12"
+    }
+  ],
+  "notes": [
+    {
+      "id": "70a0b1e770446e0242963c0397c33cfa",
+      "title": "Shopping",
+      "body": "milk, eggs, 🍞"
+    }
+  ],
+  "lists": [
+    {
+      "id": "998b00834b8d0c49567a01269b8b9690",
+      "name": "Favourites",
+      "itemIds": [
+        "fdaf73f184620776f7446020b763b39b",
+        "70a0b1e770446e0242963c0397c33cfa"
+      ],
+      "createdAt": 1767225606000,
+      "cover": "fdaf73f184620776f7446020b763b39b"
+    }
+  ],
+  "thumbSha256": {
+    "fdaf73f184620776f7446020b763b39b": "e9dd3a80b192d51c91e5214b78f126218b6a6e091e778933e9e8ec97d321ca18"
+  }
+}

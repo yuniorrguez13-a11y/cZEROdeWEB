@@ -1,0 +1,106 @@
+{
+  "format": "czd2 FORMAT v2 (DESIGN §3.3)",
+  "generator": "scripts/gen-rust-vectors.mjs",
+  "note": "Decrypt-only vectors for src-tauri/src/stream.rs (czstream). Vault items: itemWrapKey = HKDF-SHA256(vmk, salt = vaultId, \"cZEROde czd2 vault item-wrap\"). plaintext = prng(seed, size) as in czd2.json.",
+  "prng": "mulberry32 (see czd2.json)",
+  "vmkHex": "20cf09acd9b1b8427b5a52f2d4ae5a31ccca16b6ed0fe0079990afaba09a50bb",
+  "vaultIdHex": "302fe38bcff287156eaae96a71aaa799",
+  "vectors": [
+    {
+      "id": "rust-pad-extra",
+      "file": "rust-pad-extra.czd",
+      "size": 266240,
+      "paddedSize": 270336,
+      "n": 66,
+      "chunkExp": 12,
+      "headerLen": 443,
+      "containerSize": 271835,
+      "containerSha256": "4841d04add3c6ce8896f14186218a389d06b68f9da1fdfbfb3280b13b47aaa01",
+      "plaintextSha256": "7b965c5be94e092b3a484ce84baf7e1c99067a856f80d970df8a0ef76029bbcd",
+      "fileKeyHex": "50e5c44fe38ea5cd25b91890849ded74a494ba788c8c9a9f4a59267ace11275e",
+      "streamSaltHex": "899eb17a6feb1dfadfe21f063f45b866",
+      "kind": "vault",
+      "seed": 6100,
+      "itemIdHex": "cd93b9b734c08d4404b804bbe1aeba7d",
+      "meta": {
+        "v": 1,
+        "name": "rust-pad-extra.bin",
+        "type": "video/webm",
+        "mtime": 1767225600000,
+        "size": 266240
+      }
+    },
+    {
+      "id": "rust-exp12-4097",
+      "file": "rust-exp12-4097.czd",
+      "size": 4097,
+      "paddedSize": 4352,
+      "n": 2,
+      "chunkExp": 12,
+      "headerLen": 443,
+      "containerSize": 4827,
+      "containerSha256": "6c2975b6a89836b0053f7a42add954cce1823f6f1e09a7e15f70325e23cf11bf",
+      "plaintextSha256": "fb5151b25a8c05087ebc02a14b86009b0e17668959a6eb847abbde9b91abdaf9",
+      "fileKeyHex": "d40ddfa2c57b4ec68c2004f3d4406cd5eba36741591a24f7deb1311fdf7c9fcc",
+      "streamSaltHex": "b0817ccdbeb12475fdbece19bd7a8374",
+      "kind": "vault",
+      "seed": 6101,
+      "itemIdHex": "42dd94adc8ac317e44250e300773fa7b",
+      "meta": {
+        "v": 1,
+        "name": "rust-exp12-4097.bin",
+        "type": "audio/ogg",
+        "mtime": 1767225600000,
+        "size": 4097
+      }
+    },
+    {
+      "id": "rust-exp24",
+      "file": "rust-exp24.czd",
+      "size": 70001,
+      "paddedSize": 71680,
+      "n": 1,
+      "chunkExp": 24,
+      "headerLen": 443,
+      "containerSize": 72139,
+      "containerSha256": "433c4240211ea35e5f410cbbf1bbe0659eb6bc06d8c5a83f6f410619af73dbaa",
+      "plaintextSha256": "002036950bf3b9570b8ac6330c3ae937249cc01ee626c426b1d746143e317464",
+      "fileKeyHex": "320208615216605bbeb060715bf986a1cb5d108e0b41c8d8386db2b4bf9ae7d0",
+      "streamSaltHex": "178237ac7891589a48316271c285b461",
+      "kind": "vault",
+      "seed": 6102,
+      "itemIdHex": "e40bcc4ab1fd86371ec8857436659dca",
+      "meta": {
+        "v": 1,
+        "name": "rust-exp24.bin",
+        "type": "video/mp4",
+        "mtime": 1767225600000,
+        "size": 70001
+      }
+    },
+    {
+      "id": "rust-3mib",
+      "file": "rust-3mib.czd",
+      "size": 3146505,
+      "paddedSize": 3211264,
+      "n": 13,
+      "chunkExp": 18,
+      "headerLen": 443,
+      "containerSize": 3211915,
+      "containerSha256": "af2854f67ec6049a0159b40abea9e20f3de244f21c1e91ddf6b41f621580da1d",
+      "plaintextSha256": "744be7d49a5299178b45f412387a9b2b678372c59581c1df09ed0c93299d3bfe",
+      "fileKeyHex": "b3d5262e1530264f0169c0581597e2adbd570b48cbf3cbc3f439cb7beddd5dd8",
+      "streamSaltHex": "53768fd1e064fb672cbba24a14785fe6",
+      "kind": "vault",
+      "seed": 6103,
+      "itemIdHex": "a9d812ebcd427944d799d5e3b1de067b",
+      "meta": {
+        "v": 1,
+        "name": "rust-3mib.bin",
+        "type": "video/webm",
+        "mtime": 1767225600000,
+        "size": 3146505
+      }
+    }
+  ]
+}

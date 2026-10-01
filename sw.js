@@ -9,7 +9,7 @@
 //             (4) precached GETs      → cache, each entry re-verified once per worker lifetime
 //             (5) anything else       → network (not intercepted)
 //   message   {cmd:'share-get', id} → reply {ok, files} on the port (once), {cmd:'SKIP_WAITING'} → skipWaiting().
-//             Streaming messages (register/unregister/lock) belong to sw-stream.js's own listener.
+//             Streaming messages {cmd:'register'|'unregister'|'lock'} → self.czStream.onMessage(event) (sw-stream.js).
 'use strict';
 
 // Under Tauri the app is served from *.localhost (Windows: https://tauri.localhost). A worker must never
@@ -195,6 +195,11 @@ function czdWorker() {
     const cmd = typeof data === 'string' ? data : data && data.cmd;
     if (cmd === 'SKIP_WAITING') {
       event.waitUntil(self.skipWaiting());
+      return;
+    }
+    if (cmd === 'register' || cmd === 'unregister' || cmd === 'lock') {
+      const stream = self.czStream;
+      if (stream && typeof stream.onMessage === 'function') stream.onMessage(event);
       return;
     }
     if (cmd === 'share-get') {

@@ -25,6 +25,29 @@ tauri-plugin-opener = "2.7"
 tauri-plugin-single-instance = "2.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+# czstream (src/stream.rs, DESIGN §5.3): HKDF-SHA256 payload key + AES-256-GCM chunks. The `zeroize`
+# features wipe the AES key schedule, GHASH key and HMAC/SHA-256 state on drop (hmac is listed only to
+# turn its feature on for hkdf).
+aes-gcm = { version = "0.11.1", default-features = false, features = ["aes", "zeroize"] }
+hkdf = "0.13"
+hmac = { version = "0.13", features = ["zeroize"] }
+sha2 = { version = "0.11", default-features = false, features = ["zeroize"] }
+zeroize = "1.8"
+
+# Debug builds (cargo test, `tauri build --debug`) still decrypt at release speed. The AES-GCM generics are
+# instantiated in this crate, so it is optimized too (unoptimized: ~4 MiB/s, too slow to play a video).
+[profile.dev.package.czeroode]
+opt-level = 2
+[profile.dev.package.aes]
+opt-level = 3
+[profile.dev.package.aes-gcm]
+opt-level = 3
+[profile.dev.package.ghash]
+opt-level = 3
+[profile.dev.package.polyval]
+opt-level = 3
+[profile.dev.package.sha2]
+opt-level = 3
 
 # Smaller, faster release binary (Tauri "App Size" guide).
 [profile.release]

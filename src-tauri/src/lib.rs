@@ -11,12 +11,12 @@
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
+use tauri::webview::PageLoadEvent;
 use tauri::{AppHandle, Emitter, Manager, Runtime, State, Url};
 use tauri_plugin_fs::FsExt;
 
-// G (phase 2): the czstream protocol and the stream_* commands live in `mod stream;` (DESIGN §5.3).
-// Add the module declaration here, register the protocol on the builder and its commands in
-// `invoke_handler!` next to `take_open_files`.
+// czstream: large vault videos played straight from disk (DESIGN §5.3).
+mod stream;
 
 /// Event the main window receives when files are queued; payload: the new paths.
 const OPEN_FILES_EVENT: &str = "open-files";
@@ -144,7 +144,22 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .manage(PendingOpenFiles::default())
-        .invoke_handler(tauri::generate_handler![take_open_files])
+        .manage(stream::Streams::default())
+        .register_asynchronous_uri_scheme_protocol(stream::SCHEME, stream::protocol)
+        // A (re)loaded page has lost its keys (it starts locked): drop the streaming keys too.
+        .on_page_load(|webview, payload| {
+            if payload.event() == PageLoadEvent::Started
+                && let Some(streams) = webview.try_state::<stream::Streams>()
+            {
+                streams.clear();
+            }
+        })
+        .invoke_handler(tauri::generate_handler![
+            take_open_files,
+            stream::stream_register,
+            stream::stream_unregister,
+            stream::stream_clear
+        ])
         .setup(|app| {
             // <AppData> = {data_dir}/{identifier}: the 2.0 vault lives in vault2/items; the Tauri 1 app's
             // old .czd files are in vault/ (read only, never created here).
@@ -161,17 +176,23 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building cZEROde");
 
-    app.run(|handle, event| {
+    app.run(|handle, event| match event {
+        // macOS hands files opened with the app (Finder, "Open With", dock) here, not on the command line.
         #[cfg(target_os = "macos")]
-        if let tauri::RunEvent::Opened { urls } = event {
+        tauri::RunEvent::Opened { urls } => {
             let paths = urls
                 .into_iter()
                 .filter_map(|u| u.to_file_path().ok())
                 .collect();
             accept_paths(handle, paths);
+            focus_main(handle);
         }
-        #[cfg(not(target_os = "macos"))]
-        let _ = (handle, event);
+        tauri::RunEvent::Exit => {
+            if let Some(streams) = handle.try_state::<stream::Streams>() {
+                streams.clear();
+            }
+        }
+        _ => {}
     });
 }
 
